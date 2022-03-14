@@ -6,6 +6,11 @@
 // TODO: design project icon and update favicons
 // TODO: update metadat
 // TODO: add description about the origin of the project name
+// TODO: export database schema to schema.sql
+// TODO: create demo data and export to demoData.sql
+// TODO: update site.webmanifest (also include proper link)
+// TODO: review TODOs in code
+// TODO: remove unused code
 
 
 ## Development

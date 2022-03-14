@@ -7,11 +7,7 @@
 
 // eslint-disable-next-line unicorn/prefer-module
 module.exports = {
-  content: [
-    './lib/components/**/*.tsx',
-    './lib/templates/*.html',
-    './lib/*.{ts,js}',
-  ],
+  content: ['./components/*.tsx', './pages/*.tsx'],
   corePlugins: {
     float: false,
     clear: false,
