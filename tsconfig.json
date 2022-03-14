@@ -1,0 +1,59 @@
+{
+  /** ROOT FIELDS **/
+  /* File Inclusion */
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next"
+  ],
+  "compilerOptions": {
+    /** COMPILER OPTIONS **/
+    /* Basic Options */
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "lib": [
+      "es6",
+      "dom",
+      "dom.iterable",
+      "es2016",
+      "es2017",
+      "es2018",
+      "es2019",
+      "es2020",
+      "esnext"
+    ],
+    "module": "esnext",
+    "noEmit": true,
+    "sourceMap": true,
+    "target": "esnext",
+    "allowJs": true,
+    "checkJs": true,
+    /**/
+    /* Strict Checks */
+    "strict": true,
+    /**/
+    /* Module Resolution */
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    /**/
+    /* Linter Checks */
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    /**/
+    /* Experimental*/
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    /**/
+    /* Advanced*/
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "incremental": true
+  },
+  "noPropertyAccessFromIndexSignature": true
+}
