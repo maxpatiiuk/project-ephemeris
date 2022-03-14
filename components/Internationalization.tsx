@@ -148,17 +148,11 @@ const relativeDate = new Intl.RelativeTimeFormat(LANGUAGE, {
   style: 'long',
 });
 
+// TODO: add support for future dates
 export function getRelativeDate(date: Readonly<Date>): string {
   const timePassed = Math.round((Date.now() - date.getTime()) / MILLISECONDS);
-  if (timePassed < 0) {
-    /*
-     * This happens due to time zone conversion issues.
-     * Need to fix that issue on the front-end first.
-     */
-    // Throw new Error('Future dates are not supported');
-    console.error('Future dates are not supported');
-    return relativeDate.format(0, 'second');
-  } else if (timePassed <= MINUTE)
+  if (timePassed < 0) throw new Error('Future dates are not supported');
+  else if (timePassed <= MINUTE)
     return relativeDate.format(-Math.round(timePassed / SECOND), 'second');
   else if (timePassed <= HOUR)
     return relativeDate.format(-Math.round(timePassed / MINUTE), 'minute');
@@ -172,3 +166,6 @@ export function getRelativeDate(date: Readonly<Date>): string {
     return relativeDate.format(-Math.round(timePassed / MONTH), 'month');
   else return relativeDate.format(-Math.round(timePassed / YEAR), 'year');
 }
+
+export const countDaysInMonth = (year: number, month: number): number =>
+  new Date(year, month + 1, 0).getDate();

@@ -97,7 +97,6 @@ const niceButton = `rounded cursor-pointer active:brightness-80 px-4 py-2
   inline-flex items-center`;
 const baseContainer = `bg-gray-200 dark:bg-neutral-800 flex flex-col gap-2
     p-4 shadow-md shadow-gray-500 rounded`;
-const subViewHeader = 'specify-subview-header';
 export const className = {
   root: `flex flex-col h-screen overflow-hidden bg-white dark:bg-neutral-900
     text-neutral-900 dark:text-neutral-200`,
@@ -112,7 +111,7 @@ export const className = {
   textarea: 'resize max-w-full',
   form: 'flex flex-col gap-4',
   button: 'button',
-  link: 'link intercept-navigation',
+  link: 'link',
   transparentButton: `hover:bg-gray-300 hover:dark:bg-neutral-500
     text-gray-800 dark:text-neutral-200`,
   grayButton: `hover:bg-gray-400 bg-gray-300 text-gray-800
@@ -128,18 +127,6 @@ export const className = {
   containerFull: 'flex flex-col gap-4 h-full',
   containerBase: `${baseContainer}`,
   container: `${baseContainer} max-w-[1000px] mx-auto`,
-  formHeader: `specify-form-header border-b-2 border-brand-300 flex items-center
-    pb-2 gap-x-4`,
-  formTitle: 'view-title flex-1 text-lg',
-  formLabel: 'specify-form-label text-right',
-  formFooter:
-    'specify-form-buttons border-brand-300 border-t-2 flex print:hidden pt-2 gap-x-2',
-  // TODO: get rid of usages of this:
-  subViewHeader,
-  subFormHeader: `${subViewHeader} gap-x-2 flex font-bold border-b border-gray-500`,
-  queryField: `bg-white dark:bg-neutral-700 border border-gray-300 p-2 shadow
-    flex gap-x-2 rounded dark:border-none`,
-  h2: 'font-semibold text-black dark:text-white',
 } as const;
 
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -150,10 +137,6 @@ export const Checkbox = wrap('input', className.checkbox, { type: 'checkbox' });
 export const ErrorMessage = wrap('div', className.errorMessage, {
   role: 'alert',
 });
-export const FormFooter = wrap('div', className.formFooter, {
-  role: 'toolbar',
-});
-export const SubFormHeader = wrap('div', className.subFormHeader);
 export const Form = wrap(
   'form',
   `${className.notSubmittedForm} ${className.form}`,
@@ -387,6 +370,3 @@ export const Progress = wrap(
 
 // Need to set explicit role as for list without bullets to be announced as a list
 export const Ul = wrap('ul', '', { role: 'list' });
-
-export const H2 = wrap('h2', className.h2);
-/* eslint-enable @typescript-eslint/naming-convention */

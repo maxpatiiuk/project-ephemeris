@@ -31,4 +31,5 @@ export const globalText = createDictionary({
   unexpectedErrorHasOccurred: { 'en-us': 'An unexpected error has occurred.' },
   today: { 'en-us': 'Today' },
   week: { 'en-us': 'Week' },
+  daysOfWeek: { 'en-us': 'MTWTFSS' },
 });

@@ -16,12 +16,15 @@ export default function Index(): JSX.Element {
     <Layout title={undefined}>
       <div
         className={`min-h-screen flex flex-col gap-2 bg-black text-white
-           grid grid-cols-[min-content_1fr] grid-rows-[min-content_1fr] p-4`}
+           grid grid-cols-[256px_1fr] grid-rows-[min-content_1fr] p-4`}
       >
         <header className="contents">
-          <h1 className="text-right">{globalText('title')}</h1>
+          <h1 className="flex items-center text-2xl">{globalText('title')}</h1>
           <div className="flex gap-2">
-            <Button.Gray>{globalText('today')}</Button.Gray>
+            <Button.Gray onClick={(): void => setCurrentDate(new Date())}>
+              {globalText('today')}
+            </Button.Gray>
+            <span className="flex-1 -ml-2" />
             <Select
               value={view}
               onChange={({ target }): void => setView(target.value as View)}
