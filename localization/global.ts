@@ -32,4 +32,5 @@ export const globalText = createDictionary({
   today: { 'en-us': 'Today' },
   week: { 'en-us': 'Week' },
   daysOfWeek: { 'en-us': 'MTWTFSS' },
+  noEvents: { 'en-us': 'No Events' },
 });

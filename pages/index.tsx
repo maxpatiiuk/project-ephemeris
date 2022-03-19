@@ -3,10 +3,11 @@ import React from 'react';
 import { Button, Select } from '../components/Basic';
 import { dateParts } from '../components/Internationalization';
 import Layout from '../components/Layout';
+import { MainView } from '../components/MainView';
 import { MiniCalendar } from '../components/MiniCalendar';
 import { globalText } from '../localization/global';
 
-type View = 'day' | 'week' | 'month' | 'year';
+export type View = 'day' | 'week' | 'month' | 'year';
 
 export default function Index(): JSX.Element {
   const [currentDate, setCurrentDate] = React.useState<Date>(new Date());
@@ -47,9 +48,15 @@ export default function Index(): JSX.Element {
             <MiniCalendar
               currentDate={currentDate}
               onDateSelect={setCurrentDate}
+              mode="aside"
             />
           </aside>
-          <section />
+          <MainView
+            type={view}
+            date={currentDate}
+            onViewChange={setView}
+            onDateSelect={setCurrentDate}
+          />
         </main>
       </div>
     </Layout>

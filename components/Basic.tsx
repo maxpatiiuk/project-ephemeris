@@ -127,6 +127,7 @@ export const className = {
   containerFull: 'flex flex-col gap-4 h-full',
   containerBase: `${baseContainer}`,
   container: `${baseContainer} max-w-[1000px] mx-auto`,
+  miniCalendarDay: `flex items-center justify-center rounded-full w-6`,
 } as const;
 
 /* eslint-disable @typescript-eslint/naming-convention */
