@@ -1,104 +1,309 @@
+// This must be accompanied by a label since loading bar is hidden from screen readers
 import React from 'react';
 import Modal from 'react-modal';
-import css from 'styled-jsx/css';
 
-export function ModalDialog({
+import { globalText } from '../localization/global';
+import type { RawTagProps } from './Basic';
+import {
+  Button,
+  className,
+  DialogContext,
+  dialogIconTriggers,
+  transitionDuration,
+} from './Basic';
+import { useId, useLiveState } from './Hooks';
+import { dialogIcons } from './Icons';
+
+export const loadingBar = (
+  <div
+    aria-hidden="true"
+    className={`animate-bounce h-7 bg-gradient-to-r from-orange-400
+      to-amber-200 mt-5 rounded`}
+  />
+);
+
+/**
+ * Modal dialog with a loading bar
+ * @module
+ */
+export function LoadingScreen({
+  isLoading = true,
+}: {
+  readonly isLoading?: boolean;
+}): JSX.Element {
+  return (
+    <Dialog
+      isOpen={isLoading}
+      header={globalText('loading')}
+      className={{ container: dialogClassNames.narrowContainer }}
+      buttons={undefined}
+      onClose={undefined}
+    >
+      {loadingBar}
+    </Dialog>
+  );
+}
+
+const commonContainer = `rounded resize overflow-y-hidden max-w-[90%]
+  shadow-lg shadow-gray-500`;
+export const dialogClassNames = {
+  fullScreen: '!transform-none !w-full !h-full',
+  freeContainer: `${commonContainer} max-h-[90%]`,
+  narrowContainer: `${commonContainer} max-h-[50%] min-w-[min(20rem,90%)]
+    lg:max-w-[50%]`,
+  normalContainer: `${commonContainer} max-h-[90%] min-w-[min(30rem,90%)]`,
+  wideContainer: `${commonContainer} max-h-[90%] min-w-[min(40rem,90%)]`,
+  flexContent: 'flex flex-col gap-y-2',
+} as const;
+
+/*
+ * Starting at 180 puts dialogs over Handsontable column headers (which have
+ * z-index of 180)
+ */
+const initialIndex = 180;
+const topIndex = 10_000;
+const dialogIndexes: Set<number> = new Set();
+const getNextIndex = (): number =>
+  dialogIndexes.size === 0 ? initialIndex : Math.max(...dialogIndexes) + 1;
+
+/*
+ * TODO: disable outside click detection while resizing the dialog
+ * TODO: reset scrollTop if title and header changed
+ * TODO: consider hiding dialogs while loading context is true
+ */
+export function Dialog({
+  /*
+   * Using isOpen prop instead of conditional rendering is optional, but it
+   * allows for smooth dialog close animation
+   */
+  /*
+   * TODO: consider getting rid of this
+   * TODO: test if it works, and if animations could be made to work without it
+   */
   isOpen = true,
-  title,
+  header,
+  headerButtons,
+  // Default icon type is determined based on dialog button types
+  icon: defaultIconType,
   buttons,
   children,
-  onCloseClick: handleCloseClick,
+  /*
+   * Non-modal dialogs are discouraged due to accessibility concerns and
+   * possible state conflicts arising from the user interacting with different
+   * parts of the app at the same time
+   */
+  modal = true,
+  onClose: handleClose,
+  onResize: handleResize,
+  className: {
+    // Dialog's content is a flexbox
+    content: contentClassName = dialogClassNames.flexContent,
+    // Dialog has optimal width
+    container: containerClassName = dialogClassNames.normalContainer,
+    // Buttons are right-aligned by default
+    buttonContainer: buttonContainerClassName = 'justify-end',
+    header: headerClassName = `${className.h2} text-xl`,
+  } = {},
+  /* Force dialog to stay on top of all others. Useful for exception messages */
+  forceToTop = false,
+  contentRef,
 }: {
   readonly isOpen?: boolean;
-  readonly title: string;
-  readonly buttons?: React.ReactNode;
+  readonly header: React.ReactNode;
+  // TODO: remove this and usages
+  readonly title?: string;
+  readonly headerButtons?: React.ReactNode;
+  // TODO: review dialogs that don't need icons
+  readonly icon?: keyof typeof dialogIconTriggers;
+  // Have to explicitly pass undefined if you don't want buttons
+  readonly buttons: undefined | string | JSX.Element;
   readonly children: React.ReactNode;
-  readonly onCloseClick?: () => void;
+  readonly modal?: boolean;
+  /*
+   * Have to explicitly pass undefined if dialog should not be closable
+   *
+   * This gets called only when dialog is closed by the user.
+   * If dialog is removed from the element tree programmatically, callback is
+   * not called
+   */
+  readonly onClose: (() => void) | undefined;
+  readonly onResize?: (element: HTMLElement) => void;
+  readonly className?: {
+    readonly content?: string;
+    readonly container?: string;
+    readonly buttonContainer?: string;
+    readonly header?: string;
+  };
+  readonly forceToTop?: boolean;
+  readonly contentRef?: RawTagProps<'div'>['ref'];
 }): JSX.Element {
-  const { className } = css.resolve``;
+  const id = useId('modal');
 
-  Modal.setAppElement('#__next');
+  /*
+   * Don't set index on first render, because that may lead multiple dialogs
+   * to have the same index, since render of all children is done before any
+   * useEffect can update max z-index)
+   */
+  const [zIndex, setZindex] = React.useState<number | undefined>(undefined);
+
+  React.useEffect(() => {
+    if (!isOpen) return undefined;
+    if (forceToTop) {
+      setZindex(topIndex);
+      return undefined;
+    }
+    const zIndex = getNextIndex();
+    setZindex(zIndex);
+    dialogIndexes.add(zIndex);
+    return (): void => setZindex(undefined);
+  }, [isOpen, forceToTop]);
+
+  React.useEffect(() => {
+    if (forceToTop || modal || !isOpen || typeof zIndex === 'undefined')
+      return undefined;
+
+    dialogIndexes.add(zIndex);
+    return (): void => void dialogIndexes.delete(zIndex);
+  }, [forceToTop, modal, isOpen, zIndex]);
+
+  // Facilitate moving non-modal dialog to top on click
+  const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  React.useEffect(() => {
+    if (
+      forceToTop ||
+      modal ||
+      !isOpen ||
+      typeof zIndex === 'undefined' ||
+      container === null
+    )
+      return undefined;
+    const handleClick = (): void =>
+      // Check if dialog is already at the very top
+      Math.max(...dialogIndexes) === zIndex
+        ? undefined
+        : setZindex(getNextIndex);
+
+    container.addEventListener('click', handleClick);
+    return (): void => container?.removeEventListener('click', handleClick);
+  }, [forceToTop, modal, isOpen, zIndex, container]);
+
+  // Resize listener
+  React.useEffect(() => {
+    if (!isOpen || container === null || typeof handleResize === 'undefined')
+      return undefined;
+
+    const observer = new ResizeObserver(() => handleResize?.(container));
+    observer.observe(container);
+
+    return (): void => observer.disconnect();
+  }, [isOpen, container, handleResize]);
+
+  const isFullScreen = containerClassName.includes(dialogClassNames.fullScreen);
+
+  const [buttonContainer, setButtonContainer] =
+    React.useState<HTMLDivElement | null>(null);
+  const [iconType] = useLiveState(
+    React.useCallback(() => {
+      if (typeof defaultIconType === 'string') return defaultIconType;
+      else if (buttonContainer === null) return 'none';
+      /*
+       * If icon was not specified explicitly, it is determined based on what
+       * matching className dialog buttons have
+       */
+      return (
+        Object.entries(dialogIconTriggers).find(
+          ([_type, className]) =>
+            className !== '' &&
+            typeof buttonContainer.getElementsByClassName(className)[0] ===
+              'object'
+        )?.[0] ?? 'none'
+      );
+    }, [defaultIconType, buttons, buttonContainer])
+  );
 
   return (
-    <div className="modal-root">
-      <Modal
-        isOpen={isOpen}
-        closeTimeoutMS={100}
-        contentLabel={title}
-        style={{
-          overlay: {
-            opacity: 0,
-            transition: 'opacity 100ms ease-in-out',
-            width: '100vw',
-            height: '100vh',
-            position: 'absolute',
-            inset: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: '#0009',
-          },
-          content: {
-            position: 'unset',
-            inset: 'unset',
-            border: 'unset',
-            background: 'unset',
-            overflow: 'unset',
-            borderRadius: 'unset',
-            outline: 'unset',
-            padding: 'unset',
-          },
-        }}
-        portalClassName={className}
-        className={'w-full'}
-        shouldCloseOnEsc={typeof handleCloseClick === 'function'}
+    <Modal
+      isOpen={isOpen}
+      closeTimeoutMS={transitionDuration === 0 ? undefined : transitionDuration}
+      overlayClassName={{
+        base: `w-screen h-screen absolute inset-0 flex items-center
+          justify-center ${
+            modal
+              ? 'bg-gray-500/70 dark:bg-neutral-900/70'
+              : 'pointer-events-none'
+          }`,
+        afterOpen: `opacity-1`,
+        beforeClose: 'opacity-0',
+      }}
+      style={{ overlay: { zIndex } }}
+      portalClassName=""
+      className={`bg-gradient-to-bl from-gray-200 dark:from-neutral-800
+        via-white dark:via-neutral-900 to-white dark:to-neutral-900
+        outline-none flex flex-col p-4 gap-y-2 ${containerClassName}
+        dark:text-neutral-200 dark:border dark:border-neutral-700
+        text-neutral-900 ${isFullScreen ? 'full-screen' : ''}
+        ${modal ? '' : 'pointer-events-auto border border-gray-500'}`}
+      shouldCloseOnEsc={modal && typeof handleClose === 'function'}
+      shouldCloseOnOverlayClick={modal && typeof handleClose === 'function'}
+      aria={{
+        labelledby: id('header'),
+        describedby: id('content'),
+      }}
+      onRequestClose={handleClose}
+      bodyOpenClassName={null}
+      htmlOpenClassName={null}
+      ariaHideApp={modal}
+      contentRef={(container): void => {
+        // Save to state so that React.useEffect hooks are reRun
+        setContainer(container ?? null);
+        // Save to React.useRef so that React Draggable can have immediate access
+        containerRef.current = container ?? null;
+      }}
+    >
+      {/* "p-4 -m-4" increases the handle size for easier dragging */}
+      <span
+        className={`handle flex flex-wrap gap-4' ${
+          isFullScreen ? '' : 'p-4 -m-4 cursor-move'
+        }`}
       >
-        <div className="w-auto w-1/2 m-auto bg-white shadow-xl">
-          <div
-            className={`bg-gray-50 p-4 flex justify-between
-          items-center`}
-          >
-            <h3 className="text-lg text-gray-900">{title}</h3>
-            {handleCloseClick && (
-              <button
-                type="button"
-                className={`flex items-center justify-center
-                rounded-full bg-red-100 sm:h-10 sm:w-10
-                cursor-pointer`}
-                onClick={handleCloseClick}
-              >
-                <svg
-                  className="w-6 h-6 text-red-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            )}
-          </div>
-          <div className="p-4 text-sm text-gray-500">{children}</div>
-          <div className="bg-gray-50 gap-x-2 flex justify-end p-4">
-            {buttons}
-          </div>
+        <div className="flex items-center gap-2">
+          {dialogIcons[iconType]}
+          <h2 className={headerClassName} id={id('header')}>
+            {header}
+          </h2>
         </div>
-      </Modal>
-      <style jsx global>{`
-        .${className} > :global(.ReactModal__Overlay--after-open) {
-          opacity: 1 !important;
-        }
-
-        .${className} > :global(.ReactModal__Overlay--before-close) {
-          opacity: 0 !important;
-        }
-      `}</style>
-    </div>
+        {headerButtons}
+      </span>
+      {/*
+       * "px-1 -mx-1" ensures that focus outline for checkboxes
+       * and other inputs is not cut-off
+       */}
+      <div
+        className={`px-1 py-4 -mx-1 overflow-y-auto flex-1 text-gray-700
+          dark:text-neutral-350 ${contentClassName}`}
+        ref={contentRef}
+        id={id('content')}
+      >
+        {children}
+      </div>
+      {typeof buttons !== 'undefined' && (
+        <div
+          className={`gap-x-2 flex ${buttonContainerClassName}`}
+          ref={setButtonContainer}
+        >
+          <DialogContext.Provider value={handleClose}>
+            {typeof buttons === 'string' ? (
+              // If button was passed directly as text, render it as Blue.Button
+              <Button.DialogClose component={Button.Blue}>
+                {buttons}
+              </Button.DialogClose>
+            ) : (
+              buttons
+            )}
+          </DialogContext.Provider>
+        </div>
+      )}
+    </Modal>
   );
 }

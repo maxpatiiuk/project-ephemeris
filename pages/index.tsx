@@ -9,6 +9,11 @@ import { globalText } from '../localization/global';
 
 export type View = 'day' | 'week' | 'month' | 'year';
 
+/*
+ * TODO: 2 queries with joins
+ * TODO: go though all files and remove everything unused
+ */
+
 export default function Index(): JSX.Element {
   const [currentDate, setCurrentDate] = React.useState<Date>(new Date());
   const [view, setView] = React.useState<View>('week');

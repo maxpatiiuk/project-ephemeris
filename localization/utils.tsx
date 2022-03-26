@@ -18,7 +18,6 @@ export const LANGUAGE: Language =
   languages.includes(document.documentElement.lang.toLowerCase() as Language)
     ? (document.documentElement.lang.toLowerCase() as Language)
     : undefined) ?? DEFAULT_LANGUAGE;
-console.log(LANGUAGE);
 
 type Line = string | JSX.Element;
 export type Value =
