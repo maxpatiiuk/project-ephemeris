@@ -12,6 +12,7 @@ function DayEvents({ events }: { readonly events: RA<''> }): JSX.Element {
         events.length === 0 ? 'justify-center items-center' : ''
       }`}
     >
+      {/* TODO: display events */}
       {events.length === 0 && globalText('noEvents')}
     </div>
   );
@@ -31,7 +32,7 @@ export function MonthView({
   return (
     <div className="grid grid-cols-7 grid-rows-6">
       {days.previousMonth.map(([label, date]) => (
-        <div className="border flex flex-col gap-1">
+        <div className="border flex flex-col gap-1" key={label}>
           <div className="flex justify-center">
             <button
               type="button"
@@ -45,7 +46,7 @@ export function MonthView({
         </div>
       ))}
       {days.currentMonth.map(([label, date]) => (
-        <div className="border flex flex-col gap-1">
+        <div className="border flex flex-col gap-1" key={label}>
           <div className="flex justify-center">
             <button
               type="button"
@@ -61,7 +62,7 @@ export function MonthView({
         </div>
       ))}
       {days.nextMonth.map(([label, date]) => (
-        <div className="border flex flex-col gap-1">
+        <div className="border flex flex-col gap-1" key={label}>
           <div className="flex justify-center">
             <button
               type="button"

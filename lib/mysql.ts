@@ -1,5 +1,8 @@
 import mysql from 'mysql2/promise';
 
+import { f } from './functools';
+import type { RA } from './types';
+
 let connectionPromise: Promise<void> | undefined = undefined;
 
 const reconnectTimeout = 10_000;
@@ -30,7 +33,15 @@ makeConnection();
 
 export let connection: mysql.Connection;
 
-export async function connectToDatabase() {
+export async function connectToDatabase(): Promise<mysql.Connection> {
   if (typeof connection === 'undefined') await connectionPromise;
   return connection;
 }
+
+export const execute = async <TYPE>(
+  connection: mysql.Connection,
+  sql: string,
+  args: RA<unknown> = []
+): Promise<RA<TYPE>> =>
+  f.log(`QUERY: ${sql}. ARGUMENTS: `, ...args) ??
+  connection.execute(sql, args).then(([data]) => data as unknown as RA<TYPE>);

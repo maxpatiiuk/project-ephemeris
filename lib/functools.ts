@@ -131,4 +131,5 @@ export const f = {
       return store.get(callback) as RETURN;
     },
   unique: <ITEM>(array: RA<ITEM>): RA<ITEM> => Array.from(new Set(array)),
+  last: <ITEM>(array: RA<ITEM>): ITEM => array.slice(-1)[0],
 } as const;

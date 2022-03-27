@@ -27,7 +27,7 @@ export default function Index(): JSX.Element {
   const [calendars] = useAsyncState(
     React.useCallback(
       async () =>
-        ajax<RA<Calendar>>('/api/calendar', {
+        ajax<RA<Calendar>>('/api/table/calendar', {
           headers: { Accept: 'application/json' },
         }).then(({ data }) => data),
       []
@@ -87,6 +87,7 @@ export default function Index(): JSX.Element {
             date={currentDate}
             onViewChange={setView}
             onDateSelect={setCurrentDate}
+            enabledCalendars={enabledCalendars ?? []}
           />
         </main>
       </Container.Quartered>

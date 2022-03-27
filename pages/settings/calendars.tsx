@@ -26,7 +26,7 @@ export default function Calendars(): JSX.Element {
   const [calendars, setCalendars] = useAsyncState<RA<New<Calendar>>>(
     React.useCallback(
       async () =>
-        ajax<RA<Calendar>>('/api/calendar', {
+        ajax<RA<Calendar>>('/api/table/calendar', {
           headers: { Accept: 'application/json' },
         }).then(({ data }) => data),
       []
@@ -85,56 +85,60 @@ export default function Calendars(): JSX.Element {
                   </li>
                 </Ul>
               </aside>
-              <section className="flex flex-col gap-4">
-                <Form
-                  onSubmit={(): void =>
-                    loading(
-                      Promise.all(
-                        calendars.map((calendar, index) =>
-                          typeof calendar.id === 'number'
-                            ? JSON.stringify(calendar) ===
-                              JSON.stringify(defined(originalCalendars)[index])
-                              ? undefined
+              {typeof calendars[selectedCalendar] === 'object' && (
+                <section className="flex flex-col gap-4">
+                  <Form
+                    onSubmit={(): void =>
+                      loading(
+                        Promise.all(
+                          calendars.map((calendar, index) =>
+                            typeof calendar.id === 'number'
+                              ? JSON.stringify(calendar) ===
+                                JSON.stringify(
+                                  defined(originalCalendars)[index]
+                                )
+                                ? undefined
+                                : ping(
+                                    `/api/table/calendar/${calendar.id}`,
+                                    {
+                                      method: 'PUT',
+                                      body: calendar,
+                                    },
+                                    { expectedResponseCodes: [Http.NO_CONTENT] }
+                                  )
                               : ping(
-                                  `/api/calendar/${calendar.id}`,
+                                  '/api/table/calendar',
                                   {
-                                    method: 'PUT',
+                                    method: 'POST',
                                     body: calendar,
                                   },
-                                  { expectedResponseCodes: [Http.NO_CONTENT] }
+                                  { expectedResponseCodes: [Http.CREATED] }
                                 )
-                            : ping(
-                                '/api/calendar',
-                                {
-                                  method: 'POST',
-                                  body: calendar,
-                                },
-                                { expectedResponseCodes: [Http.CREATED] }
-                              )
-                        )
-                      ).then(async () => router.push('/'))
-                    )
-                  }
-                >
-                  <CalendarView
-                    calendar={calendars[selectedCalendar]}
-                    onChange={(calendar): void =>
-                      setCalendars(
-                        replaceItem(calendars, selectedCalendar, calendar)
+                          )
+                        ).then(async () => router.push('/'))
                       )
                     }
-                  />
-                  <div className="flex gap-2">
-                    <Link.LikeFancyButton
-                      className={className.redButton}
-                      href="/"
-                    >
-                      {globalText('cancel')}
-                    </Link.LikeFancyButton>
-                    <Submit.Green>{globalText('save')}</Submit.Green>
-                  </div>
-                </Form>
-              </section>
+                  >
+                    <CalendarView
+                      calendar={calendars[selectedCalendar]}
+                      onChange={(calendar): void =>
+                        setCalendars(
+                          replaceItem(calendars, selectedCalendar, calendar)
+                        )
+                      }
+                    />
+                    <div className="flex gap-2">
+                      <Link.LikeFancyButton
+                        className={className.redButton}
+                        href="/"
+                      >
+                        {globalText('cancel')}
+                      </Link.LikeFancyButton>
+                      <Submit.Green>{globalText('save')}</Submit.Green>
+                    </div>
+                  </Form>
+                </section>
+              )}
             </>
           )}
         </main>

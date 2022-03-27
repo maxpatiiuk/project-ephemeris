@@ -227,13 +227,15 @@ export const replaceKey = <T extends IR<unknown>>(
   targetKey: keyof T,
   newValue: T[keyof T]
 ): T =>
-  Object.fromEntries(
-    Object.entries(object).map(([key, value]) => [
-      key,
-      /*
-       * Convert targetKey to string because Object.entries convers all keys
-       * to a string
-       */
-      key === targetKey.toString() ? newValue : value,
-    ])
-  ) as T;
+  object[targetKey] === newValue
+    ? object
+    : (Object.fromEntries(
+        Object.entries(object).map(([key, value]) => [
+          key,
+          /*
+           * Convert targetKey to string because Object.entries convers all keys
+           * to a string
+           */
+          key === targetKey.toString() ? newValue : value,
+        ])
+      ) as T);

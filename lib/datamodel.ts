@@ -45,6 +45,9 @@ export type Event = {
   calendarId: number;
 };
 
+// Aliased, because "Event" classes with a global TypeScript type
+export type EventTable = Event;
+
 export const eventOccurrence = {
   id: number,
   name: string,
