@@ -7,6 +7,14 @@ import { crash, ErrorBoundary } from './ErrorBoundary';
 import { useBooleanState } from './Hooks';
 import { LoadingScreen } from './ModalDialog';
 
+/*
+ * Exposing component's setError callback to the outside so that an error
+ * can be summoned outside of React code
+ */
+let exposedSetError: (errorElement: JSX.Element | undefined) => void;
+export const summonErrorPage = (errorElement: JSX.Element | undefined) =>
+  exposedSetError(errorElement);
+
 export function Contexts({
   children,
 }: {
@@ -35,11 +43,20 @@ export function Contexts({
     },
     [handleLoading, handleLoaded]
   );
+
+  const [error, setError] = React.useState<JSX.Element | undefined>(undefined);
+  React.useEffect(() => {
+    exposedSetError = setError;
+  });
+
   return (
     <ErrorBoundary>
       <LoadingContext.Provider value={handle}>
         <LoadingScreen isLoading={isLoading} />
-        {children}
+        <ErrorContext.Provider value={setError}>
+          {error}
+          {children}
+        </ErrorContext.Provider>
       </LoadingContext.Provider>
     </ErrorBoundary>
   );
@@ -49,3 +66,8 @@ export const LoadingContext = React.createContext<
   (promise: Promise<unknown>) => void
 >(() => error('Not defined'));
 LoadingContext.displayName = 'LoadingContext';
+
+export const ErrorContext = React.createContext<
+  (errorElement: JSX.Element) => void
+>(() => error('Not defined'));
+ErrorContext.displayName = 'ErrorContext';

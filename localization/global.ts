@@ -34,4 +34,11 @@ export const globalText = createDictionary({
   daysOfWeek: { 'en-us': 'MTWTFSS' },
   noEvents: { 'en-us': 'No Events' },
   loading: { 'en-us': 'Loading' },
+  errorBoundaryDialogTitle: { 'en-us': 'Server Error' },
+  errorBoundaryDialogHeader: { 'en-us': 'Unexpected error has occurred' },
+  errorBoundaryDialogMessage: {
+    'en-us': 'Please reload the page and try again.',
+  },
+  errorMessage: { 'en-us': 'Error message:' },
+  close: { 'en-us': 'Close' },
 });

@@ -3,12 +3,11 @@ import React from 'react';
 
 import Layout from '../components/Layout';
 import { globalText } from '../localization/global';
-import { Centered } from './UI';
 
 function ErrorPage({ errorCode }: { readonly errorCode: number }): JSX.Element {
   return (
     <Layout title={errorCode.toString()}>
-      <Centered>
+      <div className="flex items-center justify-center w-screen h-screen text-center">
         <div className="text-center">
           <h1 className="text-9xl py-2 text-indigo-300">{errorCode}</h1>
           <h2>{globalText('notFoundPageHeader')}</h2>
@@ -25,7 +24,7 @@ function ErrorPage({ errorCode }: { readonly errorCode: number }): JSX.Element {
             </Link>
           </p>
         </div>
-      </Centered>
+      </div>
     </Layout>
   );
 }

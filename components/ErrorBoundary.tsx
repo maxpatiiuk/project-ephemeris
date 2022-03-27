@@ -7,6 +7,12 @@
 
 import React from 'react';
 
+import { breakpoint } from '../lib/assert';
+import { globalText } from '../localization/global';
+import { Button } from './Basic';
+import { summonErrorPage } from './Contexts';
+import { Dialog } from './ModalDialog';
+
 type ErrorBoundaryState =
   | {
       readonly hasError: false;
@@ -17,35 +23,9 @@ type ErrorBoundaryState =
       readonly errorInfo: { componentStack: string };
     };
 
-function ErrorComponent({
-  header,
-  message,
-}: {
-  readonly header: string;
-  readonly message: string;
-}): JSX.Element {
-  return (
-    <Container.Generic>
-      <H2>{header}</H2>
-      <p>{message}</p>
-    </Container.Generic>
-  );
-}
-
-export const ErrorView = createBackboneView(ErrorComponent);
-
-export const supportLink =
-  process.env.NODE_ENV == 'test' ? (
-    (undefined as unknown as JSX.Element)
-  ) : (
-    <Link.NewTab href="mailto:support@specifysoftware.org" rel="noreferrer">
-      support@specifysoftware.org
-    </Link.NewTab>
-  );
-
 function ErrorDialog({
-  title = commonText('errorBoundaryDialogTitle'),
-  header = commonText('errorBoundaryDialogHeader'),
+  title = globalText('errorBoundaryDialogTitle'),
+  header = globalText('errorBoundaryDialogHeader'),
   children,
   // Error dialog is only closable in Development
   onClose: handleClose,
@@ -62,7 +42,7 @@ function ErrorDialog({
       buttons={
         <>
           <Button.Red onClick={(): void => window.location.assign('/')}>
-            {commonText('close')}
+            {globalText('close')}
           </Button.Red>
           {process.env.NODE_ENV !== 'production' &&
             typeof handleClose === 'function' && (
@@ -75,20 +55,14 @@ function ErrorDialog({
       forceToTop={true}
       onClose={undefined}
     >
-      <p>
-        {commonText('errorBoundaryDialogMessage')}
-        <br />
-        {commonText('errorBoundaryDialogSecondMessage')(supportLink)}
-      </p>
+      <p>{globalText('errorBoundaryDialogMessage')}</p>
       <details className="flex-1 whitespace-pre-wrap">
-        <summary>{commonText('errorMessage')}</summary>
+        <summary>{globalText('errorMessage')}</summary>
         {children}
       </details>
     </Dialog>
   );
 }
-
-export const UnhandledErrorView = createBackboneView(ErrorDialog);
 
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 export function crash(error: Error): void {
@@ -102,11 +76,11 @@ export function crash(error: Error): void {
   const [errorObject, errorMessage] = formatError(error);
   console.error(errorMessage);
   breakpoint();
-  const handleClose = (): void => void view.remove();
-  const view = new UnhandledErrorView({
-    children: errorObject,
-    onClose: handleClose,
-  }).render();
+  summonErrorPage(
+    <ErrorDialog onClose={() => summonErrorPage(undefined)}>
+      {errorObject}
+    </ErrorDialog>
+  );
 }
 
 export class ErrorBoundary extends React.Component<
@@ -131,7 +105,6 @@ export class ErrorBoundary extends React.Component<
     error: { readonly toString: () => string },
     errorInfo: { readonly componentStack: string }
   ): void {
-    clearUnloadProtect();
     console.error(error.toString());
     this.setState({
       hasError: true,
@@ -206,39 +179,13 @@ export function handleAjaxError(
   url: string,
   strict: boolean
 ): never {
-  const permissionError = error as {
-    readonly type: 'permissionDenied';
-    readonly responseText: string;
-  };
-  const isPermissionError =
-    typeof permissionError === 'object' &&
-    permissionError?.type === 'permissionDenied' &&
-    strict;
-  if (isPermissionError) {
-    const [errorObject, errorMessage] = formatPermissionsError(
-      permissionError.responseText,
-      url
-    );
-    new PermissionErrorView({
-      error: errorObject,
-    }).render();
-    const error = new Error(errorMessage);
-    Object.defineProperty(error, 'handledBy', {
-      value: handleAjaxError,
-    });
-    throw error;
-  }
   const [errorObject, errorMessage] = formatError(error, url);
-  const handleClose = (): void => void view?.remove();
-  const view =
-    strict && !isPermissionError
-      ? new UnhandledErrorView({
-          title: commonText('backEndErrorDialogTitle'),
-          header: commonText('backEndErrorDialogHeader'),
-          children: errorObject,
-          onClose: handleClose,
-        }).render()
-      : undefined;
+  if (strict)
+    summonErrorPage(
+      <ErrorDialog onClose={(): void => summonErrorPage(undefined)}>
+        {errorObject}
+      </ErrorDialog>
+    );
   const newError = new Error(errorMessage);
   Object.defineProperty(newError, 'handledBy', {
     value: handleAjaxError,
@@ -278,79 +225,9 @@ function ErrorIframe({ children: error }: { children: string }): JSX.Element {
 
   return (
     <iframe
-      title={commonText('backEndErrorDialogTitle')}
+      title={globalText('errorBoundaryDialogTitle')}
       className="h-full"
       ref={iframeRef}
     />
   );
-}
-
-type PermissionErrorSchema = {
-  readonly NoMatchingRuleException: RA<{
-    readonly action: string;
-    readonly collectionid: number;
-    readonly resource: string;
-    readonly userid: string;
-  }>;
-};
-
-function PermissionError({
-  error,
-}: {
-  readonly error: JSX.Element | undefined;
-}): JSX.Element {
-  return typeof error === 'object' ? (
-    /*
-     * If this type of error occurs, it is a UI's fault
-     * No need to localize it, only need to make sure it never happens
-     */
-    <Dialog
-      header="Permission denied error"
-      onClose={(): void => window.location.assign('/specify/')}
-      buttons={
-        <Button.DialogClose component={Button.Red}>
-          {commonText('close')}
-        </Button.DialogClose>
-      }
-    >
-      {error}
-    </Dialog>
-  ) : (
-    <Dialog
-      title={commonText('sessionTimeOutDialogTitle')}
-      header={commonText('sessionTimeOutDialogHeader')}
-      forceToTop={true}
-      onClose={(): void =>
-        window.location.assign(`/accounts/login/?next=${window.location.href}`)
-      }
-      buttons={commonText('logIn')}
-    >
-      {commonText('sessionTimeOutDialogMessage')}
-    </Dialog>
-  );
-}
-
-const PermissionErrorView = createBackboneView(PermissionError);
-
-function formatPermissionsError(
-  response: string,
-  url: string
-): Readonly<[errorObject: JSX.Element | undefined, errorMessage: string]> {
-  if (response.length === 0)
-    return [undefined, commonText('sessionTimeOutDialogTitle')];
-  const error = (JSON.parse(response) as PermissionErrorSchema)
-    .NoMatchingRuleException;
-
-  return [
-    <div className="gap-y-2 flex flex-col h-full">
-      <p>
-        Permission denied when accessing <code>{url}</code>
-        {formatErrorResponse(response)}
-      </p>
-    </div>,
-    [
-      `Permission denied when fetching from ${url}`,
-      `Response: ${JSON.stringify(error, null, '\t')}`,
-    ].join('\n'),
-  ] as const;
 }
