@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { LANGUAGE } from '../localization/utils';
 import { className } from './Basic';
 import { DAYS_IN_WEEK } from './MiniCalendar';
 
@@ -12,16 +13,20 @@ export function WeekView({
 }): JSX.Element {
   const days = React.useMemo(() => {
     const weekDay = currentDate.getDay();
-    return Array.from({ length: DAYS_IN_WEEK }, (_, index) => {
+    const newDate = Array.from({ length: DAYS_IN_WEEK }, (_, index) => {
       const newDate = new Date(currentDate);
       newDate.setDate(currentDate.getDate() + index - weekDay);
       return newDate;
-    }).map((date) => ({
+    });
+    return newDate.map((date) => ({
       date,
       day: date.getDate(),
-      weekDay: date.toLocaleString(window.navigator.language, {
-        weekday: 'short',
-      }),
+      weekDay: date.toLocaleString(
+        typeof window === 'undefined' ? LANGUAGE : window?.navigator.language,
+        {
+          weekday: 'short',
+        }
+      ),
     }));
   }, [currentDate]);
   return (

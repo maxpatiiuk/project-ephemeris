@@ -1,6 +1,7 @@
 import type { Connection } from 'mysql2/promise';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { Http } from './ajax';
 import { connectToDatabase } from './mysql';
 import type { RR } from './types';
 import { defined } from './types';
@@ -40,15 +41,6 @@ export type Payload<BODY, QUERY extends string = never> = {
   readonly query: RR<QUERY, string>;
 };
 
-export const Http = {
-  OK: 200,
-  CREATED: 201,
-  NO_CONTENT: 204,
-  NOT_FOUND: 404,
-  WRONG_METHDO: 405,
-  SERVER_ERROR: 500,
-} as const;
-
 export const endpoint =
   <
     DEFINITION extends {
@@ -65,7 +57,7 @@ export const endpoint =
           ? catchErrors(
               defined(definition[request.method as Method])({
                 connection,
-                body: JSON.parse(request.body || '{}') as never,
+                body: (request.body ?? {}) as never,
                 request,
                 response,
                 query: request.query as never,

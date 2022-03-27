@@ -41,10 +41,10 @@ function Layout({
         />
         {useDefaultDescription && (
           <>
-            <meta name="description" content={globalText('description')} />
+            <meta name="description" content={globalText('siteDescription')} />
             <meta
               property="og:description"
-              content={globalText('description')}
+              content={globalText('siteDescription')}
             />
           </>
         )}

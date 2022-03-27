@@ -1,7 +1,7 @@
 import type { Connection } from 'mysql2/promise';
 
+import { Http } from './ajax';
 import type { ResponsePayload } from './apiUtils';
-import { Http } from './apiUtils';
 import { f } from './functools';
 import type { RA } from './types';
 

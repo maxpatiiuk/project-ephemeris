@@ -12,7 +12,7 @@ import { createDictionary } from './utils';
 
 export const globalText = createDictionary({
   title: { 'en-us': 'Project Ephemeris' },
-  description: {
+  siteDescription: {
     'en-us': strip(`Ephemeris is a web-based calendar application`),
   },
   keywords: { 'en-us': strip(`Project Ephemeris, Max Patiiuk`) },
@@ -41,4 +41,13 @@ export const globalText = createDictionary({
   },
   errorMessage: { 'en-us': 'Error message:' },
   close: { 'en-us': 'Close' },
+  goBack: { 'en-us': 'Go Back' },
+  edit: { 'en-us': 'Edit' },
+  name: { 'en-us': 'Name' },
+  description: { 'en-us': 'Description' },
+  color: { 'en-us': 'Color' },
+  cancel: { 'en-us': 'Cancel' },
+  save: { 'en-us': 'Save' },
+  add: { 'en-us': 'Add' },
+  myCalendar: { 'en-us': 'My calendar' },
 });

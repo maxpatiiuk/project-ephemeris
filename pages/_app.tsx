@@ -2,14 +2,12 @@ import '../styles/main.css';
 
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import React from 'react';
 
-import ErrorBoundary from '../components/ErrorBoundary';
+import { Contexts } from '../components/Contexts';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 
 function App({ Component, pageProps }: AppProps): JSX.Element {
-  const { defaultLocale = 'en-US', locale = defaultLocale } = useRouter();
-
   React.useEffect(() => {
     if ('serviceWorker' in navigator)
       window.addEventListener(
@@ -27,7 +25,9 @@ function App({ Component, pageProps }: AppProps): JSX.Element {
             content="width=device-width, initial-scale=1, viewport-fit=cover"
           />
         </Head>
-        <Component {...pageProps} />
+        <Contexts>
+          <Component {...pageProps} />
+        </Contexts>
       </>
     </ErrorBoundary>
   );

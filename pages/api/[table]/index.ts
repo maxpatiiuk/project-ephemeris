@@ -1,5 +1,6 @@
+import { Http } from '../../../lib/ajax';
 import type { Payload } from '../../../lib/apiUtils';
-import { endpoint, Http } from '../../../lib/apiUtils';
+import { endpoint } from '../../../lib/apiUtils';
 import { tables } from '../../../lib/datamodel';
 import { queryRecords } from '../../../lib/query';
 import type { IR } from '../../../lib/types';
@@ -17,7 +18,9 @@ export default endpoint({
         `INSERT INTO \`${table}\` (${Object.keys(
           tables[table as keyof typeof tables]
         ).join(', ')}) VALUES (?, ?, ?, ?)`,
-        [body.name, body.description, body.color, body.isEnabled]
+        Object.keys(tables[table as keyof typeof tables]).map(
+          (column) => body[column]
+        )
       )
       .then(() => ({ status: Http.CREATED, body: '' })),
 });

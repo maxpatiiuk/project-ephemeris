@@ -303,3 +303,18 @@ export function useBooleanState(
     ),
   ];
 }
+
+export function isClientSide(): boolean {
+  const [state, setState] = React.useState(false);
+  React.useEffect(() => setState(true), []);
+  return state;
+}
+
+export function useOriginalValue<T>(value: T): T {
+  const initialValue = React.useRef(value);
+  React.useEffect(() => {
+    if (typeof initialValue.current === 'undefined')
+      initialValue.current = value;
+  }, [value]);
+  return initialValue.current;
+}

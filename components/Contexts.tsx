@@ -3,7 +3,7 @@ import Modal from 'react-modal';
 
 import { error } from '../lib/assert';
 import type { RA } from '../lib/types';
-import { crash, ErrorBoundary } from './ErrorBoundary';
+import { crash } from './ErrorBoundary';
 import { useBooleanState } from './Hooks';
 import { LoadingScreen } from './ModalDialog';
 
@@ -47,18 +47,16 @@ export function Contexts({
   const [error, setError] = React.useState<JSX.Element | undefined>(undefined);
   React.useEffect(() => {
     exposedSetError = setError;
-  });
+  }, []);
 
   return (
-    <ErrorBoundary>
-      <LoadingContext.Provider value={handle}>
-        <LoadingScreen isLoading={isLoading} />
-        <ErrorContext.Provider value={setError}>
-          {error}
-          {children}
-        </ErrorContext.Provider>
-      </LoadingContext.Provider>
-    </ErrorBoundary>
+    <LoadingContext.Provider value={handle}>
+      <LoadingScreen isLoading={isLoading} />
+      <ErrorContext.Provider value={setError}>
+        {error}
+        {children}
+      </ErrorContext.Provider>
+    </LoadingContext.Provider>
   );
 }
 

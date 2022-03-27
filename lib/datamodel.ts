@@ -1,15 +1,19 @@
 const number = 0;
 const string = '';
-const boolean = 0;
 const date = new Date();
 const time = new Date();
+
+export type New<TABLE extends Table[keyof Table]> =
+  | TABLE
+  | (Omit<TABLE, 'id'> & {
+      readonly id: number | undefined;
+    });
 
 export const calendar = {
   id: number,
   name: string,
   description: string,
   color: string,
-  isEnabled: boolean,
 };
 
 export type Calendar = {
@@ -17,7 +21,6 @@ export type Calendar = {
   readonly name: string;
   readonly description: string;
   readonly color: string;
-  readonly isEnabled: 1 | 0;
 };
 
 export const event = {

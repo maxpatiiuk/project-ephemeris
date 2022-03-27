@@ -1,7 +1,8 @@
+import LinkComponent from 'next/link';
 import React from 'react';
 
 import { error } from '../lib/assert';
-import { split } from '../lib/split';
+import { split } from '../lib/helpers';
 import type { IR, RA, RR } from '../lib/types';
 import type { Input as InputType } from '../lib/types';
 import { globalText } from '../localization/global';
@@ -118,8 +119,8 @@ const niceButton = `rounded cursor-pointer active:brightness-80 px-4 py-2
 const containerBackground = 'bg-gray-200 dark:bg-neutral-800';
 const baseContainer = `${containerBackground} flex flex-col gap-2 p-4 shadow-md
   shadow-gray-500 rounded`;
-// TODO: reduce this once everything is using React
 const rootBackground = 'bg-white dark:bg-neutral-900';
+// TODO: remove unused
 export const className = {
   rootBackground,
   containerBackground,
@@ -129,8 +130,6 @@ export const className = {
   notSubmittedForm: 'not-submitted',
   // Or field lost focus
   notTouchedInput: 'not-touched',
-  // Disable default link click intercept action
-  navigationHandled: 'navigation-handled',
   label: 'flex flex-col',
   labelForCheckbox: 'cursor-pointer inline-flex gap-x-1 items-center',
   button: 'button',
@@ -143,16 +142,13 @@ export const className = {
   blueButton: `${dialogIconTriggers.info} hover:bg-blue-700 bg-blue-600 text-white`,
   orangeButton: `${dialogIconTriggers.warning} hover:bg-orange-600 bg-orange-500 text-white`,
   greenButton: `${dialogIconTriggers.success} hover:bg-green-800 bg-green-700 text-white`,
-  fancyButton: `active:bg-brand-300 active:dark:bg-brand-400 bg-gray-300 gap-2
-    hover:bg-brand-200 hover:dark:bg-brand:400 inline-flex dark:bg-neutral-500
-    dark:text-white justify-center items-center p-2 text-black cursor-pointer
-    rounded`,
   containerFull: 'flex flex-col gap-4 h-full',
   containerBase: `${baseContainer}`,
   formHeader: 'border-b-2 border-brand-300 flex items-center pb-2 gap-x-4',
   formTitle: 'text-lg',
   h2: 'font-semibold text-black dark:text-white',
   h3: 'text-gray-500 dark:text-neutral-400',
+  miniCalendarDay: `flex items-center justify-center rounded-full w-6`,
 } as const;
 
 export const Label = {
@@ -430,33 +426,81 @@ export const Select = wrap<
 );
 
 export const Link = {
-  Default: wrap('Link.Default', 'a', className.link),
-  NewTab: wrap('Link.NewTab', 'a', className.link, (props) => ({
-    ...props,
-    target: '_blank',
-    children: (
-      <>
-        {props.children}
+  Default({
+    children,
+    href,
+    ...props
+  }: TagProps<'a'> & { readonly href: string }): JSX.Element {
+    return (
+      <LinkComponent href={href}>
+        <a {...props} className={`${className.link} ${props.className ?? ''}`}>
+          {children}
+        </a>
+      </LinkComponent>
+    );
+  },
+  NewTab({ children, ...props }: TagProps<'a'>): JSX.Element {
+    return (
+      <a
+        {...props}
+        target="_blank"
+        className={`${className.link} ${props.className ?? ''}`}
+      >
+        {children}
         <span
           title={globalText('opensInNewTab')}
           aria-label={globalText('opensInNewTab')}
         >
           {icons.externalLink}
         </span>
-      </>
-    ),
-  })),
-  LikeButton: wrap('Link.LikeButton', 'a', className.button),
-  LikeFancyButton: wrap('Link.LikeFancyButton', 'a', niceButton),
-  Icon: wrap<'a', IconProps>(
-    'Link.Icon',
-    'a',
-    `${className.link} rounded`,
-    (props) => ({
-      ...props,
-      children: icons[props.icon],
-    })
-  ),
+      </a>
+    );
+  },
+  LikeButton({
+    children,
+    href,
+    ...props
+  }: TagProps<'a'> & { readonly href: string }): JSX.Element {
+    return (
+      <LinkComponent href={href}>
+        <a
+          {...props}
+          className={`${className.button} ${props.className ?? ''}`}
+        >
+          {children}
+        </a>
+      </LinkComponent>
+    );
+  },
+  LikeFancyButton({
+    children,
+    href,
+    ...props
+  }: TagProps<'a'> & { readonly href: string }): JSX.Element {
+    return (
+      <LinkComponent href={href}>
+        <a {...props} className={`${niceButton} ${props.className ?? ''}`}>
+          {children}
+        </a>
+      </LinkComponent>
+    );
+  },
+  Icon({
+    icon,
+    href,
+    ...props
+  }: TagProps<'a'> & IconProps & { readonly href: string }): JSX.Element {
+    return (
+      <LinkComponent href={href}>
+        <a
+          {...props}
+          className={`${className.link} rounded ${props.className ?? ''}`}
+        >
+          {icons[icon]}
+        </a>
+      </LinkComponent>
+    );
+  },
 } as const;
 
 export const DialogContext = React.createContext<(() => void) | undefined>(() =>
@@ -537,7 +581,6 @@ const submitButton = (name: string, buttonClassName: string) =>
 export const Submit = {
   // Force passing children by nesting rather than through the [value] attribute
   Simple: submitButton('Submit.Simple', className.button),
-  Fancy: submitButton('Submit.Fancy', className.fancyButton),
   Transparent: submitButton(
     'Submit.Transparent',
     `${niceButton} ${className.transparentButton}`
@@ -560,6 +603,12 @@ export const Container = {
   ),
   Full: wrap('Container.Full', 'section', className.containerFull),
   Base: wrap('Container.Base', 'section', className.containerBase),
+  Quartered: wrap(
+    'Container.Quartered',
+    'main',
+    `min-h-screen flex flex-col gap-2 bg-black text-white grid
+      grid-cols-[256px_1fr] grid-rows-[min-content_1fr] p-4`
+  ),
 };
 export const Progress = wrap<'progress', { readonly value: number }>(
   'Progress',

@@ -1,5 +1,6 @@
+import { Http } from '../../../lib/ajax';
 import type { Payload } from '../../../lib/apiUtils';
-import { endpoint, Http } from '../../../lib/apiUtils';
+import { endpoint } from '../../../lib/apiUtils';
 import { tables } from '../../../lib/datamodel';
 import { queryRecord } from '../../../lib/query';
 import type { IR } from '../../../lib/types';
