@@ -1,8 +1,9 @@
 import React from 'react';
 
+import { serializeDate } from '../lib/dateUtils';
 import type { RA } from '../lib/types';
 import { globalText } from '../localization/global';
-import { className } from './Basic';
+import { className, Link } from './Basic';
 import { getMonthDays } from './MiniCalendar';
 
 function DayEvents({ events }: { readonly events: RA<''> }): JSX.Element {
@@ -20,10 +21,8 @@ function DayEvents({ events }: { readonly events: RA<''> }): JSX.Element {
 
 export function MonthView({
   currentDate,
-  onDateSelect: handleDateSelect,
 }: {
   readonly currentDate: Date;
-  readonly onDateSelect: (newDate: Date) => void;
 }): JSX.Element {
   const days = React.useMemo(
     () => getMonthDays(currentDate, true),
@@ -34,13 +33,12 @@ export function MonthView({
       {days.previousMonth.map(([label, date]) => (
         <div className="border flex flex-col gap-1" key={label}>
           <div className="flex justify-center">
-            <button
-              type="button"
+            <Link.Default
               className={`${className.miniCalendarDay} text-gray-500`}
-              onClick={(): void => handleDateSelect(date)}
+              href={`/view/day/date/${serializeDate(date)}`}
             >
               {label}
-            </button>
+            </Link.Default>
           </div>
           <DayEvents events={[]} />
         </div>
@@ -48,15 +46,14 @@ export function MonthView({
       {days.currentMonth.map(([label, date]) => (
         <div className="border flex flex-col gap-1" key={label}>
           <div className="flex justify-center">
-            <button
-              type="button"
+            <Link.Default
               className={`${className.miniCalendarDay}  ${
                 days.todayDay === label ? 'bg-brand-300' : ''
               }`}
-              onClick={(): void => handleDateSelect(date)}
+              href={`/view/day/date/${serializeDate(date)}`}
             >
               {label}
-            </button>
+            </Link.Default>
           </div>
           <DayEvents events={[]} />
         </div>
@@ -64,13 +61,12 @@ export function MonthView({
       {days.nextMonth.map(([label, date]) => (
         <div className="border flex flex-col gap-1" key={label}>
           <div className="flex justify-center">
-            <button
-              type="button"
+            <Link.Default
               className={`${className.miniCalendarDay} text-gray-500`}
-              onClick={(): void => handleDateSelect(date)}
+              href={`/view/day/date/${serializeDate(date)}`}
             >
               {label}
-            </button>
+            </Link.Default>
           </div>
           <DayEvents events={[]} />
         </div>

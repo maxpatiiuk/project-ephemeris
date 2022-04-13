@@ -1,54 +1,38 @@
 import React from 'react';
 
-import type { EventTable } from '../lib/datamodel';
+import type { EventOccurrence, EventTable } from '../lib/datamodel';
 import type { R, RA } from '../lib/types';
-import type { View } from '../pages';
+import type { View } from '../pages/view/[view]/date/[date]';
 import { DayView } from './DayView';
 import { MonthView } from './MonthView';
 import { WeekView } from './WeekView';
 import { YearView } from './YearView';
 
-export type EventsRef = React.MutableRefObject<
-  R<Promise<EventTable> | undefined>
->;
+export type EventsRef = React.MutableRefObject<{
+  readonly events: R<EventTable>;
+  readonly eventOccurrences: R<R<EventOccurrence>>;
+}>;
 
 export function MainView({
   type,
   date,
-  onDateSelect: handleDateSelect,
-  onViewChange: handleViewChange,
   enabledCalendars,
 }: {
   readonly type: View;
   readonly date: Date;
-  readonly onDateSelect: (newDate: Date) => void;
-  readonly onViewChange: (newView: View) => void;
   readonly enabledCalendars: RA<number>;
 }): JSX.Element {
-  const eventsRef = React.useRef<R<Promise<EventTable> | undefined>>({});
+  const eventsRef = React.useRef<EventsRef['current']>({
+    events: {},
+    eventOccurrences: {},
+  });
   return type === 'year' ? (
-    <YearView
-      currentDate={date}
-      onDateSelect={(newDate): void => {
-        handleDateSelect(newDate);
-        handleViewChange('week');
-      }}
-    />
+    <YearView currentDate={date} />
   ) : type === 'month' ? (
-    <MonthView
-      currentDate={date}
-      onDateSelect={(newDate): void => {
-        handleDateSelect(newDate);
-        handleViewChange('week');
-      }}
-    />
+    <MonthView currentDate={date} />
   ) : type === 'week' ? (
     <WeekView
       currentDate={date}
-      onDateSelect={(newDate): void => {
-        handleDateSelect(newDate);
-        handleViewChange('day');
-      }}
       enabledCalendars={enabledCalendars}
       eventsRef={eventsRef}
     />

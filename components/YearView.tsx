@@ -6,10 +6,8 @@ const MONTHS_IN_YEAR = 12;
 
 export function YearView({
   currentDate,
-  onDateSelect: handleDateSelect,
 }: {
   readonly currentDate: Date;
-  readonly onDateSelect: (newDate: Date) => void;
 }): JSX.Element {
   const year = currentDate.getFullYear();
   const dates = React.useMemo(
@@ -26,7 +24,7 @@ export function YearView({
         <MiniCalendar
           key={index}
           currentDate={date}
-          onDateSelect={handleDateSelect}
+          view="year"
           mode="yearPart"
         />
       ))}

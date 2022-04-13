@@ -50,4 +50,6 @@ export const globalText = createDictionary({
   save: { 'en-us': 'Save' },
   add: { 'en-us': 'Add' },
   myCalendar: { 'en-us': 'My calendar' },
+  next: { 'en-us': 'Next' },
+  previous: { 'en-us': 'Previous' },
 });

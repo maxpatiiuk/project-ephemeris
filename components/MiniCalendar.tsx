@@ -1,9 +1,10 @@
 import React from 'react';
 
+import { serializeDate } from '../lib/dateUtils';
 import type { RA } from '../lib/types';
 import { globalText } from '../localization/global';
-import { Button, className } from './Basic';
-import { icons } from './Icons';
+import type { View } from '../pages/view/[view]/date/[date]';
+import { className, Link } from './Basic';
 import { countDaysInMonth, months } from './Internationalization';
 
 export const DAYS_IN_WEEK = 7;
@@ -93,11 +94,11 @@ export function getMonthDays(
 
 export function MiniCalendar({
   currentDate,
-  onDateSelect: handleDateSelect,
+  view,
   mode,
 }: {
   readonly currentDate: Date;
-  readonly onDateSelect: (newDate: Date) => void;
+  readonly view: View;
   readonly mode: 'aside' | 'yearPart';
 }): JSX.Element {
   const days = React.useMemo(
@@ -111,16 +112,22 @@ export function MiniCalendar({
         <span className="flex-1 -ml-2" />
         {mode === 'aside' && (
           <>
-            <Button.LikeLink
-              onClick={(): void => handleDateSelect(days.thisDayLastMonth)}
-            >
-              {icons.chevronLeft}
-            </Button.LikeLink>
-            <Button.LikeLink
-              onClick={(): void => handleDateSelect(days.thisDayNextMonth)}
-            >
-              {icons.chevronRight}
-            </Button.LikeLink>
+            <Link.Icon
+              icon="chevronLeft"
+              href={`/view/${view}/date/${serializeDate(
+                days.thisDayLastMonth
+              )}`}
+              title={globalText('previous')}
+              aria-label={globalText('previous')}
+            />
+            <Link.Icon
+              icon="chevronRight"
+              href={`/view/${view}/date/${serializeDate(
+                days.thisDayLastMonth
+              )}`}
+              title={globalText('next')}
+              aria-label={globalText('next')}
+            />
           </>
         )}
       </div>
@@ -136,16 +143,16 @@ export function MiniCalendar({
             </div>
           ))}
         {days.previousMonth.map(([label, date]) => (
-          <Button.LikeLink
+          <Link.Default
             className={`${className.miniCalendarDay} text-gray-500`}
             key={`previousMonth_${label}`}
-            onClick={(): void => handleDateSelect(date)}
+            href={`/view/${view}/date/${serializeDate(date)}`}
           >
             {label}
-          </Button.LikeLink>
+          </Link.Default>
         ))}
         {days.currentMonth.map(([label, date]) => (
-          <Button.LikeLink
+          <Link.Default
             className={`${className.miniCalendarDay} ${
               label === days.day && mode === 'aside'
                 ? 'bg-brand-200'
@@ -154,19 +161,19 @@ export function MiniCalendar({
                 : ''
             }`}
             key={`currentMonth_${label}`}
-            onClick={(): void => handleDateSelect(date)}
+            href={`/view/${view}/date/${serializeDate(date)}`}
           >
             {label}
-          </Button.LikeLink>
+          </Link.Default>
         ))}
         {days.nextMonth.map(([label, date]) => (
-          <Button.LikeLink
+          <Link.Default
             className={`${className.miniCalendarDay} text-gray-500`}
             key={`nextMonth_${label}`}
-            onClick={(): void => handleDateSelect(date)}
+            href={`/view/${view}/date/${serializeDate(date)}`}
           >
             {label}
-          </Button.LikeLink>
+          </Link.Default>
         ))}
       </div>
     </section>

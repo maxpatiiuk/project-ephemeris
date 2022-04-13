@@ -132,4 +132,8 @@ export const f = {
     },
   unique: <ITEM>(array: RA<ITEM>): RA<ITEM> => Array.from(new Set(array)),
   last: <ITEM>(array: RA<ITEM>): ITEM => array.slice(-1)[0],
+  parseInt: (value: string): number | undefined =>
+    f.var(Number.parseInt(value), (number) =>
+      Number.isNaN(number) ? undefined : number
+    ),
 } as const;

@@ -118,7 +118,7 @@ export const filtersToSql = (
       [
         parsed.length === 0
           ? ''
-          : `WHERE ${parsed.map(([sql]) => sql).join(', ')}`,
+          : `WHERE ${parsed.map(([sql]) => sql).join(' AND ')}`,
         parsed.flatMap(([_sql, ...values]) => values),
       ] as const
   );

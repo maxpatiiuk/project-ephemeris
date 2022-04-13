@@ -1,8 +1,9 @@
 import React from 'react';
 
+import { serializeDate } from '../lib/dateUtils';
 import type { RA } from '../lib/types';
 import { LANGUAGE } from '../localization/utils';
-import { className } from './Basic';
+import { className, Link } from './Basic';
 import { Column } from './Column';
 import type { EventsRef } from './MainView';
 import { DAYS_IN_WEEK } from './MiniCalendar';
@@ -10,12 +11,10 @@ import { useEvents } from './useEvents';
 
 export function WeekView({
   currentDate,
-  onDateSelect: handleDateSelect,
   enabledCalendars,
   eventsRef,
 }: {
   readonly currentDate: Date;
-  readonly onDateSelect: (newDate: Date) => void;
   readonly enabledCalendars: RA<number>;
   readonly eventsRef: EventsRef;
 }): JSX.Element {
@@ -38,7 +37,7 @@ export function WeekView({
     }));
   }, [currentDate]);
 
-  const [events] = useEvents(
+  const events = useEvents(
     days[0].date,
     days.slice(-1)[0].date,
     eventsRef,
@@ -46,13 +45,12 @@ export function WeekView({
   );
 
   return (
-    <div className="flex border">
-      {days.map(({ date, day, weekDay }) => (
-        <div key={day} className="flex-1 border flex flex-col gap-1">
-          <button
-            type="button"
-            className="flex gap-1 p-1 border-b"
-            onClick={(): void => handleDateSelect(date)}
+    <div className="flex border divide-x-2 rounded">
+      {days.map(({ date, day, weekDay }, index) => (
+        <div key={day} className="flex-1 flex flex-col gap-1">
+          <Link.Default
+            className="flex p-1 border-b"
+            href={`/view/day/date/${serializeDate(date)}`}
           >
             <div className="flex-1 text-left">{weekDay}</div>
             <div
@@ -62,8 +60,8 @@ export function WeekView({
             >
               {day}
             </div>
-          </button>
-          <Column date={date} enabledCalendars={enabledCalendars} />
+          </Link.Default>
+          <Column occurrences={events?.[index]} />
         </div>
       ))}
     </div>
