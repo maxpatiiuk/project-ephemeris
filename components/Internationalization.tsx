@@ -62,9 +62,11 @@ declare namespace Intl {
     public constructor(
       locales?: string | RA<string>,
       options?: {
+        readonly weekday?: 'long' | 'short';
         readonly dateStyle?: 'full' | 'long' | 'medium' | 'short';
         readonly timeStyle?: 'full' | 'long' | 'medium' | 'short';
         readonly month?: 'long' | 'short';
+        readonly timeZone?: 'UTC';
       }
     );
 
@@ -169,3 +171,15 @@ export function getRelativeDate(date: Readonly<Date>): string {
 
 export const countDaysInMonth = (year: number, month: number): number =>
   new Date(year, month + 1, 0).getDate();
+
+const weekDayFormatter = new Intl.DateTimeFormat(LANGUAGE, {
+  weekday: 'long',
+  timeZone: 'UTC',
+});
+export const weekDays = Array.from(
+  { length: WEEK / DAY },
+  (_, index) =>
+    new Date(
+      `2017-01-${index < 9 ? `0${index + 1}` : index + 1}T00:00:00+00:00`
+    )
+).map(weekDayFormatter.format);

@@ -34,7 +34,8 @@ export const event = {
   calendarId: number,
 };
 
-export type Event = {
+// Called EventTable rather than Event as Event is a global TypeScript type
+export type EventTable = {
   id: number;
   startDate: Date;
   endDate: Date;
@@ -44,9 +45,6 @@ export type Event = {
   defaultColor: string;
   calendarId: number;
 };
-
-// Aliased, because "Event" classes with a global TypeScript type
-export type EventTable = Event;
 
 export const eventOccurrence = {
   id: number,
@@ -76,6 +74,6 @@ export const tables = {
 
 export type Table = {
   Calendar: Calendar;
-  Event: Event;
+  Event: EventTable;
   EventOccurrence: EventOccurrence;
 };

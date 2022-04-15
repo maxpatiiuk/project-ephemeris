@@ -60,4 +60,5 @@ export const globalText = createDictionary({
   deleteOccurrenceDialogMessage: {
     'en-us': 'Are you sure you want to delete this event?',
   },
+  repeatsEvery: { 'en-us': 'Repeats every:' },
 });

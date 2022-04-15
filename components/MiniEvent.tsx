@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router';
 import React from 'react';
 
-import type { Calendar, EventOccurrence } from '../lib/datamodel';
-import { replaceKey } from '../lib/helpers';
+import type { Calendar, EventOccurrence, EventTable } from '../lib/datamodel';
+import { replaceItem, replaceKey } from '../lib/helpers';
 import type { IR } from '../lib/types';
 import { globalText } from '../localization/global';
 import { Button, Form, Link, Submit, Textarea } from './Basic';
@@ -10,6 +10,7 @@ import { EventsContext } from './Contexts';
 import { crash } from './ErrorBoundary';
 import { useBooleanState } from './Hooks';
 import { iconClassName, icons } from './Icons';
+import { weekDays } from './Internationalization';
 import { Dialog } from './ModalDialog';
 
 export function MiniEvent({
@@ -24,8 +25,10 @@ export function MiniEvent({
     occurrence;
 
   const eventsRef = React.useContext(EventsContext);
-  const event = eventsRef.current.events[eventId];
-  const calendar = calendars?.[event?.calendarId ?? ''];
+  const [event, setEvent] = React.useState<EventTable>(
+    eventsRef.current.events[eventId]
+  );
+  const calendar = calendars?.[event.calendarId ?? ''];
 
   const router = useRouter();
   const baseUrl = `/view/${router.query.view as string}/date/${
@@ -51,7 +54,7 @@ export function MiniEvent({
         headerButtons={
           <>
             <span className="flex-1 -ml-2" />
-            <div className="flex flex gap-2">
+            <div className="flex flex gap-4">
               <Button.Icon
                 icon="trash"
                 aria-label={globalText('delete')}
@@ -92,6 +95,39 @@ export function MiniEvent({
                 : `${startDateTime.toDateString()},`
             } ${endDateTime.getHours()}:${endDateTime.getMinutes()}`}</time>
           </div>
+          <span className="flex gap-2 items-center">
+            {icons.refresh}
+            {globalText('repeatsEvery')}
+            {weekDays.map((name, index) => {
+              const isEnabled =
+                event.daysOfWeek[index].toLowerCase() !==
+                event.daysOfWeek[index];
+              const Component = isEnabled ? Button.Blue : Button.Gray;
+              return (
+                <Component
+                  aria-pressed={isEnabled}
+                  key={index}
+                  onClick={(): void =>
+                    setEvent(
+                      replaceKey(
+                        event,
+                        'daysOfWeek',
+                        replaceItem(
+                          event.daysOfWeek.split(''),
+                          index,
+                          isEnabled
+                            ? event.daysOfWeek[index].toLowerCase()
+                            : event.daysOfWeek[index].toUpperCase()
+                        ).join('')
+                      )
+                    )
+                  }
+                >
+                  {name[0]}
+                </Component>
+              );
+            })}
+          </span>
           <span className="flex gap-2">
             <span
               aria-label={globalText('calendar')}
