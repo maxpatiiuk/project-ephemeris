@@ -1,6 +1,6 @@
 import type { Calendar } from '../lib/datamodel';
 import { toggleItem } from '../lib/helpers';
-import type { RA } from '../lib/types';
+import type { IR, RA } from '../lib/types';
 import { globalText } from '../localization/global';
 import { Input, Label, Link, Ul } from './Basic';
 
@@ -9,7 +9,7 @@ export function CalendarList({
   enabledCalendars,
   onChange: handleChange,
 }: {
-  readonly calendars: RA<Calendar> | undefined;
+  readonly calendars: IR<Calendar> | undefined;
   readonly enabledCalendars: RA<number>;
   readonly onChange: (enabledCalendars: RA<number>) => void;
 }): JSX.Element {
@@ -24,9 +24,9 @@ export function CalendarList({
           title={globalText('edit')}
         />
       </div>
-      {Array.isArray(calendars) ? (
+      {typeof calendars === 'object' ? (
         <Ul>
-          {calendars.map((calendar) => (
+          {Object.values(calendars).map((calendar) => (
             <li key={calendar.id} title={calendar.description}>
               <Label.ForCheckbox>
                 <Input.Checkbox

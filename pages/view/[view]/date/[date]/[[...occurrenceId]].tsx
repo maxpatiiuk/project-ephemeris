@@ -6,19 +6,19 @@ import {
   Container,
   Link,
   Select,
-} from '../../../../components/Basic';
-import { CalendarList } from '../../../../components/CalendarList';
-import { useAsyncState } from '../../../../components/Hooks';
-import { dateParts } from '../../../../components/Internationalization';
-import Layout from '../../../../components/Layout';
-import { MainView } from '../../../../components/MainView';
-import { MiniCalendar } from '../../../../components/MiniCalendar';
-import { ajax } from '../../../../lib/ajax';
-import type { Calendar } from '../../../../lib/datamodel';
-import { deserializeDate, serializeDate } from '../../../../lib/dateUtils';
-import { useCachedState } from '../../../../lib/stateCache';
-import type { RA } from '../../../../lib/types';
-import { globalText } from '../../../../localization/global';
+} from '../../../../../components/Basic';
+import { CalendarList } from '../../../../../components/CalendarList';
+import { useAsyncState } from '../../../../../components/Hooks';
+import { dateParts } from '../../../../../components/Internationalization';
+import Layout from '../../../../../components/Layout';
+import { MainView } from '../../../../../components/MainView';
+import { MiniCalendar } from '../../../../../components/MiniCalendar';
+import { ajax } from '../../../../../lib/ajax';
+import type { Calendar } from '../../../../../lib/datamodel';
+import { useCachedState } from '../../../../../lib/stateCache';
+import type { RA } from '../../../../../lib/types';
+import { deserializeDate, serializeDate } from '../../../../../lib/utils';
+import { globalText } from '../../../../../localization/global';
 
 export type View = 'day' | 'week' | 'month' | 'year';
 
@@ -38,7 +38,9 @@ export default function Index(): JSX.Element {
       async () =>
         ajax<RA<Calendar>>('/api/table/calendar', {
           headers: { Accept: 'application/json' },
-        }).then(({ data }) => data),
+        }).then(({ data }) =>
+          Object.fromEntries(data.map((calendar) => [calendar.id, calendar]))
+        ),
       []
     ),
     false
@@ -123,9 +125,10 @@ export default function Index(): JSX.Element {
             />
           </aside>
           <MainView
-            type={view}
+            view={view}
             date={currentDate}
             enabledCalendars={enabledCalendars ?? []}
+            calendars={calendars}
           />
         </main>
       </Container.Quartered>

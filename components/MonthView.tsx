@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { serializeDate } from '../lib/dateUtils';
 import type { RA } from '../lib/types';
+import { serializeDate } from '../lib/utils';
 import { globalText } from '../localization/global';
 import { className, Link } from './Basic';
 import { getMonthDays } from './MiniCalendar';

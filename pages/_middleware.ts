@@ -1,7 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { serializeDate } from '../lib/dateUtils';
+import { serializeDate } from '../lib/utils';
 
 export function middleware(request: NextRequest): NextResponse {
   return request.nextUrl.pathname == '/'

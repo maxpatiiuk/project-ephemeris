@@ -6,6 +6,7 @@ import { f } from '../lib/functools';
 import { sortFunction } from '../lib/helpers';
 import { formatUrl } from '../lib/querystring';
 import type { RA } from '../lib/types';
+import { serializeDate } from '../lib/utils';
 import { useAsyncState } from './Hooks';
 import { DAY, MILLISECONDS } from './Internationalization';
 import type { EventsRef } from './MainView';
@@ -34,7 +35,7 @@ const getDatesBetween = (startDate: Date, endDate: Date): RA<string> =>
     (_, index) => {
       const date = new Date(startDate);
       date.setDate(startDate.getDate() + index);
-      return date.toLocaleDateString();
+      return serializeDate(date);
     }
   );
 
@@ -71,9 +72,9 @@ const fetchEventOccurrences = async (
           occurrences.forEach((occurrence) => {
             const startDateTime = new Date(occurrence.startDateTime);
             const endDateTime = new Date(occurrence.endDateTime);
-            eventsRef.current.eventOccurrences[
-              startDateTime.toLocaleDateString()
-            ][occurrence.id] = {
+            eventsRef.current.eventOccurrences[serializeDate(startDateTime)][
+              occurrence.id
+            ] = {
               ...occurrence,
               startDateTime,
               endDateTime,

@@ -1,6 +1,7 @@
 import React from 'react';
 
-import type { RA } from '../lib/types';
+import type { Calendar } from '../lib/datamodel';
+import type { IR, RA } from '../lib/types';
 import { className } from './Basic';
 import { Column } from './Column';
 import type { EventsRef } from './MainView';
@@ -10,10 +11,12 @@ export function DayView({
   currentDate,
   enabledCalendars,
   eventsRef,
+  calendars,
 }: {
   readonly currentDate: Date;
   readonly enabledCalendars: RA<number>;
   readonly eventsRef: EventsRef;
+  readonly calendars: IR<Calendar> | undefined;
 }): JSX.Element {
   const eventOccurrences = useEvents(
     currentDate,
@@ -32,7 +35,7 @@ export function DayView({
         <div className={`${className.miniCalendarDay} bg-brand-100`}>
           {currentDate.getDate()}
         </div>
-        <Column occurrences={eventOccurrences?.[0]} />
+        <Column occurrences={eventOccurrences?.[0]} calendars={calendars} />
       </div>
     </div>
   );

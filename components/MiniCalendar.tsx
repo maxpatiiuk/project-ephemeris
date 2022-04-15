@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { serializeDate } from '../lib/dateUtils';
 import type { RA } from '../lib/types';
+import { serializeDate } from '../lib/utils';
 import { globalText } from '../localization/global';
-import type { View } from '../pages/view/[view]/date/[date]';
+import type { View } from '../pages/view/[view]/date/[date]/[[...occurrenceId]]';
 import { className, Link } from './Basic';
 import { countDaysInMonth, months } from './Internationalization';
 
