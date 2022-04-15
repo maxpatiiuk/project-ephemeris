@@ -105,7 +105,7 @@ export function useEvents(
   startDate: Date,
   endDate: Date,
   eventsRef: EventsRef,
-  enabledCalendars: RA<number>
+  enabledCalendars: RA<number> | undefined
 ): RA<RA<OccurrenceWithEvent>> | undefined {
   const [eventOccurrences] = useAsyncState<RA<RA<OccurrenceWithEvent>>>(
     React.useCallback(
@@ -130,8 +130,8 @@ export function useEvents(
   return React.useMemo(
     () =>
       eventOccurrences?.map((occurrences) =>
-        occurrences.filter(({ event }) =>
-          enabledCalendars.includes(event.calendarId)
+        occurrences.filter(
+          ({ event }) => enabledCalendars?.includes(event.calendarId) !== false
         )
       ),
     [eventOccurrences, enabledCalendars]

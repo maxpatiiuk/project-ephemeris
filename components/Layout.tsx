@@ -1,8 +1,7 @@
 import Head from 'next/head';
 import React from 'react';
 
-import { robots, themeColor } from '../const/siteConfig';
-import { twitter } from '../const/siteConfig';
+import { robots, themeColor, twitter } from '../const/siteConfig';
 import { globalText } from '../localization/global';
 
 const extractTitle = (title: string): string =>

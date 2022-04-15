@@ -8,15 +8,11 @@ import {
   Select,
 } from '../../../../../components/Basic';
 import { CalendarList } from '../../../../../components/CalendarList';
-import { useAsyncState } from '../../../../../components/Hooks';
 import { dateParts } from '../../../../../components/Internationalization';
 import Layout from '../../../../../components/Layout';
 import { MainView } from '../../../../../components/MainView';
 import { MiniCalendar } from '../../../../../components/MiniCalendar';
-import { ajax } from '../../../../../lib/ajax';
-import type { Calendar } from '../../../../../lib/datamodel';
 import { useCachedState } from '../../../../../lib/stateCache';
-import type { RA } from '../../../../../lib/types';
 import { deserializeDate, serializeDate } from '../../../../../lib/utils';
 import { globalText } from '../../../../../localization/global';
 
@@ -33,18 +29,6 @@ export default function Index(): JSX.Element {
     [router.query.date]
   );
 
-  const [calendars] = useAsyncState(
-    React.useCallback(
-      async () =>
-        ajax<RA<Calendar>>('/api/table/calendar', {
-          headers: { Accept: 'application/json' },
-        }).then(({ data }) =>
-          Object.fromEntries(data.map((calendar) => [calendar.id, calendar]))
-        ),
-      []
-    ),
-    false
-  );
   const [enabledCalendars, setEnabledCalendars] = useCachedState({
     bucketName: 'main',
     cacheName: 'enabledCalendars',
@@ -119,7 +103,6 @@ export default function Index(): JSX.Element {
           <aside className="flex flex-col gap-4">
             <MiniCalendar currentDate={currentDate} view={view} mode="aside" />
             <CalendarList
-              calendars={calendars}
               enabledCalendars={enabledCalendars ?? []}
               onChange={setEnabledCalendars}
             />
@@ -128,7 +111,6 @@ export default function Index(): JSX.Element {
             view={view}
             date={currentDate}
             enabledCalendars={enabledCalendars ?? []}
-            calendars={calendars}
           />
         </main>
       </Container.Quartered>

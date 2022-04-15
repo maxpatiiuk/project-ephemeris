@@ -4,7 +4,6 @@ import type { IR, PartialBy, RA } from './types';
 
 export const csrfSafeMethod = new Set(['GET', 'HEAD', 'OPTIONS', 'TRACE']);
 
-// TODO: make back-end accept both formData and JSON
 export function formData(data: IR<string | Blob>): FormData {
   const formData = new FormData();
   Object.entries(data).forEach(([key, value]) => formData.append(key, value));
@@ -31,8 +30,6 @@ export const Http = {
   UNAVAILABLE: 503,
   SERVER_ERROR: 500,
 };
-
-// TODO: add a central place for all API endpoint definitions
 
 export type MimeType = 'application/json' | 'application/xml' | 'text/plain';
 

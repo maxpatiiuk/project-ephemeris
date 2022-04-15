@@ -4,20 +4,19 @@ import type { Calendar } from '../lib/datamodel';
 import type { IR, RA } from '../lib/types';
 import { className } from './Basic';
 import { Column } from './Column';
-import type { EventsRef } from './MainView';
+import { EventsContext } from './Contexts';
 import { useEvents } from './useEvents';
 
 export function DayView({
   currentDate,
   enabledCalendars,
-  eventsRef,
   calendars,
 }: {
   readonly currentDate: Date;
   readonly enabledCalendars: RA<number>;
-  readonly eventsRef: EventsRef;
   readonly calendars: IR<Calendar> | undefined;
 }): JSX.Element {
+  const eventsRef = React.useContext(EventsContext);
   const eventOccurrences = useEvents(
     currentDate,
     currentDate,
@@ -35,8 +34,8 @@ export function DayView({
         <div className={`${className.miniCalendarDay} bg-brand-100`}>
           {currentDate.getDate()}
         </div>
-        <Column occurrences={eventOccurrences?.[0]} calendars={calendars} />
       </div>
+      <Column occurrences={eventOccurrences?.[0]} calendars={calendars} />
     </div>
   );
 }

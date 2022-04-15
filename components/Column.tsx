@@ -6,6 +6,7 @@ import type { Calendar } from '../lib/datamodel';
 import { f } from '../lib/functools';
 import type { IR, RA } from '../lib/types';
 import { serializeDate } from '../lib/utils';
+import { globalText } from '../localization/global';
 import type { OccurrenceWithEvent } from './useEvents';
 
 export function Column({
@@ -42,8 +43,17 @@ export function Column({
               className={`flex flex-col rounded p-1 !border-l-2 hover:brightness-150`}
             >
               <span>{name}</span>
-              {/* TODO: add aria label */}
-              <span>{`${startDateTime.getHours()}:${startDateTime.getMinutes()} - ${endDateTime.getHours()}:${endDateTime.getMinutes()}`}</span>
+              <span>
+                <time
+                  aria-label={globalText('from')}
+                  dateTime={startDateTime.toJSON()}
+                >{`${startDateTime.getHours()}:${startDateTime.getMinutes()}`}</time>
+                {' - '}
+                <time
+                  aria-label={globalText('till')}
+                  dateTime={endDateTime.toJSON()}
+                >{`${endDateTime.getHours()}:${endDateTime.getMinutes()}`}</time>
+              </span>
             </a>
           </Link>
         )

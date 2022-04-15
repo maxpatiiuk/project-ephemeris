@@ -1,25 +1,22 @@
 import React from 'react';
 
 import type { Calendar } from '../lib/datamodel';
-import type { RA } from '../lib/types';
-import type { IR } from '../lib/types';
+import type { IR, RA } from '../lib/types';
 import { serializeDate } from '../lib/utils';
 import { LANGUAGE } from '../localization/utils';
 import { className, Link } from './Basic';
 import { Column } from './Column';
-import type { EventsRef } from './MainView';
+import { EventsContext } from './Contexts';
 import { DAYS_IN_WEEK } from './MiniCalendar';
 import { useEvents } from './useEvents';
 
 export function WeekView({
   currentDate,
   enabledCalendars,
-  eventsRef,
   calendars,
 }: {
   readonly currentDate: Date;
   readonly enabledCalendars: RA<number>;
-  readonly eventsRef: EventsRef;
   readonly calendars: IR<Calendar> | undefined;
 }): JSX.Element {
   const days = React.useMemo(() => {
@@ -41,6 +38,7 @@ export function WeekView({
     }));
   }, [currentDate]);
 
+  const eventsRef = React.useContext(EventsContext);
   const events = useEvents(
     days[0].date,
     days.slice(-1)[0].date,

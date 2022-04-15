@@ -1,5 +1,7 @@
 // This must be accompanied by a label since loading bar is hidden from screen readers
 import React from 'react';
+import Draggable from 'react-draggable';
+import type { Props } from 'react-modal';
 import Modal from 'react-modal';
 
 import { globalText } from '../localization/global';
@@ -66,19 +68,10 @@ const dialogIndexes: Set<number> = new Set();
 const getNextIndex = (): number =>
   dialogIndexes.size === 0 ? initialIndex : Math.max(...dialogIndexes) + 1;
 
-/*
- * TODO: disable outside click detection while resizing the dialog
- * TODO: reset scrollTop if title and header changed
- * TODO: consider hiding dialogs while loading context is true
- */
 export function Dialog({
   /*
    * Using isOpen prop instead of conditional rendering is optional, but it
    * allows for smooth dialog close animation
-   */
-  /*
-   * TODO: consider getting rid of this
-   * TODO: test if it works, and if animations could be made to work without it
    */
   isOpen = true,
   header,
@@ -110,10 +103,8 @@ export function Dialog({
 }: {
   readonly isOpen?: boolean;
   readonly header: React.ReactNode;
-  // TODO: remove this and usages
   readonly title?: string;
   readonly headerButtons?: React.ReactNode;
-  // TODO: review dialogs that don't need icons
   readonly icon?: keyof typeof dialogIconTriggers;
   // Have to explicitly pass undefined if you don't want buttons
   readonly buttons: undefined | string | JSX.Element;
@@ -201,6 +192,27 @@ export function Dialog({
 
   const isFullScreen = containerClassName.includes(dialogClassNames.fullScreen);
 
+  const draggableContainer: Props['contentElement'] = React.useCallback(
+    (props, children) => (
+      <Draggable
+        // Don't allow moving the dialog past the window bounds
+        bounds="parent"
+        // Allow moving the dialog when hovering over the header line
+        handle={`#${id('handle')}`}
+        // Don't allow moving when in full-screen
+        cancel={`#${id('full-screen')}`}
+        // Don't need any extra classNames
+        defaultClassName=""
+        defaultClassNameDragging=""
+        defaultClassNameDragged=""
+        nodeRef={containerRef}
+      >
+        <div {...props}>{children}</div>
+      </Draggable>
+    ),
+    [id]
+  );
+
   const [buttonContainer, setButtonContainer] =
     React.useState<HTMLDivElement | null>(null);
   const [iconType] = useLiveState(
@@ -260,12 +272,14 @@ export function Dialog({
         // Save to React.useRef so that React Draggable can have immediate access
         containerRef.current = container ?? null;
       }}
+      contentElement={draggableContainer}
     >
       {/* "p-4 -m-4" increases the handle size for easier dragging */}
       <span
-        className={`handle flex flex-wrap gap-4' ${
+        className={`flex flex-wrap gap-4' ${
           isFullScreen ? '' : 'p-4 -m-4 cursor-move'
         }`}
+        id={id('handle')}
       >
         <div className="flex items-center gap-2">
           {dialogIcons[iconType]}

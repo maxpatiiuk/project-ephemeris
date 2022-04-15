@@ -83,17 +83,12 @@ function wrap<
   return wrapped;
 }
 
-// TODO: make a react hook that listens for updates
 const reduceMotion =
   typeof window === 'object'
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
     : false;
 export const transitionDuration = reduceMotion ? 0 : 100;
 
-/*
- * TODO: make a react hook that listens for updates
- * TODO: allow overwriting this in the UI
- */
 export const darkMode =
   typeof window === 'object'
     ? window.matchMedia('(prefers-color-scheme: dark)').matches

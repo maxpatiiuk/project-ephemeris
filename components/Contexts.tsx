@@ -1,10 +1,13 @@
 import React from 'react';
 import Modal from 'react-modal';
 
+import { ajax } from '../lib/ajax';
 import { error } from '../lib/assert';
-import type { RA } from '../lib/types';
+import type { Calendar } from '../lib/datamodel';
+import type { IR, RA } from '../lib/types';
 import { crash } from './ErrorBoundary';
-import { useBooleanState } from './Hooks';
+import { useAsyncState, useBooleanState } from './Hooks';
+import type { EventsRef } from './MainView';
 import { LoadingScreen } from './ModalDialog';
 
 /*
@@ -49,12 +52,34 @@ export function Contexts({
     exposedSetError = setError;
   }, []);
 
+  const eventsRef = React.useRef<EventsRef['current']>({
+    events: {},
+    eventOccurrences: {},
+  });
+
+  const [calendars] = useAsyncState(
+    React.useCallback(
+      async () =>
+        ajax<RA<Calendar>>('/api/table/calendar', {
+          headers: { Accept: 'application/json' },
+        }).then(({ data }) =>
+          Object.fromEntries(data.map((calendar) => [calendar.id, calendar]))
+        ),
+      []
+    ),
+    false
+  );
+
   return (
     <LoadingContext.Provider value={handle}>
       <LoadingScreen isLoading={isLoading} />
       <ErrorContext.Provider value={setError}>
         {error}
-        {children}
+        <EventsContext.Provider value={eventsRef}>
+          <CalendarsContext.Provider value={calendars}>
+            {children}
+          </CalendarsContext.Provider>
+        </EventsContext.Provider>
       </ErrorContext.Provider>
     </LoadingContext.Provider>
   );
@@ -69,3 +94,18 @@ export const ErrorContext = React.createContext<
   (errorElement: JSX.Element) => void
 >(() => error('Not defined'));
 ErrorContext.displayName = 'ErrorContext';
+
+// Stores events and event occurrences
+export const EventsContext = React.createContext<EventsRef>({
+  current: {
+    events: {},
+    eventOccurrences: {},
+  },
+});
+EventsContext.displayName = 'EventsContext';
+
+// Stores calendars
+export const CalendarsContext = React.createContext<IR<Calendar> | undefined>(
+  {}
+);
+CalendarsContext.displayName = 'CalendarsContext';

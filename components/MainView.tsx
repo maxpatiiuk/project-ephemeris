@@ -1,14 +1,13 @@
 import { useRouter } from 'next/router';
 import React from 'react';
 
-import type { Calendar, EventOccurrence, EventTable } from '../lib/datamodel';
+import type { EventOccurrence, EventTable } from '../lib/datamodel';
 import { f } from '../lib/functools';
-import type { IR, R, RA } from '../lib/types';
-import { globalText } from '../localization/global';
+import type { R, RA } from '../lib/types';
 import type { View } from '../pages/view/[view]/date/[date]/[[...occurrenceId]]';
+import { CalendarsContext, EventsContext } from './Contexts';
 import { DayView } from './DayView';
-import { crash } from './ErrorBoundary';
-import { Dialog } from './ModalDialog';
+import { MiniEvent } from './MiniEvent';
 import { MonthView } from './MonthView';
 import { WeekView } from './WeekView';
 import { YearView } from './YearView';
@@ -22,17 +21,13 @@ export function MainView({
   view,
   date,
   enabledCalendars,
-  calendars,
 }: {
   readonly view: View;
   readonly date: Date;
   readonly enabledCalendars: RA<number>;
-  readonly calendars: IR<Calendar> | undefined;
 }): JSX.Element {
-  const eventsRef = React.useRef<EventsRef['current']>({
-    events: {},
-    eventOccurrences: {},
-  });
+  const calendars = React.useContext(CalendarsContext);
+  const eventsRef = React.useContext(EventsContext);
   const router = useRouter();
   const currentOccurrenceId = f.parseInt(router.query.occurrenceId?.[1] ?? '');
   const currentOccurrence =
@@ -49,30 +44,17 @@ export function MainView({
         <WeekView
           currentDate={date}
           enabledCalendars={enabledCalendars}
-          eventsRef={eventsRef}
           calendars={calendars}
         />
       ) : (
         <DayView
           currentDate={date}
           enabledCalendars={enabledCalendars}
-          eventsRef={eventsRef}
           calendars={calendars}
         />
       )}
       {typeof currentOccurrence === 'object' && (
-        <Dialog
-          modal={false}
-          header={currentOccurrence.name}
-          onClose={(): void =>
-            void router
-              .push(`/view/${view}/date${router.query.date as string}`)
-              .catch(crash)
-          }
-          buttons={globalText('close')}
-        >
-          <pre>{JSON.stringify(currentOccurrence, null, 4)}</pre>
-        </Dialog>
+        <MiniEvent occurrence={currentOccurrence} calendars={calendars} />
       )}
     </>
   );

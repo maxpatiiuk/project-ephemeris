@@ -20,6 +20,7 @@ export const globalText = createDictionary({
   returnToHomePage: { 'en-us': '← Return to homepage' },
   opensInNewTab: { 'en-us': '(opens in new tab)' },
   calendars: { 'en-us': 'Calendars' },
+  calendar: { 'en-us': 'Calendar' },
   notFoundPageHeader: { 'en-us': 'Oops! Nothing was found' },
   notFoundPageMessage: {
     'en-us': `The page you are looking for might have been removed,
@@ -52,4 +53,11 @@ export const globalText = createDictionary({
   myCalendar: { 'en-us': 'My calendar' },
   next: { 'en-us': 'Next' },
   previous: { 'en-us': 'Previous' },
+  delete: { 'en-us': 'delete' },
+  from: { 'en-us': 'From' },
+  till: { 'en-us': 'Till' },
+  deleteOccurrenceDialogTitle: { 'en-us': 'Delete event?' },
+  deleteOccurrenceDialogMessage: {
+    'en-us': 'Are you sure you want to delete this event?',
+  },
 });
