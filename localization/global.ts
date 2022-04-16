@@ -61,4 +61,9 @@ export const globalText = createDictionary({
     'en-us': 'Are you sure you want to delete this event?',
   },
   repeatsEvery: { 'en-us': 'Repeats every:' },
+  repeatsFor: { 'en-us': 'Repeats for:' },
+  createEvent: { 'en-us': 'Create Event' },
+  startTime: { 'en-us': 'Start time' },
+  endTime: { 'en-us': 'End time' },
+  weeks: { 'en-us': 'weeks' },
 });

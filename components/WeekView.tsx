@@ -63,7 +63,11 @@ export function WeekView({
               {day}
             </div>
           </Link.Default>
-          <Column occurrences={events?.[index]} calendars={calendars} />
+          <Column
+            occurrences={events?.[index]}
+            calendars={calendars}
+            date={date}
+          />
         </div>
       ))}
     </div>

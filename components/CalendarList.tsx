@@ -15,7 +15,7 @@ export function CalendarList({
 }): JSX.Element {
   const calendars = React.useContext(CalendarsContext);
   return (
-    <section>
+    <section className="flex flex-col gap-2">
       <div className="flex">
         <h2 className="flex-1">{globalText('calendars')}</h2>
         <Link.Icon

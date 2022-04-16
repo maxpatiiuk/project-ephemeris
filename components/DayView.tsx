@@ -35,7 +35,11 @@ export function DayView({
           {currentDate.getDate()}
         </div>
       </div>
-      <Column occurrences={eventOccurrences?.[0]} calendars={calendars} />
+      <Column
+        occurrences={eventOccurrences?.[0]}
+        calendars={calendars}
+        date={currentDate}
+      />
     </div>
   );
 }

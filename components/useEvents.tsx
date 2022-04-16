@@ -23,9 +23,11 @@ function treatAsUTC(date: Date): Date {
 
 const MILLISECONDS_IN_DAY = MILLISECONDS * DAY;
 
-const getDaysBetween = (startDate: Date, endDate: Date): number =>
-  (treatAsUTC(endDate).getTime() - treatAsUTC(startDate).getTime()) /
-  MILLISECONDS_IN_DAY;
+export const getDaysBetween = (startDate: Date, endDate: Date): number =>
+  Math.round(
+    (treatAsUTC(endDate).getTime() - treatAsUTC(startDate).getTime()) /
+      MILLISECONDS_IN_DAY
+  );
 
 const getDatesBetween = (startDate: Date, endDate: Date): RA<string> =>
   Array.from(
