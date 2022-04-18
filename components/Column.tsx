@@ -4,7 +4,7 @@ import React from 'react';
 
 import type { Calendar } from '../lib/datamodel';
 import type { IR, RA } from '../lib/types';
-import { serializeDate } from '../lib/utils';
+import { MARKS_IN_DAY, serializeDate } from '../lib/utils';
 import { globalText } from '../localization/global';
 import type { OccurrenceWithEvent } from './useEvents';
 
@@ -19,7 +19,34 @@ export function Column({
 }): JSX.Element {
   const router = useRouter();
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col relative">
+      <Link
+        href={`/view/${router.query.view as string}/date/${serializeDate(
+          date
+        )}${
+          typeof router.query.occurrenceId === 'undefined' ? '/event/add' : ''
+        }`}
+      >
+        <a
+          className="absolute w-full h-full block flex flex-col"
+          aria-label={globalText('createEvent')}
+          onClick={(event): void => {
+            event.preventDefault();
+            const { top, height } = (
+              event.target as Element
+            ).getBoundingClientRect();
+            const percentage = (event.clientY - top) / height;
+            console.log(percentage);
+          }}
+        >
+          {Array.from({ length: MARKS_IN_DAY }, (_, index) => (
+            <span
+              key={index}
+              className="border-b border-gray-200 dark:border-neutral-900 flex-1"
+            />
+          ))}
+        </a>
+      </Link>
       {occurrences?.map(
         ({
           id,
@@ -44,7 +71,8 @@ export function Column({
                 backgroundColor: color,
                 borderColor: calendars?.[calendarId].color ?? color,
               }}
-              className={`flex flex-col rounded p-1 !border-l-2 hover:brightness-150
+              className={`flex flex-col rounded p-1 !border-l-2
+                hover:brightness-150 z-10
                 ${endDateTime.getTime() < Date.now() ? 'brightness-80' : ''}`}
             >
               <span>{name}</span>
@@ -63,19 +91,6 @@ export function Column({
           </Link>
         )
       )}
-      <Link
-        href={`/view/${router.query.view as string}/date/${serializeDate(
-          date
-        )}${
-          typeof router.query.occurrenceId === 'undefined' ? '/event/add' : ''
-        }`}
-      >
-        <a
-          className="flex-1 block"
-          aria-label={globalText('createEvent')}
-          title={globalText('createEvent')}
-        />
-      </Link>
     </div>
   );
 }

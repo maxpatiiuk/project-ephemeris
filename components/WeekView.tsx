@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { Calendar } from '../lib/datamodel';
 import type { IR, RA } from '../lib/types';
-import { serializeDate } from '../lib/utils';
+import { MARKS_IN_DAY, padNumber, serializeDate } from '../lib/utils';
 import { LANGUAGE } from '../localization/utils';
 import { className, Link } from './Basic';
 import { Column } from './Column';
@@ -48,8 +48,22 @@ export function WeekView({
 
   return (
     <div className="flex border divide-x-2 rounded">
+      <div className="flex flex-col text-gray-500">
+        <div className="flex p-1 border-b" aria-hidden>
+          <div className="flex-1 text-left">{'ㅤ'}</div>
+          <div className={className.miniCalendarDay}>{'ㅤ'}</div>
+        </div>
+        {Array.from({ length: MARKS_IN_DAY }, (_, index) => (
+          <span
+            key={index}
+            className="border-b border-gray-200 dark:border-neutral-900 flex-1 flex items-end"
+          >
+            {`${padNumber(index + 1)}:00`}
+          </span>
+        ))}
+      </div>
       {days.map(({ date, day, weekDay }, index) => (
-        <div key={day} className="flex-1 flex flex-col gap-1">
+        <div key={day} className="flex-1 flex flex-col">
           <Link.Default
             className="flex p-1 border-b"
             href={`/view/day/date/${serializeDate(date)}`}

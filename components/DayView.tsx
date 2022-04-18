@@ -24,7 +24,7 @@ export function DayView({
     enabledCalendars
   );
   return (
-    <div className="flex-1 border flex flex-col gap-1">
+    <div className="flex-1 border flex flex-col gap-1 overflow-y-scroll">
       <div className="flex gap-1 p-1 border-b">
         <div className="flex-1">
           {currentDate.toLocaleString(window.navigator.language, {

@@ -8,7 +8,7 @@ export const serializeDate = (date: Date): string =>
 export const deserializeDate = (dateString: string): Date =>
   new Date(dateString.replaceAll('_', '/'));
 
-const padNumber = (number: number): string =>
+export const padNumber = (number: number): string =>
   number.toString().padStart(2, '0');
 
 export const dateToDatetimeLocal = (date: Date): string =>
@@ -24,6 +24,8 @@ export const DEFAULT_EVENT_DURATION = 15 * MINUTE * MILLISECONDS;
 
 // Round current time to nearest 15 minutes when getting time for new event
 export const DEFAULT_MINUTE_ROUNDING = 15;
+
+export const MARKS_IN_DAY = 24;
 
 const reDateTimeLocal = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/;
 export const parseDateTimeLocal = (dateString: string): Date =>

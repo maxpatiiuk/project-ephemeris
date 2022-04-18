@@ -83,7 +83,9 @@ export default function Index(): JSX.Element {
             <Select
               value={view}
               onValueChange={async (newView) =>
-                router.push(`/view/${newView}/${router.query.date as string}`)
+                router.push(
+                  `/view/${newView}/date/${router.query.date as string}`
+                )
               }
             >
               {Object.entries({

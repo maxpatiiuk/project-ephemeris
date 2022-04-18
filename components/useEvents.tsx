@@ -15,7 +15,7 @@ export type OccurrenceWithEvent = EventOccurrence & {
   readonly event: EventTable;
 };
 
-function treatAsUTC(date: Date): Date {
+function treatAsUtc(date: Date): Date {
   const result = new Date(date);
   result.setMinutes(result.getMinutes() - result.getTimezoneOffset());
   return result;
@@ -25,7 +25,7 @@ const MILLISECONDS_IN_DAY = MILLISECONDS * DAY;
 
 export const getDaysBetween = (startDate: Date, endDate: Date): number =>
   Math.round(
-    (treatAsUTC(endDate).getTime() - treatAsUTC(startDate).getTime()) /
+    (treatAsUtc(endDate).getTime() - treatAsUtc(startDate).getTime()) /
       MILLISECONDS_IN_DAY
   );
 
@@ -67,22 +67,8 @@ const fetchEventOccurrences = async (
           {
             headers: { Accept: 'application/json' },
           }
-        ).then(async ({ data: occurrences }) => {
-          dates.forEach((dateNumber) => {
-            eventsRef.current.eventOccurrences[dateNumber] ??= {};
-          });
-          occurrences.forEach((occurrence) => {
-            const startDateTime = new Date(occurrence.startDateTime);
-            const endDateTime = new Date(occurrence.endDateTime);
-            eventsRef.current.eventOccurrences[serializeDate(startDateTime)][
-              occurrence.id
-            ] = {
-              ...occurrence,
-              startDateTime,
-              endDateTime,
-            };
-          });
-          return Promise.all(
+        ).then(async ({ data: occurrences }) =>
+          Promise.all(
             f
               .unique(occurrences.map(({ eventId }) => eventId))
               .filter(
@@ -100,8 +86,23 @@ const fetchEventOccurrences = async (
                   };
                 })
               )
-          ).then(f.void);
-        })
+          ).then((): void => {
+            dates.forEach((dateNumber) => {
+              eventsRef.current.eventOccurrences[dateNumber] ??= {};
+            });
+            occurrences.forEach((occurrence) => {
+              const startDateTime = new Date(occurrence.startDateTime);
+              const endDateTime = new Date(occurrence.endDateTime);
+              eventsRef.current.eventOccurrences[serializeDate(startDateTime)][
+                occurrence.id
+              ] = {
+                ...occurrence,
+                startDateTime,
+                endDateTime,
+              };
+            });
+          })
+        )
   );
 
 /**
