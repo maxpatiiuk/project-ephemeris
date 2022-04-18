@@ -138,10 +138,10 @@ export const formatNumber = (number: number): string =>
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 export const MILLISECONDS = 1000;
 const SECOND = 1;
-const MINUTE = 60 * SECOND;
+export const MINUTE = 60 * SECOND;
 const HOUR = 60 * MINUTE;
 export const DAY = 24 * HOUR;
-const WEEK = 7 * DAY;
+export const WEEK = 7 * DAY;
 const MONTH = 4 * WEEK;
 const YEAR = 12 * MONTH;
 /* eslint-enable @typescript-eslint/no-magic-numbers */

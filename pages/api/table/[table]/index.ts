@@ -6,17 +6,20 @@ import { tables } from '../../../../lib/datamodel';
 import { f } from '../../../../lib/functools';
 import { execute } from '../../../../lib/mysql';
 import { filtersToSql, queryRecords } from '../../../../lib/query';
-import type { IR } from '../../../../lib/types';
+import type { IR, RA } from '../../../../lib/types';
 
 export const parseTableName = (tableName: string): keyof typeof tables =>
   Object.keys(tables).find(
     (key) => key.toLowerCase() === tableName.toLowerCase()
   ) ??
   error(
-    `"${tableName}" is not a valid table Name. Table names include ${Object.keys(
+    `"${tableName}" is not a valid table name. Table names include ${Object.keys(
       tables
     ).join(', ')}`
   );
+
+export const getTableColumns = (tableName: string): RA<string> =>
+  Object.keys(tables[parseTableName(tableName)]).filter((key) => key !== 'id');
 
 export default endpoint({
   GET: async ({
@@ -37,11 +40,24 @@ export default endpoint({
     connection,
     query: { table },
   }: Payload<IR<unknown>, 'table'>) =>
-    execute(
+    execute<{ readonly insertId: number }>(
       connection,
-      `INSERT INTO \`${parseTableName(table)}\` (${Object.keys(
-        tables[parseTableName(table)]
-      ).join(', ')}) VALUES (?, ?, ?, ?)`,
-      Object.keys(tables[parseTableName(table)]).map((column) => body[column])
-    ).then(() => ({ status: Http.CREATED, body: '' })),
+      `INSERT INTO \`${parseTableName(table)}\` (${getTableColumns(table).join(
+        ', '
+      )}) VALUES (${Array.from(getTableColumns(table)).fill('?').join(', ')})`,
+      getTableColumns(table).map(
+        (column) => body[column.toLowerCase()] ?? body[column]
+      )
+    ).then(({ insertId }) => ({
+      status: Http.CREATED,
+      body: {
+        id: insertId,
+        ...Object.fromEntries(
+          getTableColumns(table).map((column) => [
+            column,
+            body[column.toLowerCase()] ?? body[column],
+          ])
+        ),
+      },
+    })),
 });

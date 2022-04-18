@@ -42,6 +42,6 @@ export const execute = async <TYPE>(
   connection: mysql.Connection,
   sql: string,
   args: RA<unknown> = []
-): Promise<RA<TYPE>> =>
+): Promise<TYPE> =>
   f.log(`QUERY: ${sql}. ARGUMENTS: `, ...args) ??
-  connection.execute(sql, args).then(([data]) => data as unknown as RA<TYPE>);
+  connection.execute(sql, args).then(([data]) => data as unknown as TYPE);

@@ -4,7 +4,11 @@ import React from 'react';
 import type { EventOccurrence, EventTable } from '../lib/datamodel';
 import { f } from '../lib/functools';
 import type { R, RA } from '../lib/types';
-import { deserializeDate } from '../lib/utils';
+import {
+  DEFAULT_EVENT_DURATION,
+  DEFAULT_MINUTE_ROUNDING,
+  deserializeDate,
+} from '../lib/utils';
 import type { View } from '../pages/view/[view]/date/[date]/[[...occurrenceId]]';
 import { CalendarsContext, EventsContext } from './Contexts';
 import { DayView } from './DayView';
@@ -31,29 +35,34 @@ export function MainView({
   const eventsRef = React.useContext(EventsContext);
   const router = useRouter();
   const currentOccurrenceId = f.parseInt(router.query.occurrenceId?.[1] ?? '');
-  const currentOccurrence = React.useMemo(
-    () =>
-      router.query.occurrenceId?.[1] === 'add'
-        ? {
-            id: undefined,
-            name: '',
-            description: '',
-            startDateTime: deserializeDate((router.query.date as string) ?? ''),
-            endDateTime: deserializeDate((router.query.date as string) ?? ''),
-            color: calendars?.[0]?.color ?? '#123abc',
-            eventId: undefined,
-          }
-        : eventsRef.current.eventOccurrences[
-            (router.query.date as string | undefined) ?? ''
-          ]?.[currentOccurrenceId ?? ''],
-    [
-      calendars,
-      eventsRef,
-      currentOccurrenceId,
-      router.query.occurrenceId,
-      router.query.date,
-    ]
-  );
+  const currentOccurrence = React.useMemo(() => {
+    if (router.query.occurrenceId?.[1] === 'add') {
+      const startDate = deserializeDate((router.query.date as string) ?? '');
+      const currentDate = new Date();
+      startDate.setHours(currentDate.getHours());
+      startDate.setMinutes(
+        f.ceil(currentDate.getMinutes(), DEFAULT_MINUTE_ROUNDING)
+      );
+      return {
+        id: undefined,
+        name: '',
+        description: '',
+        startDateTime: startDate,
+        endDateTime: new Date(startDate.getTime() + DEFAULT_EVENT_DURATION),
+        color: Object.values(calendars ?? {})[0]?.color ?? '#123abc',
+        eventId: undefined,
+      };
+    } else
+      return eventsRef.current.eventOccurrences[
+        (router.query.date as string | undefined) ?? ''
+      ]?.[currentOccurrenceId ?? ''];
+  }, [
+    calendars,
+    eventsRef,
+    currentOccurrenceId,
+    router.query.occurrenceId,
+    router.query.date,
+  ]);
   return (
     <>
       {view === 'year' ? (

@@ -1,10 +1,16 @@
 import { useRouter } from 'next/router';
 import React from 'react';
 
+import { ajax, Http, ping } from '../lib/ajax';
 import type { Calendar, EventOccurrence, EventTable } from '../lib/datamodel';
+import { f } from '../lib/functools';
 import { replaceItem, replaceKey } from '../lib/helpers';
-import type { IR, PartialBy } from '../lib/types';
-import { dateToDatetimeLocal } from '../lib/utils';
+import type { IR, PartialBy, RA } from '../lib/types';
+import {
+  dateToDatetimeLocal,
+  parseDateTimeLocal,
+  serializeDate,
+} from '../lib/utils';
 import { globalText } from '../localization/global';
 import {
   Button,
@@ -20,9 +26,9 @@ import { EventsContext } from './Contexts';
 import { crash } from './ErrorBoundary';
 import { useBooleanState } from './Hooks';
 import { iconClassName, icons } from './Icons';
-import { weekDays } from './Internationalization';
+import { DAY, WEEK, weekDays } from './Internationalization';
 import { Dialog } from './ModalDialog';
-import { getDaysBetween } from './useEvents';
+import { getDatesBetween, getDaysBetween } from './useEvents';
 
 export function MiniEvent({
   occurrence: initialOccurrence,
@@ -32,7 +38,7 @@ export function MiniEvent({
   readonly calendars: IR<Calendar> | undefined;
 }): JSX.Element {
   const [occurrence, setOccurrence] = React.useState(initialOccurrence);
-  const { name, startDateTime, endDateTime, color, description, eventId } =
+  const { id, name, startDateTime, endDateTime, color, description, eventId } =
     occurrence;
 
   const eventsRef = React.useContext(EventsContext);
@@ -45,9 +51,14 @@ export function MiniEvent({
       defaultEndTime: endDateTime,
       daysOfWeek: 'smtwtfs',
       defaultColor: color,
-      calendarId: undefined,
+      calendarId: Object.values(calendars ?? {})[0]?.id,
     }
   );
+  const initialEvent = React.useRef(event);
+
+  const nameInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  const isNew = typeof id === 'number' && typeof eventId === 'number';
 
   const router = useRouter();
   const baseUrl = `/view/${router.query.view as string}/date/${
@@ -59,44 +70,39 @@ export function MiniEvent({
       <Dialog
         modal={false}
         header={
-          <div className="flex gap-2 items-center">
-            <div className={`${iconClassName} relative`}>
-              <div className="absolute bottom-0 h-0 min-h-2.5 ml-1/6">
-                <img
-                  src={
-                    'data:image/svg+xml,%3Csvg ' +
-                    'xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"/%3E'
-                  }
-                  alt=""
-                  className="block h-full w-auto"
-                />
-                <label title={globalText('color')}>
-                  <span
-                    className="absolute inset-0 h-full w-auto rounded-full"
-                    style={{
-                      backgroundColor: color,
-                    }}
-                  />
-                  <Input.Generic
-                    className={`sr-only`}
-                    aria-label={globalText('color')}
-                    type="color"
-                    value={color}
-                    onValueChange={(color): void => {
-                      setOccurrence(replaceKey(occurrence, 'color', color));
-                      setEvent(replaceKey(event, 'defaultColor', color));
-                    }}
-                  />
-                </label>
-              </div>
-            </div>
+          <div className="flex gap-2 items-center" aria-label={name}>
+            <label title={globalText('color')} className="contents">
+              <span
+                className={`${iconClassName} rounded-full`}
+                style={{
+                  backgroundColor: color,
+                }}
+              />
+              <span className="sr-only">{globalText('color')}</span>
+              <Input.Generic
+                className={`sr-only`}
+                type="color"
+                value={color}
+                onValueChange={(color): void => {
+                  setOccurrence(replaceKey(occurrence, 'color', color));
+                  setEvent(replaceKey(event, 'defaultColor', color));
+                }}
+              />
+            </label>
             <Input.Text
               value={name}
               onValueChange={(name): void =>
                 setOccurrence(replaceKey(occurrence, 'name', name))
               }
+              onBlur={(): void =>
+                setOccurrence((occurrence) =>
+                  replaceKey(occurrence, 'name', occurrence.name.trim())
+                )
+              }
               aria-label={globalText('name')}
               placeholder={globalText('name')}
+              required
+              forwardRef={nameInputRef}
             />
           </div>
         }
@@ -108,7 +114,11 @@ export function MiniEvent({
                 icon="trash"
                 aria-label={globalText('delete')}
                 title={globalText('delete')}
-                onClick={handleDeleting}
+                onClick={
+                  typeof id === 'undefined'
+                    ? (): void => void router.push(baseUrl).catch(crash)
+                    : handleDeleting
+                }
               />
               <Link.Icon
                 icon="x"
@@ -123,10 +133,139 @@ export function MiniEvent({
         buttons={undefined}
       >
         <Form
-          onSubmit={(): void => {
-            alert('Submitted');
-            // TODO: finish this
-          }}
+          onSubmit={(): void =>
+            void (nameInputRef.current?.validity.valid === false
+              ? nameInputRef.current?.reportValidity()
+              : f.var(
+                  JSON.stringify(event) ===
+                    JSON.stringify(initialEvent.current) &&
+                    JSON.stringify(occurrence) ===
+                      JSON.stringify(initialOccurrence),
+                  async (hasChanged) =>
+                    (isNew
+                      ? // Update existing event and eventOccurrence if changed
+                        (hasChanged
+                          ? Promise.resolve()
+                          : ping(`/api/table/event/${eventId}`, {
+                              method: 'PUT',
+                              body: event,
+                            }).then(async () =>
+                              ping(`/api/table/eventOccurrence/${id}`, {
+                                method: 'PUT',
+                                body: occurrence,
+                              })
+                            )
+                        ).then(() => [id, eventId] as const)
+                      : // Or, create new event and eventOccurrence if don't exist
+                        ajax<EventTable>(
+                          '/api/table/event',
+                          {
+                            method: 'POST',
+                            body: replaceKey(
+                              event,
+                              'calendarId',
+                              event.calendarId ??
+                                Object.values(calendars ?? {})[0]?.id
+                            ),
+                            headers: { Accept: 'application/json' },
+                          },
+                          {
+                            expectedResponseCodes: [Http.CREATED],
+                          }
+                        ).then(async ({ data: { id: eventId } }) =>
+                          ajax<EventOccurrence>(
+                            '/api/table/eventOccurrence',
+                            {
+                              method: 'POST',
+                              body: replaceKey(occurrence, 'eventId', eventId),
+                              headers: { Accept: 'application/json' },
+                            },
+                            {
+                              expectedResponseCodes: [Http.CREATED],
+                            }
+                          ).then(({ data }) => [data.id, eventId])
+                        )
+                    )
+                      .then(async ([id, eventId]) => {
+                        eventsRef.current.eventOccurrences[
+                          serializeDate(initialOccurrence.startDateTime)
+                        ] = Object.fromEntries(
+                          Object.entries(
+                            eventsRef.current.eventOccurrences[
+                              serializeDate(initialOccurrence.startDateTime)
+                            ]
+                          ).filter(
+                            ([occurrenceId]) => occurrenceId === id.toString()
+                          )
+                        );
+                        eventsRef.current.eventOccurrences[
+                          serializeDate(startDateTime)
+                        ] ??= {};
+                        eventsRef.current.eventOccurrences[
+                          serializeDate(startDateTime)
+                        ][id] = { ...occurrence, id, eventId };
+                        eventsRef.current.events[eventId] = replaceKey(
+                          event,
+                          'calendarId',
+                          event.calendarId ??
+                            Object.values(calendars ?? {})[0]?.id
+                        );
+
+                        /*
+                         * If there were changes, delete future occurrences,
+                         * ask back-end to recreate them, and fetch the new
+                         * events
+                         */
+                        if (isNew || hasChanged) {
+                          getDatesBetween(
+                            initialEvent.current.endDate,
+                            event.endDate
+                          )
+                            .filter(
+                              (dateString) =>
+                                typeof eventsRef.current.eventOccurrences[
+                                  dateString
+                                ] === 'undefined'
+                            )
+                            .forEach((dateString) => {
+                              eventsRef.current.eventOccurrences[dateString] =
+                                Object.fromEntries(
+                                  Object.entries(
+                                    eventsRef.current.eventOccurrences[
+                                      dateString
+                                    ]
+                                  ).filter(
+                                    ([_id, occurrence]) =>
+                                      occurrence.eventId !== eventId
+                                  )
+                                );
+                            });
+
+                          return ajax<RA<EventOccurrence>>(
+                            `/api/table/event/${eventId}/recalculateFrom/${id}`,
+                            {
+                              method: 'POST',
+                              headers: { Accept: 'application/json' },
+                            },
+                            {
+                              expectedResponseCodes: [Http.CREATED],
+                            }
+                          ).then(async ({ data: occurrences }) =>
+                            occurrences.forEach((occurrence) => {
+                              eventsRef.current.eventOccurrences[
+                                serializeDate(occurrence.startDateTime)
+                              ] ??= {};
+                              eventsRef.current.eventOccurrences[
+                                serializeDate(occurrence.startDateTime)
+                              ][occurrence.id] = occurrence;
+                            })
+                          );
+                        } else return undefined;
+                      })
+                      .then(async () => router.push(baseUrl).catch(crash))
+                      .catch(crash)
+                ))
+          }
         >
           <div className="grid grid-cols-[auto,1fr] gap-2">
             {icons.clock}
@@ -138,21 +277,17 @@ export function MiniEvent({
                   type="datetime-local"
                   value={dateToDatetimeLocal(startDateTime)}
                   onValueChange={(dateString): void => {
+                    const startDate = parseDateTimeLocal(dateString);
                     setOccurrence(
                       replaceKey(
-                        occurrence,
-                        'startDateTime',
-                        new Date(dateString)
-                      )
-                    );
-                    setOccurrence(
-                      replaceKey(
-                        occurrence,
+                        replaceKey(occurrence, 'startDateTime', startDate),
                         'endDateTime',
                         new Date(
-                          endDateTime.getTime() -
-                            (new Date(dateString).getTime() -
-                              startDateTime.getTime())
+                          Math.max(
+                            endDateTime.getTime() -
+                              (startDateTime.getTime() - startDate.getTime()),
+                            startDate.getTime()
+                          )
                         )
                       )
                     );
@@ -166,7 +301,11 @@ export function MiniEvent({
                   value={dateToDatetimeLocal(endDateTime)}
                   onValueChange={(date): void =>
                     setOccurrence(
-                      replaceKey(occurrence, 'endDateTime', new Date(date))
+                      replaceKey(
+                        occurrence,
+                        'endDateTime',
+                        parseDateTimeLocal(date)
+                      )
                     )
                   }
                 />
@@ -178,7 +317,7 @@ export function MiniEvent({
               <span className="flex gap-2">
                 {weekDays.map((name, index) => {
                   const isEnabled =
-                    event.daysOfWeek[index].toLowerCase() !==
+                    event.daysOfWeek[index].toUpperCase() ===
                     event.daysOfWeek[index];
                   const Component = isEnabled ? Button.Blue : Button.Gray;
                   return (
@@ -213,10 +352,13 @@ export function MiniEvent({
               <div className="flex gap-2 items-center">
                 <Input.Number
                   className="flex-1"
-                  value={getDaysBetween(startDateTime, event.endDate)}
-                  onValueChange={(days: number): void => {
+                  value={Math.max(
+                    0,
+                    getDaysBetween(startDateTime, event.endDate)
+                  )}
+                  onValueChange={(weeks: number): void => {
                     const endDate = new Date(startDateTime);
-                    endDate.setDate(endDate.getDate() + days);
+                    endDate.setDate(endDate.getDate() + (weeks / WEEK) * DAY);
                     setEvent(replaceKey(event, 'endDate', endDate));
                   }}
                   min={0}
@@ -235,11 +377,26 @@ export function MiniEvent({
                   Object.values(calendars ?? [])[0]?.id ??
                   ''
                 }
-                onValueChange={(calendarId): void =>
+                onValueChange={(calendarId): void => {
+                  setOccurrence(
+                    replaceKey(
+                      occurrence,
+                      'color',
+                      calendars?.[calendarId]?.color ?? color
+                    )
+                  );
                   setEvent(
-                    replaceKey(event, 'calendarId', Number.parseInt(calendarId))
-                  )
-                }
+                    replaceKey(
+                      replaceKey(
+                        event,
+                        'calendarId',
+                        Number.parseInt(calendarId)
+                      ),
+                      'defaultColor',
+                      calendars?.[calendarId]?.color ?? event.defaultColor
+                    )
+                  );
+                }}
               >
                 {Object.values(calendars ?? []).map((calendar) => (
                   <option key={calendar.id} value={calendar.id}>
@@ -262,19 +419,40 @@ export function MiniEvent({
             </Label.Generic>
           </div>
           <div className="flex justify-end">
-            <Submit.Green>{globalText('save')}</Submit.Green>
+            <Submit.Green disabled={typeof calendars === 'undefined'}>
+              {globalText('save')}
+            </Submit.Green>
           </div>
         </Form>
       </Dialog>
-      {isDeleting && <DeleteDialog onClose={handleNotDeleting} />}
+      {isDeleting && typeof id === 'number' ? (
+        <DeleteDialog
+          onClose={handleNotDeleting}
+          occurrenceId={id}
+          onDeleted={(): void => {
+            eventsRef.current.eventOccurrences[
+              serializeDate(initialOccurrence.startDateTime)
+            ] = Object.fromEntries(
+              Object.entries(
+                eventsRef.current.eventOccurrences[serializeDate(startDateTime)]
+              ).filter(([occurrenceId]) => occurrenceId !== id.toString())
+            );
+            void router.push(baseUrl).catch(crash);
+          }}
+        />
+      ) : undefined}
     </>
   );
 }
 
 export function DeleteDialog({
   onClose: handleClose,
+  occurrenceId,
+  onDeleted: handleDeleted,
 }: {
   readonly onClose: () => void;
+  readonly occurrenceId: number;
+  readonly onDeleted: () => void;
 }): JSX.Element {
   return (
     <Dialog
@@ -284,8 +462,10 @@ export function DeleteDialog({
           <Button.DialogClose>{globalText('cancel')}</Button.DialogClose>
           <Button.Red
             onClick={(): void => {
-              alert('TODO: implement');
-              // TODO: implement
+              handleDeleted();
+              void ping(`/api/table/eventOccurrence/${occurrenceId}`, {
+                method: 'DELETE',
+              }).catch(crash);
             }}
           >
             ${globalText('delete')}

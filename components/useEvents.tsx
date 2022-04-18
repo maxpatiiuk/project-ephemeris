@@ -29,7 +29,7 @@ export const getDaysBetween = (startDate: Date, endDate: Date): number =>
       MILLISECONDS_IN_DAY
   );
 
-const getDatesBetween = (startDate: Date, endDate: Date): RA<string> =>
+export const getDatesBetween = (startDate: Date, endDate: Date): RA<string> =>
   Array.from(
     {
       length: getDaysBetween(startDate, endDate) + 1,
@@ -85,11 +85,15 @@ const fetchEventOccurrences = async (
           return Promise.all(
             f
               .unique(occurrences.map(({ eventId }) => eventId))
+              .filter(
+                (eventId) =>
+                  typeof eventsRef.current.events[eventId] === 'undefined'
+              )
               .map(async (eventId) =>
                 ajax<EventTable>(`/api/table/event/${eventId}`, {
                   headers: { Accept: 'application/json' },
                 }).then(({ data }) => {
-                  eventsRef.current.events[data.id] ??= {
+                  eventsRef.current.events[data.id] = {
                     ...data,
                     startDate: new Date(data.startDate),
                     endDate: new Date(data.endDate),
@@ -117,7 +121,7 @@ export function useEvents(
             Object.values(eventsRef.current.eventOccurrences[dateNumber])
               .map((occurrence) => ({
                 ...occurrence,
-                event: eventsRef.current.events[occurrence.id],
+                event: eventsRef.current.events[occurrence.eventId],
               }))
               .sort(
                 sortFunction(({ startDateTime }) => startDateTime.getTime())

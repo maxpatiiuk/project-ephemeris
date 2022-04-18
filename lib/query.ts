@@ -1,5 +1,6 @@
 import type { Connection } from 'mysql2/promise';
 
+import { getTableColumns } from '../pages/api/table/[table]';
 import { Http } from './ajax';
 import type { ResponsePayload } from './apiUtils';
 import { error } from './assert';
@@ -32,7 +33,7 @@ export const queryRecords = async <TYPE>(
   args: RA<unknown>
 ): Promise<ResponsePayload<RA<TYPE>>> => ({
   status: Http.OK,
-  body: await execute<TYPE>(connection, sql, args),
+  body: await execute<RA<TYPE>>(connection, sql, args),
 });
 
 const operators = ensure<
@@ -88,8 +89,8 @@ export const filtersToSql = (
               ([column]) => column.toLowerCase() === fieldName.toLowerCase()
             ) ??
               error(
-                `Unknown field "${fieldName}". Allowed fields include ${Object.keys(
-                  tables[tableName]
+                `Unknown field "${fieldName}". Allowed fields include ${getTableColumns(
+                  tableName
                 ).join(', ')}`
               ),
             Object.entries(operators).find(

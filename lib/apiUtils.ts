@@ -49,7 +49,7 @@ export const endpoint =
   >(
     definition: DEFINITION
   ) =>
-  async (request: NextApiRequest, response: NextApiResponse) =>
+  async (request: NextApiRequest, response: NextApiResponse): Promise<void> =>
     connectToDatabase().then(async (connection) =>
       processResponse(
         response,

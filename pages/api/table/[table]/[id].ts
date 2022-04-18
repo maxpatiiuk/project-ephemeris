@@ -5,7 +5,7 @@ import { tables } from '../../../../lib/datamodel';
 import { execute } from '../../../../lib/mysql';
 import { queryRecord } from '../../../../lib/query';
 import type { IR } from '../../../../lib/types';
-import { parseTableName } from './index';
+import { getTableColumns, parseTableName } from './index';
 
 export default endpoint({
   GET: async ({
@@ -31,11 +31,22 @@ export default endpoint({
         .join(', ')} WHERE id=?`,
       [
         ...Object.keys(tables[parseTableName(table)]).map(
-          (column) => body[column]
+          (column) => body[column.toLowerCase()] ?? body[column]
         ),
         Number.parseInt(id),
       ]
-    ).then(() => ({ status: Http.NO_CONTENT, body: '' })),
+    ).then(() => ({
+      status: Http.OK,
+      body: {
+        id: Number.parseInt(id),
+        ...Object.fromEntries(
+          getTableColumns(table).map((column) => [
+            column,
+            body[column.toLowerCase()] ?? body[column],
+          ])
+        ),
+      },
+    })),
   DELETE: async ({
     connection,
     query: { id, table },
