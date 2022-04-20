@@ -5,11 +5,19 @@ import { serializeDate } from '../lib/utils';
 import { globalText } from '../localization/global';
 import type { View } from '../pages/view/[view]/date/[date]/[[...occurrenceId]]';
 import { className, Link } from './Basic';
-import { countDaysInMonth, months } from './Internationalization';
+import {
+  countDaysInMonth,
+  DAY,
+  MONTH,
+  months,
+  WEEK,
+  YEAR,
+} from './Internationalization';
 
-export const DAYS_IN_WEEK = 7;
-const MONTHS_IN_YEAR = 12;
+const DAYS_IN_WEEK = WEEK / DAY;
+const MONTHS_IN_YEAR = YEAR / MONTH;
 const MONTH_HEIGHT = 5;
+const startWithSunday = true;
 
 export function getMonthDays(
   currentDate: Date,
@@ -39,7 +47,8 @@ export function getMonthDays(
   const weekDayForLastDay = new Date(year, month, daysInMonth).getDay();
   const nextMonth = (month + 1) % MONTHS_IN_YEAR;
   const nextMonthYear = month === MONTHS_IN_YEAR - 1 ? year + 1 : year;
-  const previousMonthDaysToShow = weekDayForFirstDay - 1;
+  const previousMonthDaysToShow =
+    weekDayForFirstDay - (startWithSunday ? 0 : 1);
 
   const todayDate = new Date();
   const showToday =
@@ -64,11 +73,17 @@ export function getMonthDays(
       { length: previousMonthDaysToShow },
       (_, index) =>
         [
-          daysInPreviousMonth - weekDayForFirstDay + index + 2,
+          daysInPreviousMonth -
+            weekDayForFirstDay +
+            index +
+            (startWithSunday ? 1 : 2),
           new Date(
             previousMonthYear,
             previousMonth,
-            daysInPreviousMonth - weekDayForFirstDay + index + 2
+            daysInPreviousMonth -
+              weekDayForFirstDay +
+              index +
+              (startWithSunday ? 1 : 2)
           ),
         ] as const
     ),
@@ -84,7 +99,8 @@ export function getMonthDays(
           (forceEqualHeight &&
           (previousMonthDaysToShow + daysInMonth) / DAYS_IN_WEEK < MONTH_HEIGHT
             ? DAYS_IN_WEEK
-            : 0),
+            : 0) -
+          (startWithSunday ? 1 : 0),
       },
       (_, index) =>
         [index + 1, new Date(nextMonthYear, nextMonth, index + 1)] as const
@@ -132,7 +148,10 @@ export function MiniCalendar({
         )}
       </div>
       <div className="grid grid-cols-7">
-        {globalText('daysOfWeek')
+        {(startWithSunday
+          ? globalText('daysOfWeek')
+          : globalText('daysOfWeekEurope')
+        )
           .split('')
           .map((dayOfWeek, index) => (
             <div

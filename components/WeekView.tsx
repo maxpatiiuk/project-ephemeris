@@ -7,7 +7,7 @@ import { LANGUAGE } from '../localization/utils';
 import { className, Link } from './Basic';
 import { Column } from './Column';
 import { EventsContext } from './Contexts';
-import { DAYS_IN_WEEK } from './MiniCalendar';
+import { DAY, WEEK } from './Internationalization';
 import { useEvents } from './useEvents';
 
 export function WeekView({
@@ -21,7 +21,7 @@ export function WeekView({
 }): JSX.Element {
   const days = React.useMemo(() => {
     const weekDay = currentDate.getDay();
-    const newDate = Array.from({ length: DAYS_IN_WEEK }, (_, index) => {
+    const newDate = Array.from({ length: WEEK / DAY }, (_, index) => {
       const newDate = new Date(currentDate);
       newDate.setDate(currentDate.getDate() + index - weekDay);
       return newDate;
