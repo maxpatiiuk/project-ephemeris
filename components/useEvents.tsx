@@ -105,6 +105,16 @@ const fetchEventOccurrences = async (
         )
   );
 
+function useUpdates(eventTarget: EventTarget): number {
+  const [version, setVersion] = React.useState<number>(0);
+  React.useEffect(() => {
+    const handleChange = (): void => setVersion((version) => version + 1);
+    eventTarget.addEventListener('change', handleChange);
+    return (): void => eventTarget.removeEventListener('change', handleChange);
+  }, [eventTarget]);
+  return version;
+}
+
 /**
  * A hook to get an array of occurrences for each day between dates
  */
@@ -114,6 +124,8 @@ export function useEvents(
   eventsRef: EventsRef,
   enabledCalendars: RA<number> | undefined
 ): RA<RA<OccurrenceWithEvent>> | undefined {
+  const version = useUpdates(eventsRef.current.eventTarget);
+
   const [eventOccurrences] = useAsyncState<RA<RA<OccurrenceWithEvent>>>(
     React.useCallback(
       async () =>
@@ -129,11 +141,12 @@ export function useEvents(
               )
           )
         ),
-      [eventsRef, startDate, endDate]
+      // Version is used to force recalculate events for a given day
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [eventsRef, startDate, endDate, version]
     ),
     false
   );
-
   return React.useMemo(
     () =>
       eventOccurrences?.map((occurrences) =>

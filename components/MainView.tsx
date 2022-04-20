@@ -21,6 +21,7 @@ import { YearView } from './YearView';
 export type EventsRef = React.MutableRefObject<{
   readonly events: R<EventTable>;
   readonly eventOccurrences: R<R<EventOccurrence>>;
+  readonly eventTarget: EventTarget;
 }>;
 
 export function MainView({

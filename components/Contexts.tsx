@@ -55,6 +55,7 @@ export function Contexts({
   const eventsRef = React.useRef<EventsRef['current']>({
     events: {},
     eventOccurrences: {},
+    eventTarget: new EventTarget(),
   });
 
   const [calendars] = useAsyncState(
@@ -100,6 +101,7 @@ export const EventsContext = React.createContext<EventsRef>({
   current: {
     events: {},
     eventOccurrences: {},
+    eventTarget: new EventTarget(),
   },
 });
 EventsContext.displayName = 'EventsContext';
