@@ -1,6 +1,6 @@
 import { MILLISECONDS, MINUTE } from '../components/Internationalization';
 import { f } from './functools';
-import { defined } from './types';
+import { defined, filterArray } from './types';
 
 export const serializeDate = (date: Date): string =>
   date.toLocaleDateString().replaceAll('/', '_');
@@ -16,7 +16,7 @@ export const dateToDatetimeLocal = (date: Date): string =>
     date.getDate()
   )}T${dateToTimeString(date)}`;
 
-const dateToTimeString = (date: Date): string =>
+export const dateToTimeString = (date: Date): string =>
   `${padNumber(date.getHours())}:${padNumber(date.getMinutes())}`;
 
 // Create event of this length by default
@@ -33,4 +33,13 @@ export const parseDateTimeLocal = (dateString: string): Date =>
     ...defined(
       reDateTimeLocal.exec(dateString)?.slice(1).map(f.unary(Number.parseInt))
     )
+  );
+
+const reTime = /^(\d{2})_(\d{2})$/;
+export const parseReTime = (
+  timeString: string
+): Readonly<[number, number]> | undefined =>
+  f.var(
+    filterArray(reTime.exec(timeString)?.slice(1).map(f.parseInt) ?? []),
+    (time) => (time.length === 2 ? (time as [number, number]) : undefined)
   );

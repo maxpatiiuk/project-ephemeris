@@ -8,6 +8,7 @@ import {
   DEFAULT_EVENT_DURATION,
   DEFAULT_MINUTE_ROUNDING,
   deserializeDate,
+  parseReTime,
 } from '../lib/utils';
 import type { View } from '../pages/view/[view]/date/[date]/[[...occurrenceId]]';
 import { CalendarsContext, EventsContext } from './Contexts';
@@ -38,11 +39,21 @@ export function MainView({
   const currentOccurrence = React.useMemo(() => {
     if (router.query.occurrenceId?.[1] === 'add') {
       const startDate = deserializeDate((router.query.date as string) ?? '');
-      const currentDate = new Date();
-      startDate.setHours(currentDate.getHours());
-      startDate.setMinutes(
-        f.ceil(currentDate.getMinutes(), DEFAULT_MINUTE_ROUNDING)
-      );
+      const parsedTime =
+        typeof router.query.start === 'string'
+          ? parseReTime(router.query.start)
+          : undefined;
+      if (Array.isArray(parsedTime)) {
+        const [hour, minute] = parsedTime;
+        startDate.setHours(hour);
+        startDate.setMinutes(minute);
+      } else {
+        const currentDate = new Date();
+        startDate.setHours(currentDate.getHours());
+        startDate.setMinutes(
+          f.ceil(currentDate.getMinutes(), DEFAULT_MINUTE_ROUNDING)
+        );
+      }
       return {
         id: undefined,
         name: '',
@@ -62,6 +73,7 @@ export function MainView({
     currentOccurrenceId,
     router.query.occurrenceId,
     router.query.date,
+    router.query.start,
   ]);
   return (
     <>
