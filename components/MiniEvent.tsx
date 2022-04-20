@@ -1,3 +1,7 @@
+/**
+ * Preview Event in a dialog window
+ */
+
 import { useRouter } from 'next/router';
 import React from 'react';
 
@@ -58,7 +62,7 @@ export function MiniEvent({
 
   const nameInputRef = React.useRef<HTMLInputElement | null>(null);
 
-  const isNew = typeof id === 'number' && typeof eventId === 'number';
+  const isNew = typeof id === 'undefined' || typeof eventId === 'undefined';
 
   const router = useRouter();
   const baseUrl = `/view/${router.query.view as string}/date/${
@@ -136,135 +140,149 @@ export function MiniEvent({
           onSubmit={(): void =>
             void (nameInputRef.current?.validity.valid === false
               ? nameInputRef.current?.reportValidity()
-              : f.var(
-                  JSON.stringify(event) ===
-                    JSON.stringify(initialEvent.current) &&
-                    JSON.stringify(occurrence) ===
-                      JSON.stringify(initialOccurrence),
-                  async (hasChanged) =>
-                    (isNew
-                      ? // Update existing event and eventOccurrence if changed
-                        (hasChanged
-                          ? Promise.resolve()
-                          : ping(`/api/table/event/${eventId}`, {
-                              method: 'PUT',
-                              body: event,
-                            }).then(async () =>
-                              ping(`/api/table/eventOccurrence/${id}`, {
+              : f
+                  .var(
+                    {
+                      eventChanged:
+                        JSON.stringify(event) ===
+                        JSON.stringify(initialEvent.current),
+                      occurrenceChanged:
+                        JSON.stringify(occurrence) ===
+                        JSON.stringify(initialOccurrence),
+                    },
+                    async ({ eventChanged, occurrenceChanged }) =>
+                      (typeof eventId === 'number'
+                        ? (eventChanged
+                            ? ping(`/api/table/event/${eventId}`, {
                                 method: 'PUT',
-                                body: occurrence,
+                                body: event,
                               })
-                            )
-                        ).then(() => [id, eventId] as const)
-                      : // Or, create new event and eventOccurrence if don't exist
-                        ajax<EventTable>(
-                          '/api/table/event',
-                          {
-                            method: 'POST',
-                            body: replaceKey(
-                              event,
-                              'calendarId',
-                              event.calendarId ??
-                                Object.values(calendars ?? {})[0]?.id
-                            ),
-                            headers: { Accept: 'application/json' },
-                          },
-                          {
-                            expectedResponseCodes: [Http.CREATED],
-                          }
-                        ).then(async ({ data: { id: eventId } }) =>
-                          ajax<EventOccurrence>(
-                            '/api/table/eventOccurrence',
+                            : Promise.resolve()
+                          ).then(() => eventId)
+                        : ajax<EventTable>(
+                            '/api/table/event',
                             {
                               method: 'POST',
-                              body: replaceKey(occurrence, 'eventId', eventId),
+                              body: replaceKey(
+                                event,
+                                'calendarId',
+                                event.calendarId ??
+                                  Object.values(calendars ?? {})[0]?.id
+                              ),
                               headers: { Accept: 'application/json' },
                             },
                             {
                               expectedResponseCodes: [Http.CREATED],
                             }
-                          ).then(({ data }) => [data.id, eventId])
+                          ).then(({ data: { id } }) => id)
+                      )
+                        .then(async (eventId) =>
+                          typeof id === 'number'
+                            ? (occurrenceChanged
+                                ? ping(`/api/table/eventOccurrence/${id}`, {
+                                    method: 'PUT',
+                                    body: occurrence,
+                                  })
+                                : Promise.resolve()
+                              ).then(() => [eventId, id] as const)
+                            : ajax<EventOccurrence>(
+                                '/api/table/eventOccurrence',
+                                {
+                                  method: 'POST',
+                                  body: replaceKey(
+                                    occurrence,
+                                    'eventId',
+                                    eventId
+                                  ),
+                                  headers: { Accept: 'application/json' },
+                                },
+                                {
+                                  expectedResponseCodes: [Http.CREATED],
+                                }
+                              ).then(
+                                ({ data: { id } }) => [eventId, id] as const
+                              )
                         )
-                    )
-                      .then(async ([id, eventId]) => {
-                        eventsRef.current.eventOccurrences[
-                          serializeDate(initialOccurrence.startDateTime)
-                        ] = Object.fromEntries(
-                          Object.entries(
-                            eventsRef.current.eventOccurrences[
-                              serializeDate(initialOccurrence.startDateTime)
-                            ]
-                          ).filter(
-                            ([occurrenceId]) => occurrenceId === id.toString()
-                          )
-                        );
-                        eventsRef.current.eventOccurrences[
-                          serializeDate(startDateTime)
-                        ] ??= {};
-                        eventsRef.current.eventOccurrences[
-                          serializeDate(startDateTime)
-                        ][id] = { ...occurrence, id, eventId };
-                        eventsRef.current.events[eventId] = replaceKey(
-                          event,
-                          'calendarId',
-                          event.calendarId ??
-                            Object.values(calendars ?? {})[0]?.id
-                        );
-
-                        /*
-                         * If there were changes, delete future occurrences,
-                         * ask back-end to recreate them, and fetch the new
-                         * events
-                         */
-                        if (isNew || hasChanged) {
-                          getDatesBetween(
-                            initialEvent.current.endDate,
-                            event.endDate
-                          )
-                            .filter(
-                              (dateString) =>
-                                typeof eventsRef.current.eventOccurrences[
-                                  dateString
-                                ] === 'undefined'
+                        .then(async ([eventId, id]) => {
+                          eventsRef.current.eventOccurrences[
+                            serializeDate(initialOccurrence.startDateTime)
+                          ] = Object.fromEntries(
+                            Object.entries(
+                              eventsRef.current.eventOccurrences[
+                                serializeDate(initialOccurrence.startDateTime)
+                              ]
+                            ).filter(
+                              ([occurrenceId]) => occurrenceId === id.toString()
                             )
-                            .forEach((dateString) => {
-                              eventsRef.current.eventOccurrences[dateString] =
-                                Object.fromEntries(
-                                  Object.entries(
-                                    eventsRef.current.eventOccurrences[
-                                      dateString
-                                    ]
-                                  ).filter(
-                                    ([_id, occurrence]) =>
-                                      occurrence.eventId !== eventId
-                                  )
-                                );
-                            });
-
-                          return ajax<RA<EventOccurrence>>(
-                            `/api/table/event/${eventId}/recalculateFrom/${id}`,
-                            {
-                              method: 'POST',
-                              headers: { Accept: 'application/json' },
-                            },
-                            {
-                              expectedResponseCodes: [Http.CREATED],
-                            }
-                          ).then(async ({ data: occurrences }) =>
-                            occurrences.forEach((occurrence) => {
-                              eventsRef.current.eventOccurrences[
-                                serializeDate(occurrence.startDateTime)
-                              ] ??= {};
-                              eventsRef.current.eventOccurrences[
-                                serializeDate(occurrence.startDateTime)
-                              ][occurrence.id] = occurrence;
-                            })
                           );
-                        } else return undefined;
-                      })
-                      .then(async () => router.push(baseUrl).catch(crash))
-                      .catch(crash)
-                ))
+                          eventsRef.current.eventOccurrences[
+                            serializeDate(startDateTime)
+                          ] ??= {};
+                          eventsRef.current.eventOccurrences[
+                            serializeDate(startDateTime)
+                          ][id] = { ...occurrence, id, eventId };
+                          eventsRef.current.events[eventId] = replaceKey(
+                            event,
+                            'calendarId',
+                            event.calendarId ??
+                              Object.values(calendars ?? {})[0]?.id
+                          );
+
+                          /*
+                           * If there were changes, delete future occurrences,
+                           * ask back-end to recreate them, and fetch the new
+                           * events
+                           */
+                          if (isNew || eventChanged || occurrenceChanged) {
+                            getDatesBetween(
+                              initialEvent.current.endDate,
+                              event.endDate
+                            )
+                              .filter(
+                                (dateString) =>
+                                  typeof eventsRef.current.eventOccurrences[
+                                    dateString
+                                  ] === 'object'
+                              )
+                              .forEach((dateString) => {
+                                eventsRef.current.eventOccurrences[dateString] =
+                                  Object.fromEntries(
+                                    Object.entries(
+                                      eventsRef.current.eventOccurrences[
+                                        dateString
+                                      ]
+                                    ).filter(
+                                      ([_id, occurrence]) =>
+                                        occurrence.eventId !== eventId
+                                    )
+                                  );
+                              });
+
+                            return ajax<RA<EventOccurrence>>(
+                              `/api/table/event/${eventId}/recalculateFrom/${id}`,
+                              {
+                                method: 'POST',
+                                headers: { Accept: 'application/json' },
+                              },
+                              {
+                                expectedResponseCodes: [Http.CREATED],
+                              }
+                            ).then(async ({ data: occurrences }) =>
+                              occurrences.forEach((occurrence) => {
+                                const date = serializeDate(
+                                  new Date(occurrence.startDateTime)
+                                );
+                                eventsRef.current.eventOccurrences[date] ??= {};
+                                eventsRef.current.eventOccurrences[date][
+                                  occurrence.id
+                                ] = occurrence;
+                              })
+                            );
+                          } else return undefined;
+                        })
+                  )
+                  .then(async () => router.push(baseUrl).catch(crash))
+                  .catch(crash))
           }
         >
           <div className="grid grid-cols-[auto,1fr] gap-2">
@@ -354,11 +372,14 @@ export function MiniEvent({
                   className="flex-1"
                   value={Math.max(
                     0,
-                    getDaysBetween(startDateTime, event.endDate)
+                    Math.round(
+                      (getDaysBetween(startDateTime, event.endDate) / WEEK) *
+                        DAY
+                    )
                   )}
                   onValueChange={(weeks: number): void => {
                     const endDate = new Date(startDateTime);
-                    endDate.setDate(endDate.getDate() + (weeks / WEEK) * DAY);
+                    endDate.setDate(endDate.getDate() + (weeks * WEEK) / DAY);
                     setEvent(replaceKey(event, 'endDate', endDate));
                   }}
                   min={0}
@@ -463,12 +484,16 @@ export function DeleteDialog({
           <Button.Red
             onClick={(): void => {
               handleDeleted();
-              void ping(`/api/table/eventOccurrence/${occurrenceId}`, {
-                method: 'DELETE',
-              }).catch(crash);
+              void ping(
+                `/api/table/eventOccurrence/${occurrenceId}`,
+                {
+                  method: 'DELETE',
+                },
+                { expectedResponseCodes: [Http.NO_CONTENT] }
+              ).catch(crash);
             }}
           >
-            ${globalText('delete')}
+            {globalText('delete')}
           </Button.Red>
         </>
       }

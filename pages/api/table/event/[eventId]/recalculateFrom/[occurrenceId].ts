@@ -7,7 +7,6 @@ import type {
   EventOccurrence,
   EventTable,
 } from '../../../../../../lib/datamodel';
-import { eventOccurrence } from '../../../../../../lib/datamodel';
 import { f } from '../../../../../../lib/functools';
 import { connectToDatabase, execute } from '../../../../../../lib/mysql';
 import { queryRecord } from '../../../../../../lib/query';
@@ -59,8 +58,12 @@ export default async function endpoint(
     (getDaysBetween(occurrence.startDateTime, event.endDate) / WEEK) * DAY
   );
 
-  // TODO: rotate this to match the week day of the event
-  const weekDays = event.daysOfWeek
+  const weekDay = new Date(occurrence.startDateTime).getDay();
+  // Rotate the string so that first matches the current event's day
+  const rotatedWeekDays = `${event.daysOfWeek.slice(
+    weekDay
+  )}${event.daysOfWeek.slice(0, weekDay)}`;
+  const weekDays = rotatedWeekDays
     .split('')
     .map((day, index) => [day, index] as const)
     .filter(([day]) => day === day.toUpperCase())
@@ -73,21 +76,21 @@ export default async function endpoint(
       },
       (_, weekIndex) =>
         weekDays.map(async (weekDay) => {
-          const startDateTime = new Date(eventOccurrence.startDateTime);
+          const startDateTime = new Date(occurrence.startDateTime);
           startDateTime.setDate(
             startDateTime.getDate() + (weekIndex * WEEK) / DAY + weekDay
           );
           const endDateTime = new Date(
             startDateTime.getTime() +
-              (eventOccurrence.endDateTime.getTime() -
-                eventOccurrence.startDateTime.getTime())
+              (occurrence.endDateTime.getTime() -
+                occurrence.startDateTime.getTime())
           );
           const record = {
-            name: eventOccurrence.name,
-            description: eventOccurrence.description,
+            name: occurrence.name,
+            description: occurrence.description,
             startDateTime,
             endDateTime,
-            color: eventOccurrence.color,
+            color: occurrence.color,
             eventId: event.id,
           } as const;
           return execute<{ readonly insertId: number }>(

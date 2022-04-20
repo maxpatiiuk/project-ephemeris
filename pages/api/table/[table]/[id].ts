@@ -51,9 +51,7 @@ export default endpoint({
     connection,
     query: { id, table },
   }: Payload<never, 'id' | 'table'>) =>
-    execute(
-      connection,
-      `SELECT * FROM \`${parseTableName(table)}\` WHERE id=?`,
-      [Number.parseInt(id)]
-    ).then(() => ({ status: Http.NO_CONTENT, body: '' })),
+    execute(connection, `DELETE FROM \`${parseTableName(table)}\` WHERE id=?`, [
+      Number.parseInt(id),
+    ]).then(() => ({ status: Http.NO_CONTENT, body: '' })),
 });
