@@ -1,5 +1,6 @@
 import { MILLISECONDS, MINUTE } from '../components/Internationalization';
 import { f } from './functools';
+import type { RA } from './types';
 import { defined, filterArray } from './types';
 
 export const serializeDate = (date: Date): string =>
@@ -46,3 +47,30 @@ export const parseReTime = (
     filterArray(reTime.exec(timeString)?.slice(1).map(f.parseInt) ?? []),
     (time) => (time.length === 2 ? (time as [number, number]) : undefined)
   );
+
+/**
+ * Basded on Underscore JS' debounce function
+ */
+export default function debounce<ARGS extends RA<unknown>>(
+  callback: (...args: ARGS) => void,
+  wait: number
+): (...args: ARGS) => void {
+  let timeout: number | ReturnType<typeof setTimeout> | undefined = undefined;
+  let lastCall = 0;
+
+  function later(args: ARGS): void {
+    const passed = Date.now() - lastCall;
+    if (wait > passed) {
+      timeout = setTimeout(() => later(args), wait - passed);
+    } else {
+      timeout = undefined;
+      callback(...args);
+    }
+  }
+
+  return (...args: ARGS) => {
+    lastCall = Date.now();
+    if (typeof timeout === 'undefined')
+      timeout = setTimeout(() => later(args), wait);
+  };
+}

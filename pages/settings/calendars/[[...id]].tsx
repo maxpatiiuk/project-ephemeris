@@ -61,7 +61,7 @@ export default function Calendars(): JSX.Element {
       <Container.Quartered>
         <header className="contents">
           <h1 className="flex items-center text-2xl">{globalText('title')}</h1>
-          <Link.Default href="/">{globalText('goBack')}</Link.Default>
+          <span />
         </header>
         <main className="contents">
           {Array.isArray(calendars) && (

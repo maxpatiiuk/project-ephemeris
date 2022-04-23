@@ -31,7 +31,7 @@ export function Column({
     undefined
   );
   React.useEffect(() => {
-    const interval = setInterval(() => {
+    function update(): void {
       const currentDate = new Date();
       if (dateToString(currentDate) === dateToString(date)) {
         const dayStart = new Date();
@@ -42,7 +42,9 @@ export function Column({
           (currentDate.getTime() - dayStart.getTime()) / DAY / MILLISECONDS
         );
       } else setCurrentTime(undefined);
-    }, MINUTE * MILLISECONDS);
+    }
+    const interval = setInterval(update, MINUTE * MILLISECONDS);
+    update();
     return (): void => clearInterval(interval);
   }, [date]);
   return (

@@ -72,6 +72,19 @@ declare namespace Intl {
 
     public format(value: Readonly<Date>): string;
   }
+
+  class Collator {
+    public constructor(
+      locales?: string | RA<string>,
+      options?: {
+        readonly sensitivity?: 'base' | 'accent' | 'case' | 'variant';
+        readonly caseFirst?: 'upper' | 'lower' | false;
+        readonly ignorePunctuation?: boolean;
+      }
+    );
+
+    public compare(left: string, right: string): -1 | 0 | 1;
+  }
 }
 
 const longDate = new Intl.DateTimeFormat(LANGUAGE, {
@@ -150,23 +163,44 @@ const relativeDate = new Intl.RelativeTimeFormat(LANGUAGE, {
   style: 'long',
 });
 
-// TODO: add support for future dates
 export function getRelativeDate(date: Readonly<Date>): string {
   const timePassed = Math.round((Date.now() - date.getTime()) / MILLISECONDS);
-  if (timePassed < 0) throw new Error('Future dates are not supported');
-  else if (timePassed <= MINUTE)
-    return relativeDate.format(-Math.round(timePassed / SECOND), 'second');
+  return formatRelativeDate(timePassed < 0 ? -1 : 1, Math.abs(timePassed));
+}
+
+function formatRelativeDate(direction: -1 | 1, timePassed: number): string {
+  if (timePassed <= MINUTE)
+    return relativeDate.format(
+      direction * Math.round(timePassed / SECOND),
+      'second'
+    );
   else if (timePassed <= HOUR)
-    return relativeDate.format(-Math.round(timePassed / MINUTE), 'minute');
+    return relativeDate.format(
+      direction * Math.round(timePassed / MINUTE),
+      'minute'
+    );
   else if (timePassed <= DAY)
-    return relativeDate.format(-Math.round(timePassed / HOUR), 'hour');
+    return relativeDate.format(
+      direction * Math.round(timePassed / HOUR),
+      'hour'
+    );
   else if (timePassed <= WEEK)
-    return relativeDate.format(-Math.round(timePassed / DAY), 'day');
+    return relativeDate.format(direction * Math.round(timePassed / DAY), 'day');
   else if (timePassed <= MONTH)
-    return relativeDate.format(-Math.round(timePassed / WEEK), 'week');
+    return relativeDate.format(
+      direction * Math.round(timePassed / WEEK),
+      'week'
+    );
   else if (timePassed <= YEAR)
-    return relativeDate.format(-Math.round(timePassed / MONTH), 'month');
-  else return relativeDate.format(-Math.round(timePassed / YEAR), 'year');
+    return relativeDate.format(
+      direction * Math.round(timePassed / MONTH),
+      'month'
+    );
+  else
+    return relativeDate.format(
+      direction * Math.round(timePassed / YEAR),
+      'year'
+    );
 }
 
 export const countDaysInMonth = (year: number, month: number): number =>
@@ -183,3 +217,12 @@ export const weekDays = Array.from(
       `2017-01-${index < 9 ? `0${index + 1}` : index + 1}T00:00:00+00:00`
     )
 ).map(weekDayFormatter.format);
+
+export const compareStrings = new Intl.Collator(
+  typeof window === 'object' ? window.navigator.language : 'en-us',
+  {
+    sensitivity: 'base',
+    caseFirst: 'upper',
+    ignorePunctuation: true,
+  }
+).compare;

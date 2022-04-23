@@ -27,6 +27,7 @@ function App({ Component, pageProps }: AppProps): JSX.Element {
         </Head>
         <Contexts>
           <Component {...pageProps} />
+          <div id="portal-root" />
         </Contexts>
       </>
     </ErrorBoundary>

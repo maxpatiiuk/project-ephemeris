@@ -316,3 +316,9 @@ export function useOriginalValue<T>(value: T): T {
   }, [value]);
   return initialValue.current;
 }
+
+export function useClientSide(): boolean {
+  const [isClientSide, handleClientSide] = useBooleanState();
+  React.useEffect(handleClientSide, [handleClientSide]);
+  return isClientSide;
+}

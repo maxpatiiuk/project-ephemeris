@@ -13,6 +13,7 @@ import { dateParts } from '../../../../../components/Internationalization';
 import Layout from '../../../../../components/Layout';
 import { MainView } from '../../../../../components/MainView';
 import { MiniCalendar } from '../../../../../components/MiniCalendar';
+import { SearchBar } from '../../../../../components/SearchBar';
 import { useCachedState } from '../../../../../lib/stateCache';
 import { deserializeDate, serializeDate } from '../../../../../lib/utils';
 import { globalText } from '../../../../../localization/global';
@@ -80,6 +81,7 @@ export default function Index(): JSX.Element {
               title={globalText('next')}
               aria-label={globalText('next')}
             />
+            <SearchBar currentDate={currentDate} />
             <span className="flex-1 -ml-2" />
             <Select
               value={view}

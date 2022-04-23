@@ -43,7 +43,6 @@ export const globalText = createDictionary({
   },
   errorMessage: { 'en-us': 'Error message:' },
   close: { 'en-us': 'Close' },
-  goBack: { 'en-us': 'Go Back' },
   edit: { 'en-us': 'Edit' },
   name: { 'en-us': 'Name' },
   description: { 'en-us': 'Description' },
@@ -68,4 +67,6 @@ export const globalText = createDictionary({
   endTime: { 'en-us': 'End time' },
   weeks: { 'en-us': 'weeks' },
   time: { 'en-us': (city: string) => `${city} Time` },
+  search: { 'en-us': 'Search' },
+  recurring: { 'en-us': 'Recurring' },
 });

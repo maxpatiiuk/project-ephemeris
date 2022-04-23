@@ -201,9 +201,11 @@ function formatErrorResponse(error: string): JSX.Element {
     // Failed parsing error message as JSON
   }
   try {
-    const htmlElement = document.createElement('html');
-    htmlElement.innerHTML = error;
-    htmlElement.remove();
+    if (typeof document === 'object') {
+      const htmlElement = document.createElement('html');
+      htmlElement.innerHTML = error;
+      htmlElement.remove();
+    }
     return <ErrorIframe>{error}</ErrorIframe>;
   } catch {
     // Failed parsing error message as HTML
