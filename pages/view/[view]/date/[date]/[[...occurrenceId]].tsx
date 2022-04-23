@@ -8,6 +8,7 @@ import {
   Select,
 } from '../../../../../components/Basic';
 import { CalendarList } from '../../../../../components/CalendarList';
+import { CurrentTime } from '../../../../../components/CurrentTime';
 import { dateParts } from '../../../../../components/Internationalization';
 import Layout from '../../../../../components/Layout';
 import { MainView } from '../../../../../components/MainView';
@@ -104,6 +105,7 @@ export default function Index(): JSX.Element {
         <main className="contents">
           <aside className="flex flex-col gap-4">
             <MiniCalendar currentDate={currentDate} view={view} mode="aside" />
+            <CurrentTime />
             <CalendarList
               enabledCalendars={enabledCalendars ?? []}
               onChange={setEnabledCalendars}

@@ -67,4 +67,5 @@ export const globalText = createDictionary({
   startTime: { 'en-us': 'Start time' },
   endTime: { 'en-us': 'End time' },
   weeks: { 'en-us': 'weeks' },
+  time: { 'en-us': (city: string) => `${city} Time` },
 });
