@@ -58,8 +58,8 @@ export default async function endpoint(
     (getDaysBetween(occurrence.startDateTime, event.endDate) / WEEK) * DAY
   );
 
-  const weekDay = new Date(occurrence.startDateTime).getDay();
-  // Rotate the string so that first matches the current event's day
+  const weekDay = new Date(occurrence.startDateTime).getDay() + 1;
+  // Rotate the string so that first day matches the day after current event's day
   const rotatedWeekDays = `${event.daysOfWeek.slice(
     weekDay
   )}${event.daysOfWeek.slice(0, weekDay)}`;
@@ -78,7 +78,7 @@ export default async function endpoint(
         weekDays.map(async (weekDay) => {
           const startDateTime = new Date(occurrence.startDateTime);
           startDateTime.setDate(
-            startDateTime.getDate() + (weekIndex * WEEK) / DAY + weekDay
+            startDateTime.getDate() + (weekIndex * WEEK) / DAY + weekDay + 1
           );
           const endDateTime = new Date(
             startDateTime.getTime() +

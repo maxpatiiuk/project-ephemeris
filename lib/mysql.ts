@@ -14,6 +14,7 @@ function makeConnection() {
       user: process.env.MYSQL_USERNAME,
       password: process.env.MYSQL_PASSWORD,
       database: process.env.MYSQL_DATABASE,
+      timezone: 'Z',
     })
     .then((resolved) => {
       connection = resolved.on('error', reconnect);

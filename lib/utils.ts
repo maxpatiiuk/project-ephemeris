@@ -11,10 +11,13 @@ export const deserializeDate = (dateString: string): Date =>
 export const padNumber = (number: number): string =>
   number.toString().padStart(2, '0');
 
-export const dateToDatetimeLocal = (date: Date): string =>
+export const dateToString = (date: Date): string =>
   `${date.getFullYear()}-${padNumber(date.getMonth())}-${padNumber(
     date.getDate()
-  )}T${dateToTimeString(date)}`;
+  )}`;
+
+export const dateToDatetimeLocal = (date: Date): string =>
+  `${dateToString(date)}T${dateToTimeString(date)}`;
 
 export const dateToTimeString = (date: Date): string =>
   `${padNumber(date.getHours())}:${padNumber(date.getMinutes())}`;

@@ -7,6 +7,7 @@ import React from 'react';
 
 import { ajax, Http, ping } from '../lib/ajax';
 import type { Calendar, EventOccurrence, EventTable } from '../lib/datamodel';
+import { eventOccurrence } from '../lib/datamodel';
 import { f } from '../lib/functools';
 import { replaceItem, replaceKey } from '../lib/helpers';
 import type { IR, PartialBy, RA } from '../lib/types';
@@ -144,10 +145,10 @@ export function MiniEvent({
                   .var(
                     {
                       eventChanged:
-                        JSON.stringify(event) ===
+                        JSON.stringify(event) !==
                         JSON.stringify(initialEvent.current),
                       occurrenceChanged:
-                        JSON.stringify(occurrence) ===
+                        JSON.stringify(occurrence) !==
                         JSON.stringify(initialOccurrence),
                     },
                     async ({ eventChanged, occurrenceChanged }) =>
@@ -234,10 +235,27 @@ export function MiniEvent({
                            * events
                            */
                           if (isNew || eventChanged || occurrenceChanged) {
-                            getDatesBetween(
+                            const range = [
                               initialEvent.current.endDate,
-                              event.endDate
+                              occurrence.startDateTime,
+                            ];
+                            if (
+                              initialEvent.current.endDate.getDate() >
+                              occurrence.startDateTime.getDate()
                             )
+                              range.reverse();
+                            /*
+                             * Events to be deleted can be in the range from
+                             * the day after the occurrence till the last event
+                             * day
+                             */
+                            range[0] = new Date(range[0]);
+                            range[0].setDate(range[0].getDate() + 1);
+                            range[1] = new Date(range[1]);
+                            range[1].setDate(
+                              range[1].getDate() + 1 + WEEK / DAY
+                            );
+                            getDatesBetween(...range)
                               .filter(
                                 (dateString) =>
                                   typeof eventsRef.current.eventOccurrences[
@@ -275,7 +293,13 @@ export function MiniEvent({
                                 eventsRef.current.eventOccurrences[date] ??= {};
                                 eventsRef.current.eventOccurrences[date][
                                   occurrence.id
-                                ] = occurrence;
+                                ] = {
+                                  ...occurrence,
+                                  startDateTime: new Date(
+                                    occurrence.startDateTime
+                                  ),
+                                  endDateTime: new Date(occurrence.endDateTime),
+                                };
                               })
                             );
                           } else return undefined;
