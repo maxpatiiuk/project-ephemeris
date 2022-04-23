@@ -7,13 +7,14 @@ import { formatUrl } from '../lib/querystring';
 import type { IR, RA } from '../lib/types';
 import { defined } from '../lib/types';
 import {
+  dateToString,
   dateToTimeString,
   DEFAULT_EVENT_DURATION,
   MARKS_IN_DAY,
   serializeDate,
 } from '../lib/utils';
 import { globalText } from '../localization/global';
-import { DAY, MILLISECONDS } from './Internationalization';
+import { DAY, MILLISECONDS, MINUTE } from './Internationalization';
 import type { OccurrenceWithEvent } from './useEvents';
 
 export function Column({
@@ -26,8 +27,37 @@ export function Column({
   readonly date: Date;
 }): JSX.Element {
   const router = useRouter();
+  const [currentTime, setCurrentTime] = React.useState<number | undefined>(
+    undefined
+  );
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      const currentDate = new Date();
+      if (dateToString(currentDate) === dateToString(date)) {
+        const dayStart = new Date();
+        dayStart.setHours(0);
+        dayStart.setMinutes(0);
+        dayStart.setSeconds(0);
+        setCurrentTime(
+          (currentDate.getTime() - dayStart.getTime()) / DAY / MILLISECONDS
+        );
+      } else setCurrentTime(undefined);
+    }, MINUTE * MILLISECONDS);
+    return (): void => clearInterval(interval);
+  }, [date]);
   return (
     <div className="flex-1 flex flex-col relative">
+      {typeof currentTime === 'number' && (
+        <div
+          aria-hidden={true}
+          className="absolute w-full bg-red-500 h-0.5 z-10 pointer-events-none"
+          style={{
+            top: `${currentTime * 100}%`,
+          }}
+        >
+          <div className="absolute -top-1 -left-1.5 w-3 h-3 rounded-full bg-red-500" />
+        </div>
+      )}
       <Link
         href={`/view/${router.query.view as string}/date/${serializeDate(
           date
