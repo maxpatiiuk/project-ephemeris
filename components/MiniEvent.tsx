@@ -30,7 +30,7 @@ import { ColorPicker } from './ColorPicker';
 import { EventsContext } from './Contexts';
 import { crash } from './ErrorBoundary';
 import { useBooleanState } from './Hooks';
-import { iconClassName, icons } from './Icons';
+import { icons } from './Icons';
 import { DAY, WEEK, weekDays } from './Internationalization';
 import { Dialog } from './ModalDialog';
 import { getDatesBetween, getDaysBetween } from './useEvents';

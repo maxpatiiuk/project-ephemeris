@@ -4,11 +4,34 @@ import type { Calendar } from '../lib/dataModel';
 import type { IR, RA } from '../lib/types';
 import { MARKS_IN_DAY, padNumber, serializeDate } from '../lib/utils';
 import { LANGUAGE } from '../localization/utils';
-import { className, Link } from './Basic';
+import { className, Container, Link } from './Basic';
 import { Column } from './Column';
 import { EventsContext } from './Contexts';
 import { DAY, WEEK } from './Internationalization';
 import { useEvents } from './useEvents';
+
+export function HourTape(): JSX.Element {
+  return (
+    <div className="flex flex-col text-gray-500">
+      <div
+        className="flex p-1 border-b border-gray-300 dark:border-neutral-700"
+        aria-hidden
+      >
+        <div className="flex-1 text-left">{'ㅤ'}</div>
+        <div className={className.miniCalendarDay}>{'ㅤ'}</div>
+      </div>
+      {/* A different font is used so that all numbers are equal width */}
+      <div className="flex-1 flex flex-col -mb-2 mt-2 text-sm font-[Helvetica,sans-serif]">
+        {Array.from({ length: MARKS_IN_DAY - 1 }, (_, index) => (
+          <span key={index} className="flex-1 flex items-end">
+            {`${padNumber(index + 1)}:00`}
+          </span>
+        ))}
+        <span className="flex-1" />
+      </div>
+    </div>
+  );
+}
 
 export function WeekView({
   currentDate,
@@ -47,28 +70,8 @@ export function WeekView({
   );
 
   return (
-    <div
-      className={`flex border border-gray-300 dark:border-neutral-700 divide-x-2
-        divide-gray-300 dark:divide-neutral-700 rounded`}
-    >
-      <div className="flex flex-col text-gray-500">
-        <div
-          className="flex p-1 border-b border-gray-300 dark:border-neutral-700"
-          aria-hidden
-        >
-          <div className="flex-1 text-left">{'ㅤ'}</div>
-          <div className={className.miniCalendarDay}>{'ㅤ'}</div>
-        </div>
-        {/* A different font is used so that all numbers are equal width */}
-        <div className="flex-1 flex flex-col -mb-2 mt-2 text-sm font-[Helvetica,sans-serif]">
-          {Array.from({ length: MARKS_IN_DAY - 1 }, (_, index) => (
-            <span key={index} className="flex-1 flex items-end">
-              {`${padNumber(index + 1)}:00`}
-            </span>
-          ))}
-          <span className="flex-1" />
-        </div>
-      </div>
+    <Container.Full className="flex divide-x-2 divide-gray-300 dark:divide-neutral-700">
+      <HourTape />
       {days.map(({ date, day, weekDay }, index) => (
         <div key={day} className="flex-1 flex flex-col">
           <Link.Default
@@ -91,6 +94,6 @@ export function WeekView({
           />
         </div>
       ))}
-    </div>
+    </Container.Full>
   );
 }

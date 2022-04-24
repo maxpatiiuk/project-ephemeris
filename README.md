@@ -1,5 +1,10 @@
 # EECS 647 Project: Ephemeris
 
+A full-fledged calendar application with support for multiple calendars,
+repeated events and best of all, dark mode. Supports for view modes (year, month,
+week and day).
+A Google Calendar clone application. Built with Next.JS. Uses MySQL database.
+
 // TODO: add project description
 // TODO: add project screenshots
 // TODO: add project URL

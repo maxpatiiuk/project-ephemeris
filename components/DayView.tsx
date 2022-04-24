@@ -2,10 +2,11 @@ import React from 'react';
 
 import type { Calendar } from '../lib/dataModel';
 import type { IR, RA } from '../lib/types';
-import { className } from './Basic';
+import { className, Container } from './Basic';
 import { Column } from './Column';
 import { EventsContext } from './Contexts';
 import { useEvents } from './useEvents';
+import { HourTape } from './WeekView';
 
 export function DayView({
   currentDate,
@@ -24,22 +25,28 @@ export function DayView({
     enabledCalendars
   );
   return (
-    <div className="flex-1 border flex flex-col gap-1 overflow-y-scroll">
-      <div className="flex gap-1 p-1 border-b">
-        <div className="flex-1">
-          {currentDate.toLocaleString(window.navigator.language, {
-            weekday: 'long',
-          })}
+    <Container.Full className="flex-1  flex">
+      <HourTape />
+      <div
+        className={`flex-1 border-l border-gray-300 dark:border-neutral-700
+          flex flex-col gap-1 overflow-y-scroll`}
+      >
+        <div className="flex gap-1 p-1 border-b border-gray-300 dark:border-neutral-700">
+          <div className="flex-1">
+            {currentDate.toLocaleString(window.navigator.language, {
+              weekday: 'long',
+            })}
+          </div>
+          <div className={`${className.miniCalendarDay} bg-brand-100`}>
+            {currentDate.getDate()}
+          </div>
         </div>
-        <div className={`${className.miniCalendarDay} bg-brand-100`}>
-          {currentDate.getDate()}
-        </div>
+        <Column
+          occurrences={eventOccurrences?.[0]}
+          calendars={calendars}
+          date={currentDate}
+        />
       </div>
-      <Column
-        occurrences={eventOccurrences?.[0]}
-        calendars={calendars}
-        date={currentDate}
-      />
-    </div>
+    </Container.Full>
   );
 }

@@ -106,7 +106,7 @@ const containerBackground = 'bg-gray-200 dark:bg-neutral-800';
 const baseContainer = `${containerBackground} flex flex-col gap-2 p-4 shadow-md
   shadow-gray-500 rounded`;
 const rootText = 'text-black dark:text-white';
-const rootBackground = 'bg-white dark:bg-neutral-900';
+const rootBackground = 'bg-gray-200 dark:bg-neutral-900';
 export const className = {
   rootBackground,
   containerBackground,
@@ -563,6 +563,11 @@ export const Container = {
     'section',
     `${baseContainer} ${rootBackground} ${rootText}
       max-w-[min(100%,1200px)] mx-auto`
+  ),
+  Full: wrap(
+    'Container.Full',
+    'section',
+    `bg-gray-100 dark:bg-neutral-800 rounded border border-gray-300 dark:border-neutral-700 `
   ),
   Quartered: wrap(
     'Container.Quartered',

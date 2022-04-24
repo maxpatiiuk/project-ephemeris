@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { Container } from './Basic';
 import { MiniCalendar } from './MiniCalendar';
 
 const MONTHS_IN_YEAR = 12;
@@ -19,7 +20,7 @@ export function YearView({
     [year]
   );
   return (
-    <div className="grid grid-cols-4 grid-rows-3 gap-6">
+    <Container.Full className="grid grid-cols-4 grid-rows-3 gap-6 p-4">
       {dates.map((date, index) => (
         <MiniCalendar
           key={index}
@@ -28,6 +29,6 @@ export function YearView({
           mode="yearPart"
         />
       ))}
-    </div>
+    </Container.Full>
   );
 }

@@ -130,23 +130,21 @@ export default function Index(): JSX.Element {
             </Select>
           </div>
         </header>
-        <main className="contents">
-          <aside className="flex flex-col gap-4">
-            <MiniCalendar currentDate={currentDate} view={view} mode="aside" />
-            <CurrentTime />
-            <CalendarList
-              enabledCalendars={enabledCalendars ?? []}
-              onChange={setEnabledCalendars}
-              calendars={calendars}
-            />
-          </aside>
-          <MainView
-            view={view}
-            date={currentDate}
+        <aside className="flex flex-col gap-4">
+          <MiniCalendar currentDate={currentDate} view={view} mode="aside" />
+          <CurrentTime />
+          <CalendarList
             enabledCalendars={enabledCalendars ?? []}
+            onChange={setEnabledCalendars}
             calendars={calendars}
           />
-        </main>
+        </aside>
+        <MainView
+          view={view}
+          date={currentDate}
+          enabledCalendars={enabledCalendars ?? []}
+          calendars={calendars}
+        />
       </Container.Quartered>
     </Layout>
   );

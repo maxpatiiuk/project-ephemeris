@@ -5,7 +5,7 @@ import type { Calendar } from '../lib/dataModel';
 import type { IR, RA } from '../lib/types';
 import { getMonthDays, serializeDate, startWithSunday } from '../lib/utils';
 import { globalText } from '../localization/global';
-import { className, Link } from './Basic';
+import { className, Container, Link } from './Basic';
 import type { EventsRef } from './MainView';
 import type { OccurrenceWithEvent } from './useEvents';
 import { useEvents } from './useEvents';
@@ -69,7 +69,7 @@ export function MonthView({
     enabledCalendars
   );
   return (
-    <div className="flex flex-col overflow-hidden">
+    <Container.Full className="flex flex-col overflow-hidden">
       <div className="flex">
         {(startWithSunday
           ? globalText('daysOfWeek')
@@ -87,7 +87,10 @@ export function MonthView({
       </div>
       <div className="grid grid-cols-7 grid-rows-6 flex-1">
         {days.previousMonth.map(([label, date], index) => (
-          <div className="border flex flex-col gap-1" key={label}>
+          <div
+            className="border border-gray-300 dark:border-neutral-700 flex flex-col gap-1"
+            key={label}
+          >
             <div className="flex justify-center">
               <Link.Default
                 className={`${className.miniCalendarDay} text-gray-500`}
@@ -103,7 +106,10 @@ export function MonthView({
           </div>
         ))}
         {days.currentMonth.map(([label, date], index) => (
-          <div className="border flex flex-col gap-1" key={label}>
+          <div
+            className="border border-gray-300 dark:border-neutral-700 flex flex-col gap-1"
+            key={label}
+          >
             <div className="flex justify-center">
               <Link.Default
                 className={`${className.miniCalendarDay}  ${
@@ -123,7 +129,10 @@ export function MonthView({
           </div>
         ))}
         {days.nextMonth.map(([label, date], index) => (
-          <div className="border flex flex-col gap-1" key={label}>
+          <div
+            className="border border-gray-300 dark:border-neutral-700 flex flex-col gap-1"
+            key={label}
+          >
             <div className="flex justify-center">
               <Link.Default
                 className={`${className.miniCalendarDay} text-gray-500`}
@@ -143,6 +152,6 @@ export function MonthView({
           </div>
         ))}
       </div>
-    </div>
+    </Container.Full>
   );
 }
