@@ -102,14 +102,10 @@ export default function Calendars(): JSX.Element {
                     onSubmit={(): void =>
                       loading(
                         (typeof calendar.id === 'number'
-                          ? ping(
-                              `/api/table/calendar/${calendar.id}`,
-                              {
-                                method: 'PUT',
-                                body: calendar,
-                              },
-                              { expectedResponseCodes: [Http.NO_CONTENT] }
-                            )
+                          ? ping(`/api/table/calendar/${calendar.id}`, {
+                              method: 'PUT',
+                              body: calendar,
+                            })
                           : ajax<Calendar>(
                               '/api/table/calendar',
                               {

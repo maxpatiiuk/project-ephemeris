@@ -7,12 +7,12 @@ import { globalText } from '../localization/global';
 import { Input, Label, Link, Ul } from './Basic';
 
 export function CalendarList({
-  enabledCalendars,
+  disabledCalendars,
   onChange: handleChange,
   calendars,
 }: {
-  readonly enabledCalendars: RA<number>;
-  readonly onChange: (enabledCalendars: RA<number>) => void;
+  readonly disabledCalendars: RA<number>;
+  readonly onChange: (disabledCalendars: RA<number>) => void;
   readonly calendars: IR<Calendar> | undefined;
 }): JSX.Element {
   return (
@@ -34,9 +34,9 @@ export function CalendarList({
                 <Input.Checkbox
                   className="h-5 w-5 rounded-sm"
                   style={{ color: calendar.color }}
-                  checked={enabledCalendars.includes(calendar.id)}
+                  checked={!disabledCalendars.includes(calendar.id)}
                   onValueChange={(): void =>
-                    handleChange(toggleItem(enabledCalendars, calendar.id))
+                    handleChange(toggleItem(disabledCalendars, calendar.id))
                   }
                 />
                 {calendar.name}

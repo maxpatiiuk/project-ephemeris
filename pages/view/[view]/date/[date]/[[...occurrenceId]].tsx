@@ -66,7 +66,7 @@ export default function Index(): JSX.Element {
     false
   );
 
-  const [disabledCalendars, setEnabledCalendars] = useCachedState({
+  const [disabledCalendars, setDisabledCalendars] = useCachedState({
     bucketName: 'main',
     cacheName: 'disabledCalendars',
     bucketType: 'localStorage',
@@ -134,8 +134,8 @@ export default function Index(): JSX.Element {
           <MiniCalendar currentDate={currentDate} view={view} mode="aside" />
           <CurrentTime />
           <CalendarList
-            enabledCalendars={enabledCalendars ?? []}
-            onChange={setEnabledCalendars}
+            disabledCalendars={disabledCalendars ?? []}
+            onChange={setDisabledCalendars}
             calendars={calendars}
           />
         </aside>
