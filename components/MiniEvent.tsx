@@ -26,6 +26,7 @@ import {
   Submit,
   Textarea,
 } from './Basic';
+import { ColorPicker } from './ColorPicker';
 import { EventsContext } from './Contexts';
 import { crash } from './ErrorBoundary';
 import { useBooleanState } from './Hooks';
@@ -76,18 +77,9 @@ export function MiniEvent({
         header={
           <div className="flex gap-2 items-center" aria-label={name}>
             <label title={globalText('color')} className="contents">
-              <span
-                className={`${iconClassName} rounded-full`}
-                style={{
-                  backgroundColor: color,
-                }}
-              />
-              <span className="sr-only">{globalText('color')}</span>
-              <Input.Generic
-                className={`sr-only`}
-                type="color"
-                value={color}
-                onValueChange={(color): void => {
+              <ColorPicker
+                color={color}
+                onChange={(color): void => {
                   setOccurrence(replaceKey(occurrence, 'color', color));
                   setEvent(replaceKey(event, 'defaultColor', color));
                 }}

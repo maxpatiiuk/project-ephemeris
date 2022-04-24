@@ -105,6 +105,7 @@ const niceButton = `rounded cursor-pointer active:brightness-80 px-4 py-2
 const containerBackground = 'bg-gray-200 dark:bg-neutral-800';
 const baseContainer = `${containerBackground} flex flex-col gap-2 p-4 shadow-md
   shadow-gray-500 rounded`;
+const rootText = 'text-black dark:text-white';
 const rootBackground = 'bg-white dark:bg-neutral-900';
 export const className = {
   rootBackground,
@@ -560,12 +561,13 @@ export const Container = {
   Generic: wrap(
     'Container.Generic',
     'section',
-    `${baseContainer} max-w-[min(100%,1200px)] mx-auto`
+    `${baseContainer} ${rootBackground} ${rootText}
+      max-w-[min(100%,1200px)] mx-auto`
   ),
   Quartered: wrap(
     'Container.Quartered',
     'main',
-    `h-screen flex flex-col gap-2 bg-black text-white grid
+    `h-screen flex flex-col gap-2 grid ${rootBackground} ${rootText}
       grid-cols-[256px_1fr] grid-rows-[min-content_1fr] p-4`
   ),
 };

@@ -4,6 +4,7 @@ import type { Calendar, New } from '../lib/dataModel';
 import { replaceKey } from '../lib/helpers';
 import { globalText } from '../localization/global';
 import { Input, Label, Textarea } from './Basic';
+import { ColorPicker } from './ColorPicker';
 
 export function CalendarView({
   calendar,
@@ -45,10 +46,9 @@ export function CalendarView({
       </Label.Generic>
       <Label.Generic>
         {globalText('color')}
-        <Input.Generic
-          type="color"
-          value={calendar.color}
-          onValueChange={(color): void =>
+        <ColorPicker
+          color={calendar.color}
+          onChange={(color): void =>
             handleChange(replaceKey(calendar, 'color', color))
           }
         />

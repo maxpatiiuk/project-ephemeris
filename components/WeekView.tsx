@@ -47,9 +47,15 @@ export function WeekView({
   );
 
   return (
-    <div className="flex border divide-x-2 rounded">
+    <div
+      className={`flex border border-gray-300 dark:border-neutral-700 divide-x-2
+        divide-gray-300 dark:divide-neutral-700 rounded`}
+    >
       <div className="flex flex-col text-gray-500">
-        <div className="flex p-1 border-b" aria-hidden>
+        <div
+          className="flex p-1 border-b border-gray-300 dark:border-neutral-700"
+          aria-hidden
+        >
           <div className="flex-1 text-left">{'ㅤ'}</div>
           <div className={className.miniCalendarDay}>{'ㅤ'}</div>
         </div>
@@ -66,7 +72,7 @@ export function WeekView({
       {days.map(({ date, day, weekDay }, index) => (
         <div key={day} className="flex-1 flex flex-col">
           <Link.Default
-            className="flex p-1 border-b"
+            className="flex p-1 border-b border-gray-300 dark:border-neutral-700"
             href={`/view/day/date/${serializeDate(date)}`}
           >
             <div className="flex-1 text-left">{weekDay}</div>

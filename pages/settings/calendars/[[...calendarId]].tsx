@@ -15,7 +15,6 @@ import { useAsyncState, useLiveState } from '../../../components/Hooks';
 import { icons } from '../../../components/Icons';
 import Layout from '../../../components/Layout';
 import { ajax, Http, ping } from '../../../lib/ajax';
-import * as cache from '../../../lib/cache';
 import type { Calendar, New } from '../../../lib/dataModel';
 import { f } from '../../../lib/functools';
 import type { IR, RA } from '../../../lib/types';
@@ -119,21 +118,7 @@ export default function Calendars(): JSX.Element {
                                 body: calendar,
                               },
                               { expectedResponseCodes: [Http.CREATED] }
-                            ).then(({ data: { id } }) => {
-                              const enabledCalendars = cache.get(
-                                'main',
-                                'enabledCalendars',
-                                { defaultValue: [] }
-                              );
-                              cache.set(
-                                'main',
-                                'enabledCalendars',
-                                [...enabledCalendars, id],
-                                {
-                                  overwrite: true,
-                                }
-                              );
-                            })
+                            )
                         ).then(async () => router.push('/'))
                       )
                     }

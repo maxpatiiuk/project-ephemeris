@@ -169,7 +169,7 @@ export function Column({
           {Array.from({ length: MARKS_IN_DAY }, (_, index) => (
             <span
               key={index}
-              className="border-b border-gray-200 dark:border-neutral-900 flex-1"
+              className="border-b border-gray-200 dark:border-neutral-800 flex-1"
             />
           ))}
         </a>
@@ -206,14 +206,18 @@ export function Column({
                 height: `${placing[index].height}%`,
               }}
               className={`rounded !border-l-2 hover:brightness-150 z-10 absolute
-                flex items-center
+                flex overflow-hidden
                 ${endDateTime.getTime() < Date.now() ? 'brightness-80' : ''}
-                ${placing[index].atomCount > 2 ? 'flex-col p-1' : 'text-xs'}
+                ${
+                  placing[index].atomCount > 3
+                    ? `flex-col p-1 ${
+                        placing[index].atomCount === 4 ? 'pt-0 text-sm' : ''
+                      }`
+                    : 'gap-0.5 text-xs items-center whitespace-nowrap'
+                }
               `}
             >
-              <span>{`${name}${
-                placing[index].atomCount > 2 ? '' : ', '
-              }`}</span>
+              <span>{`${name}${placing[index].atomCount > 3 ? '' : ','}`}</span>
               <span className="text-xs">
                 <time
                   aria-label={globalText('from')}

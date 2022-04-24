@@ -35,14 +35,6 @@ export default function Index(): JSX.Element {
     [router.query.date]
   );
 
-  const [enabledCalendars, setEnabledCalendars] = useCachedState({
-    bucketName: 'main',
-    cacheName: 'enabledCalendars',
-    bucketType: 'localStorage',
-    defaultValue: [],
-    staleWhileRefresh: false,
-  });
-
   const previousDate = React.useMemo(() => {
     const newDate = new Date(currentDate);
     if (view === 'day') newDate.setDate(newDate.getDate() - 1);
@@ -72,6 +64,23 @@ export default function Index(): JSX.Element {
       []
     ),
     false
+  );
+
+  const [disabledCalendars, setEnabledCalendars] = useCachedState({
+    bucketName: 'main',
+    cacheName: 'disabledCalendars',
+    bucketType: 'localStorage',
+    defaultValue: [],
+    staleWhileRefresh: false,
+  });
+  const enabledCalendars = React.useMemo(
+    () =>
+      Array.isArray(disabledCalendars) && typeof calendars === 'object'
+        ? Object.values(calendars)
+            .filter(({ id }) => !disabledCalendars.includes(id))
+            .map(({ id }) => id)
+        : undefined,
+    [disabledCalendars, calendars]
   );
 
   return (
