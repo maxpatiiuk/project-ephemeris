@@ -11,18 +11,14 @@ import {
 } from '../../../components/Basic';
 import { CalendarView } from '../../../components/CalendarView';
 import { LoadingContext } from '../../../components/Contexts';
-import {
-  useAsyncState,
-  useLiveState,
-  useOriginalValue,
-} from '../../../components/Hooks';
+import { useAsyncState, useLiveState } from '../../../components/Hooks';
 import { icons } from '../../../components/Icons';
 import Layout from '../../../components/Layout';
 import { ajax, Http, ping } from '../../../lib/ajax';
+import * as cache from '../../../lib/cache';
 import type { Calendar, New } from '../../../lib/dataModel';
 import { f } from '../../../lib/functools';
 import type { IR, RA } from '../../../lib/types';
-import { defined } from '../../../lib/types';
 import { globalText } from '../../../localization/global';
 
 export default function Calendars(): JSX.Element {
@@ -36,12 +32,11 @@ export default function Calendars(): JSX.Element {
     ),
     true
   );
-  const originalCalendars = useOriginalValue(calendars);
-
   const router = useRouter();
   const selectedCalendar =
-    f.parseInt((router.query.id as RA<string> | undefined)?.[0] ?? '') ??
-    undefined;
+    f.parseInt(
+      (router.query.calendarId as RA<string> | undefined)?.[0] ?? ''
+    ) ?? undefined;
   const [calendar, setCalendar] = useLiveState(
     React.useCallback(
       () =>
@@ -107,31 +102,38 @@ export default function Calendars(): JSX.Element {
                   <Form
                     onSubmit={(): void =>
                       loading(
-                        Promise.all(
-                          calendars.map((calendar, index) =>
-                            typeof calendar.id === 'number'
-                              ? JSON.stringify(calendar) ===
-                                JSON.stringify(
-                                  defined(originalCalendars)[index]
-                                )
-                                ? undefined
-                                : ping(
-                                    `/api/table/calendar/${calendar.id}`,
-                                    {
-                                      method: 'PUT',
-                                      body: calendar,
-                                    },
-                                    { expectedResponseCodes: [Http.NO_CONTENT] }
-                                  )
-                              : ping(
-                                  '/api/table/calendar',
-                                  {
-                                    method: 'POST',
-                                    body: calendar,
-                                  },
-                                  { expectedResponseCodes: [Http.CREATED] }
-                                )
-                          )
+                        (typeof calendar.id === 'number'
+                          ? ping(
+                              `/api/table/calendar/${calendar.id}`,
+                              {
+                                method: 'PUT',
+                                body: calendar,
+                              },
+                              { expectedResponseCodes: [Http.NO_CONTENT] }
+                            )
+                          : ajax<Calendar>(
+                              '/api/table/calendar',
+                              {
+                                method: 'POST',
+                                headers: { Accept: 'application/json' },
+                                body: calendar,
+                              },
+                              { expectedResponseCodes: [Http.CREATED] }
+                            ).then(({ data: { id } }) => {
+                              const enabledCalendars = cache.get(
+                                'main',
+                                'enabledCalendars',
+                                { defaultValue: [] }
+                              );
+                              cache.set(
+                                'main',
+                                'enabledCalendars',
+                                [...enabledCalendars, id],
+                                {
+                                  overwrite: true,
+                                }
+                              );
+                            })
                         ).then(async () => router.push('/'))
                       )
                     }
@@ -147,7 +149,7 @@ export default function Calendars(): JSX.Element {
                     />
                     <div className="flex gap-2">
                       <Link.LikeFancyButton
-                        className={className.redButton}
+                        className={className.grayButton}
                         href="/"
                       >
                         {globalText('cancel')}

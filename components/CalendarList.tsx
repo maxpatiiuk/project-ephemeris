@@ -1,19 +1,20 @@
 import React from 'react';
 
+import type { Calendar } from '../lib/dataModel';
 import { toggleItem } from '../lib/helpers';
-import type { RA } from '../lib/types';
+import type { IR, RA } from '../lib/types';
 import { globalText } from '../localization/global';
 import { Input, Label, Link, Ul } from './Basic';
-import { CalendarsContext } from './Contexts';
 
 export function CalendarList({
   enabledCalendars,
   onChange: handleChange,
+  calendars,
 }: {
   readonly enabledCalendars: RA<number>;
   readonly onChange: (enabledCalendars: RA<number>) => void;
+  readonly calendars: IR<Calendar> | undefined;
 }): JSX.Element {
-  const calendars = React.useContext(CalendarsContext);
   return (
     <section className="flex flex-col gap-2">
       <div className="flex">

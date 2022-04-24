@@ -1,12 +1,10 @@
 import React from 'react';
 import Modal from 'react-modal';
 
-import { ajax } from '../lib/ajax';
 import { error } from '../lib/assert';
-import type { Calendar } from '../lib/dataModel';
-import type { IR, RA } from '../lib/types';
+import type { RA } from '../lib/types';
 import { crash } from './ErrorBoundary';
-import { useAsyncState, useBooleanState } from './Hooks';
+import { useBooleanState } from './Hooks';
 import type { EventsRef } from './MainView';
 import { LoadingScreen } from './ModalDialog';
 
@@ -58,28 +56,13 @@ export function Contexts({
     eventTarget: new EventTarget(),
   });
 
-  const [calendars] = useAsyncState(
-    React.useCallback(
-      async () =>
-        ajax<RA<Calendar>>('/api/table/calendar', {
-          headers: { Accept: 'application/json' },
-        }).then(({ data }) =>
-          Object.fromEntries(data.map((calendar) => [calendar.id, calendar]))
-        ),
-      []
-    ),
-    false
-  );
-
   return (
     <LoadingContext.Provider value={handle}>
       <LoadingScreen isLoading={isLoading} />
       <ErrorContext.Provider value={setError}>
         {error}
         <EventsContext.Provider value={eventsRef}>
-          <CalendarsContext.Provider value={calendars}>
-            {children}
-          </CalendarsContext.Provider>
+          {children}
         </EventsContext.Provider>
       </ErrorContext.Provider>
     </LoadingContext.Provider>
@@ -105,9 +88,3 @@ export const EventsContext = React.createContext<EventsRef>({
   },
 });
 EventsContext.displayName = 'EventsContext';
-
-// Stores calendars
-export const CalendarsContext = React.createContext<IR<Calendar> | undefined>(
-  {}
-);
-CalendarsContext.displayName = 'CalendarsContext';

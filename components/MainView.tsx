@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router';
 import React from 'react';
 
-import type { EventOccurrence, EventTable } from '../lib/dataModel';
+import type { Calendar, EventOccurrence, EventTable } from '../lib/dataModel';
 import { f } from '../lib/functools';
-import type { R, RA } from '../lib/types';
+import type { IR, R, RA } from '../lib/types';
 import {
   DEFAULT_EVENT_DURATION,
   DEFAULT_MINUTE_ROUNDING,
@@ -11,7 +11,7 @@ import {
   parseReTime,
 } from '../lib/utils';
 import type { View } from '../pages/view/[view]/date/[date]/[[...occurrenceId]]';
-import { CalendarsContext, EventsContext } from './Contexts';
+import { EventsContext } from './Contexts';
 import { DayView } from './DayView';
 import { MiniEvent } from './MiniEvent';
 import { MonthView } from './MonthView';
@@ -28,12 +28,13 @@ export function MainView({
   view,
   date,
   enabledCalendars,
+  calendars,
 }: {
   readonly view: View;
   readonly date: Date;
   readonly enabledCalendars: RA<number>;
+  readonly calendars: IR<Calendar> | undefined;
 }): JSX.Element {
-  const calendars = React.useContext(CalendarsContext);
   const eventsRef = React.useContext(EventsContext);
   const router = useRouter();
   const currentOccurrenceId = f.parseInt(router.query.occurrenceId?.[1] ?? '');
