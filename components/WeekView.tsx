@@ -53,14 +53,15 @@ export function WeekView({
           <div className="flex-1 text-left">{'ㅤ'}</div>
           <div className={className.miniCalendarDay}>{'ㅤ'}</div>
         </div>
-        {Array.from({ length: MARKS_IN_DAY }, (_, index) => (
-          <span
-            key={index}
-            className="border-b border-gray-200 dark:border-neutral-900 flex-1 flex items-end"
-          >
-            {`${padNumber(index + 1)}:00`}
-          </span>
-        ))}
+        {/* A different font is used so that all numbers are equal width */}
+        <div className="flex-1 flex flex-col -mb-2 mt-2 text-sm font-[Helvetica,sans-serif]">
+          {Array.from({ length: MARKS_IN_DAY - 1 }, (_, index) => (
+            <span key={index} className="flex-1 flex items-end">
+              {`${padNumber(index + 1)}:00`}
+            </span>
+          ))}
+          <span className="flex-1" />
+        </div>
       </div>
       {days.map(({ date, day, weekDay }, index) => (
         <div key={day} className="flex-1 flex flex-col">

@@ -18,9 +18,13 @@ import { globalText } from '../localization/global';
 import { DAY, HOUR, MILLISECONDS, MINUTE } from './Internationalization';
 import type { OccurrenceWithEvent } from './useEvents';
 
-function usePlacing(
-  occurrences: RA<OccurrenceWithEvent> | undefined
-): RA<{ readonly top: number; readonly left: number; readonly width: number }> {
+function usePlacing(occurrences: RA<OccurrenceWithEvent> | undefined): RA<{
+  readonly top: number;
+  readonly left: number;
+  readonly width: number;
+  readonly height: number;
+  readonly atomCount: number;
+}> {
   return React.useMemo(() => {
     const atomCount = (MARKS_IN_DAY * HOUR) / MINUTE / DEFAULT_MINUTE_ROUNDING;
     const atoms = Array.from(
@@ -46,7 +50,7 @@ function usePlacing(
                 atomCount
             )
           : atomCount;
-      Array.from({ length: endAtom - startAtom + 1 }, (_, index) => {
+      Array.from({ length: endAtom - startAtom }, (_, index) => {
         atoms[startAtom + index].push(id);
       });
     });
@@ -63,10 +67,13 @@ function usePlacing(
         const left = Math.max(
           ...atoms.slice(startIndex, endIndex).map((atom) => atom.indexOf(id))
         );
+
         return {
           top: (startIndex / atomCount) * 100,
           left: (left / fraction) * 100,
           width: (1 / fraction) * 100,
+          height: ((endIndex - startIndex) / atomCount) * 100,
+          atomCount: endIndex - startIndex,
         };
       }) ?? []
     );
@@ -87,6 +94,7 @@ export function Column({
     undefined
   );
   const placing = usePlacing(occurrences);
+
   React.useEffect(() => {
     function update(): void {
       const currentDate = new Date();
@@ -105,6 +113,7 @@ export function Column({
     update();
     return (): void => clearInterval(interval);
   }, [date]);
+
   return (
     <div className="flex-1 flex flex-col relative">
       {typeof currentTime === 'number' && (
@@ -194,13 +203,18 @@ export function Column({
                 top: `${placing[index].top}%`,
                 left: `${placing[index].left}%`,
                 width: `${placing[index].width}%`,
+                height: `${placing[index].height}%`,
               }}
-              className={`flex flex-col rounded p-1 !border-l-2
-                hover:brightness-150 z-10 absolute
-                ${endDateTime.getTime() < Date.now() ? 'brightness-80' : ''}`}
+              className={`rounded !border-l-2 hover:brightness-150 z-10 absolute
+                flex items-center
+                ${endDateTime.getTime() < Date.now() ? 'brightness-80' : ''}
+                ${placing[index].atomCount > 2 ? 'flex-col p-1' : 'text-xs'}
+              `}
             >
-              <span>{name}</span>
-              <span>
+              <span>{`${name}${
+                placing[index].atomCount > 2 ? '' : ', '
+              }`}</span>
+              <span className="text-xs">
                 <time
                   aria-label={globalText('from')}
                   dateTime={startDateTime.toJSON()}

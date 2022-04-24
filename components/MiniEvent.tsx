@@ -212,7 +212,7 @@ export function MiniEvent({
                                 serializeDate(initialOccurrence.startDateTime)
                               ]
                             ).filter(
-                              ([occurrenceId]) => occurrenceId === id.toString()
+                              ([occurrenceId]) => occurrenceId !== id.toString()
                             )
                           );
                           eventsRef.current.eventOccurrences[
