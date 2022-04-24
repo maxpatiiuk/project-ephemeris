@@ -7,7 +7,6 @@ import React from 'react';
 
 import { ajax, Http, ping } from '../lib/ajax';
 import type { Calendar, EventOccurrence, EventTable } from '../lib/datamodel';
-import { eventOccurrence } from '../lib/datamodel';
 import { f } from '../lib/functools';
 import { replaceItem, replaceKey } from '../lib/helpers';
 import type { IR, PartialBy, RA } from '../lib/types';

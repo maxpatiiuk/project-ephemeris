@@ -12,7 +12,6 @@ export function middleware(request: NextRequest): NextResponse {
 }
 
 /*
- * TODO: 2 queries with joins
  * TODO: go though all files and remove everything unused
  * TODO: deploy to vercel
  * TODO: record a video review

@@ -69,4 +69,5 @@ export const globalText = createDictionary({
   time: { 'en-us': (city: string) => `${city} Time` },
   search: { 'en-us': 'Search' },
   recurring: { 'en-us': 'Recurring' },
+  eventCount: { 'en-us': 'Total events:' },
 });

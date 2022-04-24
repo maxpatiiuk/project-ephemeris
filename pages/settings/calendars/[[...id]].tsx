@@ -21,7 +21,7 @@ import Layout from '../../../components/Layout';
 import { ajax, Http, ping } from '../../../lib/ajax';
 import type { Calendar, New } from '../../../lib/datamodel';
 import { f } from '../../../lib/functools';
-import type { RA } from '../../../lib/types';
+import type { IR, RA } from '../../../lib/types';
 import { defined } from '../../../lib/types';
 import { globalText } from '../../../localization/global';
 
@@ -55,6 +55,17 @@ export default function Calendars(): JSX.Element {
     )
   );
   const loading = React.useContext(LoadingContext);
+
+  const [stats] = useAsyncState(
+    React.useCallback(
+      async () =>
+        ajax<IR<number>>('/api/stats/global', {
+          headers: { Accept: 'application/json' },
+        }).then(({ data }) => data),
+      []
+    ),
+    false
+  );
 
   return (
     <Layout title={undefined}>
@@ -125,7 +136,15 @@ export default function Calendars(): JSX.Element {
                       )
                     }
                   >
-                    <CalendarView calendar={calendar} onChange={setCalendar} />
+                    <CalendarView
+                      calendar={calendar}
+                      onChange={setCalendar}
+                      occurrenceCount={
+                        typeof stats === 'object'
+                          ? stats?.[calendar?.id ?? '']
+                          : globalText('loading')
+                      }
+                    />
                     <div className="flex gap-2">
                       <Link.LikeFancyButton
                         className={className.redButton}

@@ -8,9 +8,11 @@ import { Input, Label, Textarea } from './Basic';
 export function CalendarView({
   calendar,
   onChange: handleChange,
+  occurrenceCount = 0,
 }: {
   readonly calendar: New<Calendar>;
   readonly onChange: (calendar: New<Calendar>) => void;
+  readonly occurrenceCount: string | number | undefined;
 }): JSX.Element {
   return (
     <>
@@ -32,6 +34,14 @@ export function CalendarView({
             handleChange(replaceKey(calendar, 'description', description))
           }
         />
+      </Label.Generic>
+      <Label.Generic>
+        {globalText('eventCount')}
+        {typeof occurrenceCount === 'number' ? (
+          <Input.Number value={occurrenceCount} isReadOnly />
+        ) : (
+          <Input.Text value={occurrenceCount} isReadOnly />
+        )}
       </Label.Generic>
       <Label.Generic>
         {globalText('color')}
