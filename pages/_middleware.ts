@@ -13,7 +13,6 @@ export function middleware(request: NextRequest): NextResponse {
 
 /*
  * TODO: test dark mode
- * TODO: go though all files and remove everything unused
  * TODO: deploy to vercel
  * TODO: record a video review
  * TODO: write an overview and add to portfolio

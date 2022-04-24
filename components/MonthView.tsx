@@ -1,76 +1,148 @@
+import BaseLink from 'next/link';
 import React from 'react';
 
-import type { RA } from '../lib/types';
-import { serializeDate } from '../lib/utils';
+import type { Calendar } from '../lib/dataModel';
+import type { IR, RA } from '../lib/types';
+import { getMonthDays, serializeDate, startWithSunday } from '../lib/utils';
 import { globalText } from '../localization/global';
 import { className, Link } from './Basic';
-import { getMonthDays } from './MiniCalendar';
+import type { EventsRef } from './MainView';
+import type { OccurrenceWithEvent } from './useEvents';
+import { useEvents } from './useEvents';
 
-function DayEvents({ events }: { readonly events: RA<''> }): JSX.Element {
+function DayEvents({
+  occurrences,
+  calendars,
+}: {
+  readonly occurrences: RA<OccurrenceWithEvent> | undefined;
+  readonly calendars: IR<Calendar> | undefined;
+}): JSX.Element {
   return (
-    <div
-      className={`flex-1 flex flex-col overflow-auto ${
-        events.length === 0 ? 'justify-center items-center' : ''
-      }`}
-    >
-      {/* TODO: display events */}
-      {events.length === 0 && globalText('noEvents')}
+    <div className={`flex-1 flex flex-col overflow-auto`}>
+      {occurrences?.map(
+        ({
+          id,
+          name,
+          startDateTime,
+          endDateTime,
+          color,
+          event: { calendarId },
+        }) => (
+          <BaseLink
+            href={`/view/day/date/${serializeDate(startDateTime)}/event/${id}`}
+            key={id}
+          >
+            <a
+              style={{
+                backgroundColor: color,
+                borderColor: calendars?.[calendarId].color ?? color,
+              }}
+              className={`flex flex-col rounded p-1 !border-l-2
+                hover:brightness-150 z-10
+                ${endDateTime.getTime() < Date.now() ? 'brightness-80' : ''}`}
+            >
+              {name}
+            </a>
+          </BaseLink>
+        )
+      )}
     </div>
   );
 }
 
 export function MonthView({
   currentDate,
+  eventsRef,
+  enabledCalendars,
+  calendars,
 }: {
   readonly currentDate: Date;
+  readonly eventsRef: EventsRef;
+  readonly enabledCalendars: RA<number>;
+  readonly calendars: IR<Calendar> | undefined;
 }): JSX.Element {
-  const days = React.useMemo(
-    () => getMonthDays(currentDate, true),
-    [currentDate]
+  const days = React.useMemo(() => getMonthDays(currentDate), [currentDate]);
+  const eventOccurrences = useEvents(
+    days.previousMonth[0]?.[1] ?? days.currentMonth[0][1],
+    days.nextMonth.slice(-1)[0]?.[1] ?? days.currentMonth.slice(-1)[0][1],
+    eventsRef,
+    enabledCalendars
   );
   return (
-    <div className="grid grid-cols-7 grid-rows-6">
-      {days.previousMonth.map(([label, date]) => (
-        <div className="border flex flex-col gap-1" key={label}>
-          <div className="flex justify-center">
-            <Link.Default
-              className={`${className.miniCalendarDay} text-gray-500`}
-              href={`/view/day/date/${serializeDate(date)}`}
+    <div className="flex flex-col overflow-hidden">
+      <div className="flex">
+        {(startWithSunday
+          ? globalText('daysOfWeek')
+          : globalText('daysOfWeekEurope')
+        )
+          .split('')
+          .map((dayOfWeek, index) => (
+            <div
+              key={index}
+              className={`${className.miniCalendarDay} text-gray-500 w-full`}
             >
-              {label}
-            </Link.Default>
+              {dayOfWeek}
+            </div>
+          ))}
+      </div>
+      <div className="grid grid-cols-7 grid-rows-6 flex-1">
+        {days.previousMonth.map(([label, date], index) => (
+          <div className="border flex flex-col gap-1" key={label}>
+            <div className="flex justify-center">
+              <Link.Default
+                className={`${className.miniCalendarDay} text-gray-500`}
+                href={`/view/week/date/${serializeDate(date)}`}
+              >
+                {label}
+              </Link.Default>
+            </div>
+            <DayEvents
+              occurrences={eventOccurrences?.[index]}
+              calendars={calendars}
+            />
           </div>
-          <DayEvents events={[]} />
-        </div>
-      ))}
-      {days.currentMonth.map(([label, date]) => (
-        <div className="border flex flex-col gap-1" key={label}>
-          <div className="flex justify-center">
-            <Link.Default
-              className={`${className.miniCalendarDay}  ${
-                days.todayDay === label ? 'bg-brand-300' : ''
-              }`}
-              href={`/view/day/date/${serializeDate(date)}`}
-            >
-              {label}
-            </Link.Default>
+        ))}
+        {days.currentMonth.map(([label, date], index) => (
+          <div className="border flex flex-col gap-1" key={label}>
+            <div className="flex justify-center">
+              <Link.Default
+                className={`${className.miniCalendarDay}  ${
+                  days.todayDay === label ? 'bg-brand-300' : ''
+                }`}
+                href={`/view/week/date/${serializeDate(date)}`}
+              >
+                {label}
+              </Link.Default>
+            </div>
+            <DayEvents
+              occurrences={
+                eventOccurrences?.[days.previousMonth.length + index]
+              }
+              calendars={calendars}
+            />
           </div>
-          <DayEvents events={[]} />
-        </div>
-      ))}
-      {days.nextMonth.map(([label, date]) => (
-        <div className="border flex flex-col gap-1" key={label}>
-          <div className="flex justify-center">
-            <Link.Default
-              className={`${className.miniCalendarDay} text-gray-500`}
-              href={`/view/day/date/${serializeDate(date)}`}
-            >
-              {label}
-            </Link.Default>
+        ))}
+        {days.nextMonth.map(([label, date], index) => (
+          <div className="border flex flex-col gap-1" key={label}>
+            <div className="flex justify-center">
+              <Link.Default
+                className={`${className.miniCalendarDay} text-gray-500`}
+                href={`/view/week/date/${serializeDate(date)}`}
+              >
+                {label}
+              </Link.Default>
+            </div>
+            <DayEvents
+              occurrences={
+                eventOccurrences?.[
+                  days.previousMonth.length + days.currentMonth.length + index
+                ]
+              }
+              calendars={calendars}
+            />
           </div>
-          <DayEvents events={[]} />
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

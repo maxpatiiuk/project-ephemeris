@@ -34,7 +34,6 @@ export const globalText = createDictionary({
   week: { 'en-us': 'Week' },
   daysOfWeek: { 'en-us': 'SMTWTFS' },
   daysOfWeekEurope: { 'en-us': 'MTWTFSS' },
-  noEvents: { 'en-us': 'No Events' },
   loading: { 'en-us': 'Loading' },
   errorBoundaryDialogHeader: { 'en-us': 'Unexpected error has occurred' },
   errorBoundaryDialogMessage: {

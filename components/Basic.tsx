@@ -106,7 +106,6 @@ const containerBackground = 'bg-gray-200 dark:bg-neutral-800';
 const baseContainer = `${containerBackground} flex flex-col gap-2 p-4 shadow-md
   shadow-gray-500 rounded`;
 const rootBackground = 'bg-white dark:bg-neutral-900';
-// TODO: remove unused
 export const className = {
   rootBackground,
   containerBackground,
@@ -566,7 +565,7 @@ export const Container = {
   Quartered: wrap(
     'Container.Quartered',
     'main',
-    `min-h-screen flex flex-col gap-2 bg-black text-white grid
+    `h-screen flex flex-col gap-2 bg-black text-white grid
       grid-cols-[256px_1fr] grid-rows-[min-content_1fr] p-4`
   ),
 };

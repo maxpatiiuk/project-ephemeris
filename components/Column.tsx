@@ -17,6 +17,7 @@ import { globalText } from '../localization/global';
 import { DAY, MILLISECONDS, MINUTE } from './Internationalization';
 import type { OccurrenceWithEvent } from './useEvents';
 
+// TODO: place evens better
 export function Column({
   occurrences,
   calendars,

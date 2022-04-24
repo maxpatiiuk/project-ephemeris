@@ -81,7 +81,12 @@ export function MainView({
       {view === 'year' ? (
         <YearView currentDate={date} />
       ) : view === 'month' ? (
-        <MonthView currentDate={date} />
+        <MonthView
+          currentDate={date}
+          enabledCalendars={enabledCalendars}
+          eventsRef={eventsRef}
+          calendars={calendars}
+        />
       ) : view === 'week' ? (
         <WeekView
           currentDate={date}
