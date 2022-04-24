@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { Calendar } from '../lib/dataModel';
 import { toggleItem } from '../lib/helpers';
-import type { IR, RA } from '../lib/types';
+import type { RA } from '../lib/types';
 import { globalText } from '../localization/global';
 import { Input, Label, Link, Ul } from './Basic';
 
@@ -13,7 +13,7 @@ export function CalendarList({
 }: {
   readonly disabledCalendars: RA<number>;
   readonly onChange: (disabledCalendars: RA<number>) => void;
-  readonly calendars: IR<Calendar> | undefined;
+  readonly calendars: RA<Calendar> | undefined;
 }): JSX.Element {
   return (
     <section className="flex flex-col gap-2">
@@ -26,9 +26,9 @@ export function CalendarList({
           title={globalText('edit')}
         />
       </div>
-      {typeof calendars === 'object' ? (
+      {Array.isArray(calendars) ? (
         <Ul>
-          {Object.values(calendars).map((calendar) => (
+          {calendars.map((calendar) => (
             <li key={calendar.id} title={calendar.description}>
               <Label.ForCheckbox>
                 <Input.Checkbox

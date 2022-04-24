@@ -127,15 +127,10 @@ export function useTriggerState<T>(
 ): [state: T, setState: React.Dispatch<React.SetStateAction<T>>] {
   const [state, setState] = React.useState<T>(defaultValue);
 
-  /**
-   * Using React.useRef rather than React.useEffect with a [defaultValue]
-   * dependency because React.useEffect executes too late in the process
-   */
-  const previousDefaultValue = React.useRef<T>(defaultValue);
-  if (previousDefaultValue.current !== defaultValue) {
+  /* Using layout effect rather than useEffect to update the state earlier on */
+  React.useLayoutEffect(() => {
     setState(defaultValue);
-    previousDefaultValue.current = defaultValue;
-  }
+  }, [defaultValue]);
 
   return [state, setState];
 }

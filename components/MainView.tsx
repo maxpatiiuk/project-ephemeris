@@ -3,7 +3,7 @@ import React from 'react';
 
 import type { Calendar, EventOccurrence, EventTable } from '../lib/dataModel';
 import { f } from '../lib/functools';
-import type { IR, R, RA } from '../lib/types';
+import type { R, RA } from '../lib/types';
 import {
   DEFAULT_EVENT_DURATION,
   DEFAULT_MINUTE_ROUNDING,
@@ -33,7 +33,7 @@ export function MainView({
   readonly view: View;
   readonly date: Date;
   readonly enabledCalendars: RA<number>;
-  readonly calendars: IR<Calendar> | undefined;
+  readonly calendars: RA<Calendar> | undefined;
 }): JSX.Element {
   const eventsRef = React.useContext(EventsContext);
   const router = useRouter();
@@ -62,7 +62,7 @@ export function MainView({
         description: '',
         startDateTime: startDate,
         endDateTime: new Date(startDate.getTime() + DEFAULT_EVENT_DURATION),
-        color: Object.values(calendars ?? {})[0]?.color ?? '#123abc',
+        color: calendars?.[0]?.color ?? '#123abc',
         eventId: undefined,
       };
     } else

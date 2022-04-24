@@ -73,7 +73,7 @@ export function SearchBar({
     >
       {(props): JSX.Element => (
         <Input.Generic
-          className="w-full max-w-[20rem]"
+          className="w-full max-w-[30rem]"
           placeholder={globalText('search')}
           {...props}
         />

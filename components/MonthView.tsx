@@ -2,7 +2,7 @@ import BaseLink from 'next/link';
 import React from 'react';
 
 import type { Calendar } from '../lib/dataModel';
-import type { IR, RA } from '../lib/types';
+import type { RA } from '../lib/types';
 import { getMonthDays, serializeDate, startWithSunday } from '../lib/utils';
 import { globalText } from '../localization/global';
 import { className, Container, Link } from './Basic';
@@ -15,7 +15,7 @@ function DayEvents({
   calendars,
 }: {
   readonly occurrences: RA<OccurrenceWithEvent> | undefined;
-  readonly calendars: IR<Calendar> | undefined;
+  readonly calendars: RA<Calendar> | undefined;
 }): JSX.Element {
   return (
     <div className={`flex-1 flex flex-col overflow-auto`}>
@@ -35,7 +35,9 @@ function DayEvents({
             <a
               style={{
                 backgroundColor: color,
-                borderColor: calendars?.[calendarId].color ?? color,
+                borderColor:
+                  calendars?.find(({ id }) => id === calendarId)?.color ??
+                  color,
               }}
               className={`flex flex-col rounded p-1 !border-l-2
                 hover:brightness-150 z-10
@@ -59,7 +61,7 @@ export function MonthView({
   readonly currentDate: Date;
   readonly eventsRef: EventsRef;
   readonly enabledCalendars: RA<number>;
-  readonly calendars: IR<Calendar> | undefined;
+  readonly calendars: RA<Calendar> | undefined;
 }): JSX.Element {
   const days = React.useMemo(() => getMonthDays(currentDate), [currentDate]);
   const eventOccurrences = useEvents(
@@ -85,7 +87,7 @@ export function MonthView({
             </div>
           ))}
       </div>
-      <div className="grid grid-cols-7 grid-rows-6 flex-1">
+      <div className="grid grid-cols-7 grid-rows-6 flex-1 overflow-hidden">
         {days.previousMonth.map(([label, date], index) => (
           <div
             className="border border-gray-300 dark:border-neutral-700 flex flex-col gap-1"

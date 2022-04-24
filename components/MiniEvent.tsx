@@ -9,7 +9,7 @@ import { ajax, Http, ping } from '../lib/ajax';
 import type { Calendar, EventOccurrence, EventTable } from '../lib/dataModel';
 import { f } from '../lib/functools';
 import { replaceItem, replaceKey } from '../lib/helpers';
-import type { IR, PartialBy, RA } from '../lib/types';
+import type { PartialBy, RA } from '../lib/types';
 import {
   dateToDatetimeLocal,
   parseDateTimeLocal,
@@ -29,7 +29,7 @@ import {
 import { ColorPicker } from './ColorPicker';
 import { EventsContext } from './Contexts';
 import { crash } from './ErrorBoundary';
-import { useBooleanState } from './Hooks';
+import { useBooleanState, useTriggerState } from './Hooks';
 import { icons } from './Icons';
 import {
   DAY,
@@ -41,12 +41,31 @@ import {
 import { Dialog } from './ModalDialog';
 import { getDatesBetween, getDaysBetween } from './useEvents';
 
+function DateTime({
+  value: originalValue,
+  onChange: handleChange,
+}: {
+  readonly value: Date;
+  onChange: (date: Date) => void;
+}): JSX.Element {
+  const [value, setValue] = useTriggerState(dateToDatetimeLocal(originalValue));
+  return (
+    <Input.Generic
+      className="flex-1"
+      type="datetime-local"
+      value={value}
+      onValueChange={setValue}
+      onBlur={(): void => handleChange(parseDateTimeLocal(value))}
+    />
+  );
+}
+
 export function MiniEvent({
   occurrence: initialOccurrence,
   calendars,
 }: {
   readonly occurrence: PartialBy<EventOccurrence, 'id' | 'eventId'>;
-  readonly calendars: IR<Calendar> | undefined;
+  readonly calendars: RA<Calendar> | undefined;
 }): JSX.Element {
   const [occurrence, setOccurrence] = React.useState(initialOccurrence);
   const { id, name, startDateTime, endDateTime, color, description, eventId } =
@@ -62,7 +81,7 @@ export function MiniEvent({
       defaultEndTime: endDateTime,
       daysOfWeek: 'smtwtfs',
       defaultColor: color,
-      calendarId: Object.values(calendars ?? {})[0]?.id,
+      calendarId: calendars?.[0]?.id,
     }
   );
   const initialEvent = React.useRef(event);
@@ -164,8 +183,7 @@ export function MiniEvent({
                               body: replaceKey(
                                 event,
                                 'calendarId',
-                                event.calendarId ??
-                                  Object.values(calendars ?? {})[0]?.id
+                                event.calendarId ?? calendars?.[0]?.id
                               ),
                               headers: { Accept: 'application/json' },
                             },
@@ -223,8 +241,7 @@ export function MiniEvent({
                             replaceKey(
                               event,
                               'calendarId',
-                              event.calendarId ??
-                                Object.values(calendars ?? {})[0]?.id
+                              event.calendarId ?? calendars?.[0]?.id
                             ),
                             'id',
                             eventId
@@ -291,7 +308,12 @@ export function MiniEvent({
                                 const date = serializeDate(
                                   new Date(occurrence.startDateTime)
                                 );
-                                eventsRef.current.eventOccurrences[date] ??= {};
+                                if (
+                                  typeof eventsRef.current.eventOccurrences[
+                                    date
+                                  ] === 'undefined'
+                                )
+                                  return;
                                 eventsRef.current.eventOccurrences[date][
                                   occurrence.id
                                 ] = {
@@ -320,12 +342,9 @@ export function MiniEvent({
             <span className="flex gap-2">
               <label className="flex flex-col gap-1">
                 {globalText('startTime')}
-                <Input.Generic
-                  className="flex-1"
-                  type="datetime-local"
-                  value={dateToDatetimeLocal(startDateTime)}
-                  onValueChange={(dateString): void => {
-                    const startDate = parseDateTimeLocal(dateString);
+                <DateTime
+                  value={startDateTime}
+                  onChange={(startDate): void =>
                     setOccurrence(
                       replaceKey(
                         replaceKey(occurrence, 'startDateTime', startDate),
@@ -338,17 +357,15 @@ export function MiniEvent({
                           )
                         )
                       )
-                    );
-                  }}
+                    )
+                  }
                 />
               </label>
               <label className="flex flex-col gap-1">
                 <span className="flex-1">{globalText('endTime')}</span>
-                <Input.Generic
-                  type="datetime-local"
-                  value={dateToDatetimeLocal(endDateTime)}
-                  onValueChange={(date): void => {
-                    const endDate = parseDateTimeLocal(date);
+                <DateTime
+                  value={endDateTime}
+                  onChange={(endDate): void =>
                     setOccurrence(
                       replaceKey(
                         replaceKey(occurrence, 'endDateTime', endDate),
@@ -363,8 +380,8 @@ export function MiniEvent({
                             )
                           : startDateTime
                       )
-                    );
-                  }}
+                    )
+                  }
                 />
               </label>
             </span>
@@ -409,12 +426,15 @@ export function MiniEvent({
               <div className="flex gap-2 items-center">
                 <Input.Number
                   className="flex-1"
-                  value={Math.max(
-                    0,
-                    Math.round(
-                      (getDaysBetween(startDateTime, event.endDate) / WEEK) *
-                        DAY
-                    )
+                  value={f.var(
+                    Math.max(
+                      0,
+                      Math.round(
+                        (getDaysBetween(startDateTime, event.endDate) / WEEK) *
+                          DAY
+                      )
+                    ),
+                    (value) => (Number.isNaN(value) ? '' : value)
                   )}
                   onValueChange={(weeks: number): void => {
                     const endDate = new Date(startDateTime);
@@ -433,17 +453,14 @@ export function MiniEvent({
               <Select
                 required
                 className="flex gap-2"
-                value={
-                  event.calendarId ??
-                  Object.values(calendars ?? [])[0]?.id ??
-                  ''
-                }
+                value={event.calendarId ?? calendars?.[0]?.id ?? ''}
                 onValueChange={(calendarId): void => {
                   setOccurrence(
                     replaceKey(
                       occurrence,
                       'color',
-                      calendars?.[calendarId]?.color ?? color
+                      calendars?.find(({ id }) => id.toString() === calendarId)
+                        ?.color ?? color
                     )
                   );
                   setEvent(
@@ -454,12 +471,13 @@ export function MiniEvent({
                         Number.parseInt(calendarId)
                       ),
                       'defaultColor',
-                      calendars?.[calendarId]?.color ?? event.defaultColor
+                      calendars?.find(({ id }) => id.toString() === calendarId)
+                        ?.color ?? event.defaultColor
                     )
                   );
                 }}
               >
-                {Object.values(calendars ?? []).map((calendar) => (
+                {calendars?.map((calendar) => (
                   <option key={calendar.id} value={calendar.id}>
                     {calendar.name}
                   </option>

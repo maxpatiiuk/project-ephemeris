@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { Calendar } from '../lib/dataModel';
-import type { IR, RA } from '../lib/types';
+import type { RA } from '../lib/types';
 import { className, Container } from './Basic';
 import { Column } from './Column';
 import { EventsContext } from './Contexts';
@@ -15,7 +15,7 @@ export function DayView({
 }: {
   readonly currentDate: Date;
   readonly enabledCalendars: RA<number>;
-  readonly calendars: IR<Calendar> | undefined;
+  readonly calendars: RA<Calendar> | undefined;
 }): JSX.Element {
   const eventsRef = React.useContext(EventsContext);
   const eventOccurrences = useEvents(
@@ -37,7 +37,9 @@ export function DayView({
               weekday: 'long',
             })}
           </div>
-          <div className={`${className.miniCalendarDay} bg-brand-100`}>
+          <div
+            className={`${className.miniCalendarDay} bg-brand-100 dark:brand-500`}
+          >
             {currentDate.getDate()}
           </div>
           <span className="flex-1" />

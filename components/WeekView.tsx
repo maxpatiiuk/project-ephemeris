@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { Calendar } from '../lib/dataModel';
-import type { IR, RA } from '../lib/types';
+import type { RA } from '../lib/types';
 import { MARKS_IN_DAY, padNumber, serializeDate } from '../lib/utils';
 import { LANGUAGE } from '../localization/utils';
 import { className, Container, Link } from './Basic';
@@ -40,7 +40,7 @@ export function WeekView({
 }: {
   readonly currentDate: Date;
   readonly enabledCalendars: RA<number>;
-  readonly calendars: IR<Calendar> | undefined;
+  readonly calendars: RA<Calendar> | undefined;
 }): JSX.Element {
   const days = React.useMemo(() => {
     const weekDay = currentDate.getDay();
@@ -81,7 +81,9 @@ export function WeekView({
             <div className="flex-1 text-left">{weekDay}</div>
             <div
               className={`${className.miniCalendarDay} ${
-                currentDate.getDate() === day ? 'bg-brand-300' : 'bg-brand-100'
+                currentDate.getDate() === day
+                  ? 'bg-brand-300'
+                  : 'bg-brand-100 dark:bg-brand-500'
               }`}
             >
               {day}

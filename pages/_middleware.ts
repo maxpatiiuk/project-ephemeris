@@ -13,7 +13,6 @@ export function middleware(request: NextRequest): NextResponse {
 
 /*
  * TODO: deploy to vercel
- * TODO: record a video review
  * TODO: add project screenshots
  * TODO: add project URL
  */

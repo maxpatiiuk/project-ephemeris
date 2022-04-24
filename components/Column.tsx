@@ -4,7 +4,7 @@ import React from 'react';
 
 import type { Calendar } from '../lib/dataModel';
 import { formatUrl } from '../lib/querystring';
-import type { IR, RA } from '../lib/types';
+import type { RA } from '../lib/types';
 import { defined } from '../lib/types';
 import {
   dateToString,
@@ -59,8 +59,10 @@ function usePlacing(occurrences: RA<OccurrenceWithEvent> | undefined): RA<{
       occurrences?.map(({ id }) => {
         const startIndex = atoms.findIndex((atom) => atom.includes(id));
         const endIndex =
-          atoms.slice(startIndex).findIndex((atom) => !atom.includes(id)) +
-          startIndex;
+          atoms.length -
+          Array.from(atoms)
+            .reverse()
+            .findIndex((atom) => atom.includes(id));
         const fraction = Math.max(
           ...atoms.slice(startIndex, endIndex).map((atom) => atom.length)
         );
@@ -86,7 +88,7 @@ export function Column({
   date,
 }: {
   readonly occurrences: RA<OccurrenceWithEvent> | undefined;
-  readonly calendars: IR<Calendar> | undefined;
+  readonly calendars: RA<Calendar> | undefined;
   readonly date: Date;
 }): JSX.Element {
   const router = useRouter();
@@ -169,7 +171,7 @@ export function Column({
           {Array.from({ length: MARKS_IN_DAY }, (_, index) => (
             <span
               key={index}
-              className="border-b border-gray-200 dark:border-neutral-800 flex-1"
+              className="border-b border-gray-200 dark:border-neutral-700 flex-1"
             />
           ))}
         </a>
@@ -199,7 +201,9 @@ export function Column({
             <a
               style={{
                 backgroundColor: color,
-                borderColor: calendars?.[calendarId].color ?? color,
+                borderColor:
+                  calendars?.find(({ id }) => id === calendarId)?.color ??
+                  color,
                 top: `${placing[index].top}%`,
                 left: `${placing[index].left}%`,
                 width: `${placing[index].width}%`,

@@ -17,6 +17,7 @@ import { MiniCalendar } from '../../../../../components/MiniCalendar';
 import { SearchBar } from '../../../../../components/SearchBar';
 import { ajax } from '../../../../../lib/ajax';
 import type { Calendar } from '../../../../../lib/dataModel';
+import { formatUrl } from '../../../../../lib/querystring';
 import { useCachedState } from '../../../../../lib/stateCache';
 import type { IR, RA } from '../../../../../lib/types';
 import { deserializeDate, serializeDate } from '../../../../../lib/utils';
@@ -56,11 +57,12 @@ export default function Index(): JSX.Element {
   const [calendars] = useAsyncState(
     React.useCallback(
       async () =>
-        ajax<RA<Calendar>>('/api/table/calendar', {
-          headers: { Accept: 'application/json' },
-        }).then(({ data }) =>
-          Object.fromEntries(data.map((calendar) => [calendar.id, calendar]))
-        ),
+        ajax<RA<Calendar>>(
+          formatUrl('/api/table/calendar', { orderBy: 'name' }),
+          {
+            headers: { Accept: 'application/json' },
+          }
+        ).then(({ data }) => data),
       []
     ),
     false
@@ -76,7 +78,7 @@ export default function Index(): JSX.Element {
   const enabledCalendars = React.useMemo(
     () =>
       Array.isArray(disabledCalendars) && typeof calendars === 'object'
-        ? Object.values(calendars)
+        ? calendars
             .filter(({ id }) => !disabledCalendars.includes(id))
             .map(({ id }) => id)
         : undefined,
