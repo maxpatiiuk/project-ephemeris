@@ -6,6 +6,7 @@ import type { ResponsePayload } from './apiUtils';
 import { error } from './assert';
 import { tables } from './dataModel';
 import { f } from './functools';
+import { split } from './helpers';
 import { execute } from './mysql';
 import type { IR, RA } from './types';
 import { ensure } from './types';
@@ -77,49 +78,85 @@ export const filtersToSql = (
   tableName: keyof typeof tables
 ): Readonly<[sql: string, values: RA<string>]> =>
   f.var(
-    Object.entries(filters)
-      .map(
+    split(
+      Object.entries(filters).map(
         ([filterName, filterValue]) =>
           [filterName.split(filterDelimiter), filterValue] as const
-      )
-      .map(
-        ([[fieldName, operator = 'equal'], filterValue]) =>
-          [
-            Object.entries(tables[tableName]).find(
-              ([column]) => column.toLowerCase() === fieldName.toLowerCase()
-            ) ??
-              error(
-                `Unknown field "${fieldName}". Allowed fields include ${getTableColumns(
-                  tableName
-                ).join(', ')}`
-              ),
-            Object.entries(operators).find(
-              ([filter]) => filter.toLowerCase() === operator.toLowerCase()
-            ) ??
-              error(
-                `Unknown filter "${operator}". Allowed filters include ${Object.keys(
-                  operators
-                ).join(', ')}`
-              ),
-            filterValue,
-          ] as const
-      )
-      .map(
-        ([
-          [fieldName, _fieldType],
-          [_filterName, filterHandler],
-          filterValue,
-        ]) => [fieldName, filterHandler(filterValue)] as const
-      )
-      .map(
-        ([fieldName, [sql, ...values]]) =>
-          [`\`${fieldName}\` ${sql}`, ...values] as const
       ),
-    (parsed) =>
-      [
-        parsed.length === 0
-          ? ''
-          : `WHERE ${parsed.map(([sql]) => sql).join(' AND ')}`,
-        parsed.flatMap(([_sql, ...values]) => values),
-      ] as const
+      ([[fieldName]]) => fieldName.toLowerCase() === 'orderBy'.toLowerCase()
+    ),
+    ([filters, [orderBy]]) =>
+      f.var(
+        filters
+          .map(
+            ([[fieldName, operator = 'equal'], filterValue]) =>
+              [
+                Object.entries(tables[tableName]).find(
+                  ([column]) => column.toLowerCase() === fieldName.toLowerCase()
+                ) ??
+                  error(
+                    `Unknown field "${fieldName}". Allowed fields include ${getTableColumns(
+                      tableName
+                    ).join(', ')}`
+                  ),
+                Object.entries(operators).find(
+                  ([filter]) => filter.toLowerCase() === operator.toLowerCase()
+                ) ??
+                  error(
+                    `Unknown filter "${operator}". Allowed filters include ${Object.keys(
+                      operators
+                    ).join(', ')}`
+                  ),
+                filterValue,
+              ] as const
+          )
+          .map(
+            ([
+              [fieldName, _fieldType],
+              [_filterName, filterHandler],
+              filterValue,
+            ]) => [fieldName, filterHandler(filterValue)] as const
+          )
+          .map(
+            ([fieldName, [sql, ...values]]) =>
+              [`\`${fieldName}\` ${sql}`, ...values] as const
+          ),
+        (parsed) =>
+          f.var(
+            Array.isArray(orderBy)
+              ? ([
+                  ` ORDER BY ? ${
+                    orderBy[0][0].startsWith('-') ? 'DESC' : 'ASC'
+                  }`,
+                  [
+                    Object.entries(tables[tableName]).find(([column]) =>
+                      [
+                        orderBy[1].slice(1).toLowerCase(),
+                        orderBy[1].toLowerCase(),
+                      ].includes(column.toLowerCase())
+                    )?.[0] ??
+                      error(
+                        `Unknown field "${
+                          orderBy[1]
+                        }". Allowed fields include ${getTableColumns(
+                          tableName
+                        ).join(', ')}`
+                      ),
+                  ] as const,
+                ] as const)
+              : (['', [] as RA<string>] as const),
+            ([orderBy, orderFields]) =>
+              [
+                `${
+                  parsed.length === 0
+                    ? ''
+                    : `WHERE ${parsed.map(([sql]) => sql).join(' AND ')}`
+                }${orderBy}`,
+                [
+                  ...parsed.flatMap(([_sql, ...values]) => values),
+                  ...orderFields,
+                ],
+              ] as const
+          )
+      )
   );
