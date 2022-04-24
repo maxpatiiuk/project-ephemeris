@@ -32,19 +32,25 @@ export default function Calendars(): JSX.Element {
     true
   );
   const router = useRouter();
+  const rawCalendarId =
+    (router.query.calendarId as RA<string> | undefined)?.[0] ?? '';
   const selectedCalendar =
-    f.parseInt(
-      (router.query.calendarId as RA<string> | undefined)?.[0] ?? ''
-    ) ?? undefined;
+    f.parseInt(rawCalendarId) ?? (rawCalendarId === 'new' ? 'new' : undefined);
   const [calendar, setCalendar] = useLiveState(
     React.useCallback(
       () =>
-        calendars?.[selectedCalendar ?? -1] ?? {
-          id: undefined,
-          name: globalText('myCalendar'),
-          description: '',
-          color: '#ffffff',
-        },
+        typeof selectedCalendar === 'undefined'
+          ? typeof calendars === 'object'
+            ? Object.values(calendars)[0]
+            : undefined
+          : selectedCalendar === 'new'
+          ? {
+              id: undefined,
+              name: globalText('myCalendar'),
+              description: '',
+              color: '#123abc',
+            }
+          : calendars?.[selectedCalendar ?? -1],
       [calendars, selectedCalendar]
     )
   );

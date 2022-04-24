@@ -62,7 +62,7 @@ export function SearchBar({
       onChange={({ data }): void =>
         void router.push(
           `/view/${router.query.view as string}/date/${serializeDate(
-            data.startDateTime
+            new Date(data.startDateTime)
           )}/event/${data.id}`
         )
       }

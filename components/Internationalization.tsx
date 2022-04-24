@@ -104,7 +104,7 @@ const relativeDate = new Intl.RelativeTimeFormat(LANGUAGE, {
 
 export function getRelativeDate(date: Readonly<Date>): string {
   const timePassed = Math.round((Date.now() - date.getTime()) / MILLISECONDS);
-  return formatRelativeDate(timePassed < 0 ? -1 : 1, Math.abs(timePassed));
+  return formatRelativeDate(timePassed < 0 ? 1 : -1, Math.abs(timePassed));
 }
 
 function formatRelativeDate(direction: -1 | 1, timePassed: number): string {

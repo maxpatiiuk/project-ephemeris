@@ -22,12 +22,7 @@ export function YearView({
   return (
     <Container.Full className="grid grid-cols-4 grid-rows-3 gap-6 p-4">
       {dates.map((date, index) => (
-        <MiniCalendar
-          key={index}
-          currentDate={date}
-          view="year"
-          mode="yearPart"
-        />
+        <MiniCalendar key={index} currentDate={date} mode="yearPart" />
       ))}
     </Container.Full>
   );

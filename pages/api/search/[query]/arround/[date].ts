@@ -33,7 +33,7 @@ export default async function endpoint(
                 ) 'recurring'
            FROM eventOccurrence
      INNER JOIN event ON event.id = eventOccurrence.eventId
-          WHERE eventOccurrence.name LIKE '%1%'
+          WHERE eventOccurrence.name LIKE ?
        ORDER BY ABS(DATEDIFF(startDateTime,?) + 1)`,
     [`%${searchQuery}%`, currentDate]
   );

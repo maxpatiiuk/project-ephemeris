@@ -40,6 +40,7 @@ export function DayView({
           <div className={`${className.miniCalendarDay} bg-brand-100`}>
             {currentDate.getDate()}
           </div>
+          <span className="flex-1" />
         </div>
         <Column
           occurrences={eventOccurrences?.[0]}

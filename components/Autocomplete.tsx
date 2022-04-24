@@ -359,8 +359,9 @@ export function Autocomplete<T>({
                     ) : (
                       <div className="flex pr-2 gap-2">
                         {item.label}
-                        <span className="flex-1 -ml-2" />
-                        <span className="text-gray-500">{item.subLabel}</span>
+                        <span className="flex-1 flex justify-end gap-2 text-gray-500">
+                          {item.subLabel}
+                        </span>
                       </div>
                     );
                   return (

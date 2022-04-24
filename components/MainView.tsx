@@ -77,6 +77,7 @@ export function MainView({
     router.query.date,
     router.query.start,
   ]);
+
   return (
     <>
       {view === 'year' ? (

@@ -19,6 +19,7 @@ export function CurrentTime(): JSX.Element {
       () => setTime(dateToTimeString(new Date())),
       MILLISECONDS
     );
+    setTime(dateToTimeString(new Date()));
     return (): void => clearInterval(interval);
   }, []);
 
