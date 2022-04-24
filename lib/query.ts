@@ -124,38 +124,30 @@ export const filtersToSql = (
         (parsed) =>
           f.var(
             Array.isArray(orderBy)
-              ? ([
-                  ` ORDER BY ? ${
-                    orderBy[0][0].startsWith('-') ? 'DESC' : 'ASC'
-                  }`,
-                  [
-                    Object.entries(tables[tableName]).find(([column]) =>
-                      [
-                        orderBy[1].slice(1).toLowerCase(),
-                        orderBy[1].toLowerCase(),
-                      ].includes(column.toLowerCase())
-                    )?.[0] ??
-                      error(
-                        `Unknown field "${
-                          orderBy[1]
-                        }". Allowed fields include ${getTableColumns(
-                          tableName
-                        ).join(', ')}`
-                      ),
-                  ] as const,
-                ] as const)
-              : (['', [] as RA<string>] as const),
-            ([orderBy, orderFields]) =>
+              ? ` ORDER BY ${
+                  Object.entries(tables[tableName]).find(([column]) =>
+                    [
+                      orderBy[1].slice(1).toLowerCase(),
+                      orderBy[1].toLowerCase(),
+                    ].includes(column.toLowerCase())
+                  )?.[0] ??
+                  error(
+                    `Unknown field "${
+                      orderBy[1]
+                    }". Allowed fields include ${getTableColumns(
+                      tableName
+                    ).join(', ')}`
+                  )
+                } ${orderBy[1].startsWith('-') ? 'DESC' : 'ASC'}`
+              : '',
+            (orderBy) =>
               [
                 `${
                   parsed.length === 0
                     ? ''
                     : `WHERE ${parsed.map(([sql]) => sql).join(' AND ')}`
                 }${orderBy}`,
-                [
-                  ...parsed.flatMap(([_sql, ...values]) => values),
-                  ...orderFields,
-                ],
+                parsed.flatMap(([_sql, ...values]) => values),
               ] as const
           )
       )
