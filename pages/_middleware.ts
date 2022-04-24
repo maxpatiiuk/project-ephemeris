@@ -14,9 +14,6 @@ export function middleware(request: NextRequest): NextResponse {
 /*
  * TODO: deploy to vercel
  * TODO: record a video review
- * TODO: write an overview and add to portfolio
- * TODO: add a link to portfolio to readme
  * TODO: add project screenshots
  * TODO: add project URL
- * TODO: export database schema to schema.sql
  */

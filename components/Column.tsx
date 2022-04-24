@@ -222,12 +222,12 @@ export function Column({
                 <time
                   aria-label={globalText('from')}
                   dateTime={startDateTime.toJSON()}
-                >{`${startDateTime.getHours()}:${startDateTime.getMinutes()}`}</time>
+                >{`${dateToTimeString(startDateTime)}`}</time>
                 {' - '}
                 <time
                   aria-label={globalText('till')}
                   dateTime={endDateTime.toJSON()}
-                >{`${endDateTime.getHours()}:${endDateTime.getMinutes()}`}</time>
+                >{`${dateToTimeString(endDateTime)}`}</time>
               </span>
             </a>
           </Link>

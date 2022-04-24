@@ -31,7 +31,13 @@ import { EventsContext } from './Contexts';
 import { crash } from './ErrorBoundary';
 import { useBooleanState } from './Hooks';
 import { icons } from './Icons';
-import { DAY, WEEK, weekDays } from './Internationalization';
+import {
+  DAY,
+  MILLISECONDS,
+  MINUTE,
+  WEEK,
+  weekDays,
+} from './Internationalization';
 import { Dialog } from './ModalDialog';
 import { getDatesBetween, getDaysBetween } from './useEvents';
 
@@ -214,10 +220,14 @@ export function MiniEvent({
                             serializeDate(startDateTime)
                           ][id] = { ...occurrence, id, eventId };
                           eventsRef.current.events[eventId] = replaceKey(
-                            event,
-                            'calendarId',
-                            event.calendarId ??
-                              Object.values(calendars ?? {})[0]?.id
+                            replaceKey(
+                              event,
+                              'calendarId',
+                              event.calendarId ??
+                                Object.values(calendars ?? {})[0]?.id
+                            ),
+                            'id',
+                            eventId
                           );
 
                           /*
@@ -231,8 +241,8 @@ export function MiniEvent({
                               occurrence.startDateTime,
                             ];
                             if (
-                              initialEvent.current.endDate.getDate() >
-                              occurrence.startDateTime.getDate()
+                              initialEvent.current.endDate.getTime() >
+                              occurrence.startDateTime.getTime()
                             )
                               range.reverse();
                             /*
@@ -324,7 +334,7 @@ export function MiniEvent({
                           Math.max(
                             endDateTime.getTime() -
                               (startDateTime.getTime() - startDate.getTime()),
-                            startDate.getTime()
+                            startDate.getTime() + MINUTE * MILLISECONDS
                           )
                         )
                       )
@@ -337,15 +347,24 @@ export function MiniEvent({
                 <Input.Generic
                   type="datetime-local"
                   value={dateToDatetimeLocal(endDateTime)}
-                  onValueChange={(date): void =>
+                  onValueChange={(date): void => {
+                    const endDate = parseDateTimeLocal(date);
                     setOccurrence(
                       replaceKey(
-                        occurrence,
-                        'endDateTime',
-                        parseDateTimeLocal(date)
+                        replaceKey(occurrence, 'endDateTime', endDate),
+                        'startDateTime',
+                        endDate.getTime() < startDateTime.getTime()
+                          ? new Date(
+                              Math.min(
+                                startDateTime.getTime() -
+                                  (endDateTime.getTime() - endDate.getTime()),
+                                endDate.getTime() - MINUTE * MILLISECONDS
+                              )
+                            )
+                          : startDateTime
                       )
-                    )
-                  }
+                    );
+                  }}
                 />
               </label>
             </span>

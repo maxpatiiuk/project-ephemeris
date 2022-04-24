@@ -12,7 +12,7 @@ export const languages = ['en-us'] as const;
 
 export type Language = typeof languages[number];
 export const DEFAULT_LANGUAGE = 'en-us';
-// Appropriate language is selected by Next.JS. Read it from html[lang]
+// Appropriate language is selected by Next.js. Read it from html[lang]
 export const LANGUAGE: Language =
   (typeof document === 'object' &&
   languages.includes(document.documentElement.lang.toLowerCase() as Language)

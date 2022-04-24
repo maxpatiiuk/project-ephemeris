@@ -1,11 +1,27 @@
 # Project: Ephemeris
 
 A full-fledged calendar application with support for multiple calendars,
-repeated events and best of all, dark mode. Has four view modes (year, month,
-week and day).
+repeated events and best of all, dark mode. It has four view modes: year, month,
+week and day. Additionally, there is good screen reader support.
 
-Build with React, Next.JS and Tailwind. Uses MySQL/MariaDB for storage.
+Build with React, Next.js and Tailwind. Uses MySQL/MariaDB for storage.
 
+## Configuration
+
+Ephemeris requires a MySQL/MariaDB connection to store calendars and events.
+
+To configure a connection, create an `.env.local` file in the root directory
+with the following content (replace placeholder values with your credentials):
+
+```js
+MYSQL_USERNAME=<username>
+MYSQL_PASSWORD=<password>
+MYSQL_HOST=<hostname>
+MYSQL_DATABASE=<database>
+```
+
+Then, create a database with name that matches your `MYSQL_DATABASE` setting
+and import its schema from `./schema.sql`.
 
 
 ## Development
@@ -40,8 +56,10 @@ externally available.
 Majority of the start code was repurposed and reused from another project of
 mine: [max.patii.uk (my portfolio)](https://max.patii.uk).
 
-Additionally, some files have been copied/inspired by another project I am a
-member of: [Specify 7](http://github.com/specify/specify7).
+Additionally, many basic React components and utility functions have been
+repuposed from another project I am a  working on:
+[Specify 7](http://github.com/specify/specify7) (scientific collection
+management system).
 
 ## Origin of the name
 
