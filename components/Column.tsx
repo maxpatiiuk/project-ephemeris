@@ -10,14 +10,69 @@ import {
   dateToString,
   dateToTimeString,
   DEFAULT_EVENT_DURATION,
+  DEFAULT_MINUTE_ROUNDING,
   MARKS_IN_DAY,
   serializeDate,
 } from '../lib/utils';
 import { globalText } from '../localization/global';
-import { DAY, MILLISECONDS, MINUTE } from './Internationalization';
+import { DAY, HOUR, MILLISECONDS, MINUTE } from './Internationalization';
 import type { OccurrenceWithEvent } from './useEvents';
 
-// TODO: place evens better
+function usePlacing(
+  occurrences: RA<OccurrenceWithEvent> | undefined
+): RA<{ readonly top: number; readonly left: number; readonly width: number }> {
+  return React.useMemo(() => {
+    const atomCount = (MARKS_IN_DAY * HOUR) / MINUTE / DEFAULT_MINUTE_ROUNDING;
+    const atoms = Array.from(
+      {
+        length: atomCount,
+      },
+      (): number[] => []
+    );
+    const startDate = new Date(occurrences?.[0]?.startDateTime ?? new Date());
+    startDate.setHours(0);
+    startDate.setMinutes(0);
+    startDate.setSeconds(0);
+    const startTime = startDate.getTime();
+    const startString = dateToString(startDate);
+    occurrences?.forEach(({ id, startDateTime, endDateTime }) => {
+      const startAtom = Math.floor(
+        ((startDateTime.getTime() - startTime) / DAY / MILLISECONDS) * atomCount
+      );
+      const endAtom =
+        startString === dateToString(endDateTime)
+          ? Math.ceil(
+              ((endDateTime.getTime() - startTime) / DAY / MILLISECONDS) *
+                atomCount
+            )
+          : atomCount;
+      Array.from({ length: endAtom - startAtom + 1 }, (_, index) => {
+        atoms[startAtom + index].push(id);
+      });
+    });
+
+    return (
+      occurrences?.map(({ id }) => {
+        const startIndex = atoms.findIndex((atom) => atom.includes(id));
+        const endIndex =
+          atoms.slice(startIndex).findIndex((atom) => !atom.includes(id)) +
+          startIndex;
+        const fraction = Math.max(
+          ...atoms.slice(startIndex, endIndex).map((atom) => atom.length)
+        );
+        const left = Math.max(
+          ...atoms.slice(startIndex, endIndex).map((atom) => atom.indexOf(id))
+        );
+        return {
+          top: (startIndex / atomCount) * 100,
+          left: (left / fraction) * 100,
+          width: (1 / fraction) * 100,
+        };
+      }) ?? []
+    );
+  }, [occurrences]);
+}
+
 export function Column({
   occurrences,
   calendars,
@@ -31,6 +86,7 @@ export function Column({
   const [currentTime, setCurrentTime] = React.useState<number | undefined>(
     undefined
   );
+  const placing = usePlacing(occurrences);
   React.useEffect(() => {
     function update(): void {
       const currentDate = new Date();
@@ -44,6 +100,7 @@ export function Column({
         );
       } else setCurrentTime(undefined);
     }
+
     const interval = setInterval(update, MINUTE * MILLISECONDS);
     update();
     return (): void => clearInterval(interval);
@@ -109,14 +166,17 @@ export function Column({
         </a>
       </Link>
       {occurrences?.map(
-        ({
-          id,
-          name,
-          startDateTime,
-          endDateTime,
-          color,
-          event: { calendarId },
-        }) => (
+        (
+          {
+            id,
+            name,
+            startDateTime,
+            endDateTime,
+            color,
+            event: { calendarId },
+          },
+          index
+        ) => (
           <Link
             href={`/view/${router.query.view as string}/date/${serializeDate(
               startDateTime
@@ -131,9 +191,12 @@ export function Column({
               style={{
                 backgroundColor: color,
                 borderColor: calendars?.[calendarId].color ?? color,
+                top: `${placing[index].top}%`,
+                left: `${placing[index].left}%`,
+                width: `${placing[index].width}%`,
               }}
               className={`flex flex-col rounded p-1 !border-l-2
-                hover:brightness-150 z-10
+                hover:brightness-150 z-10 absolute
                 ${endDateTime.getTime() < Date.now() ? 'brightness-80' : ''}`}
             >
               <span>{name}</span>

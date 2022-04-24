@@ -63,6 +63,7 @@ const fetchEventOccurrences = async (
               endDate.getMonth(),
               endDate.getDate() + 1
             ).toJSON(),
+            orderBy: 'startDateTime',
           }),
           {
             headers: { Accept: 'application/json' },

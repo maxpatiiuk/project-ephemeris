@@ -420,6 +420,7 @@ export function MiniEvent({
             <Label.Generic className="gap-2">
               {globalText('calendar')}
               <Select
+                required
                 className="flex gap-2"
                 value={
                   event.calendarId ??
