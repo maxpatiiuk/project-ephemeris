@@ -98,15 +98,6 @@ export const darkMode =
  * If dialog contains a button with this className, it will use that icon
  * by default
  */
-export const dialogIconTriggers = {
-  // Icons are ordered by precedence
-  none: '',
-  error: 'dialog-icon-error',
-  warning: 'dialog-icon-warning',
-  success: 'dialog-icon-success',
-  info: 'dialog-icon-info',
-};
-
 // ClassNames are primarily for usage by non-react components
 const niceButton = `rounded cursor-pointer active:brightness-80 px-4 py-2
   disabled:bg-gray-200 disabled:text-gray-500 dark:disabled:bg-neutral-700 gap-2
@@ -119,8 +110,6 @@ const rootBackground = 'bg-white dark:bg-neutral-900';
 export const className = {
   rootBackground,
   containerBackground,
-  root: `flex flex-col h-screen overflow-hidden ${rootBackground} 
-    text-neutral-900 dark:text-neutral-200`,
   // Do not show validation errors until tried to submit the form
   notSubmittedForm: 'not-submitted',
   // Or field lost focus
@@ -133,16 +122,11 @@ export const className = {
     text-gray-800 dark:text-neutral-200`,
   grayButton: `hover:bg-gray-400 bg-gray-300 text-gray-800
     dark:bg-neutral-600 dark:text-gray-100 hover:dark:bg-neutral-500`,
-  redButton: `${dialogIconTriggers.error} hover:bg-red-800 bg-red-700 text-white`,
-  blueButton: `${dialogIconTriggers.info} hover:bg-blue-700 bg-blue-600 text-white`,
-  orangeButton: `${dialogIconTriggers.warning} hover:bg-orange-600 bg-orange-500 text-white`,
-  greenButton: `${dialogIconTriggers.success} hover:bg-green-800 bg-green-700 text-white`,
-  containerFull: 'flex flex-col gap-4 h-full',
-  containerBase: `${baseContainer}`,
-  formHeader: 'border-b-2 border-brand-300 flex items-center pb-2 gap-x-4',
-  formTitle: 'text-lg',
+  redButton: `hover:bg-red-800 bg-red-700 text-white`,
+  blueButton: `hover:bg-blue-700 bg-blue-600 text-white`,
+  orangeButton: `hover:bg-orange-600 bg-orange-500 text-white`,
+  greenButton: `hover:bg-green-800 bg-green-700 text-white`,
   h2: 'font-semibold text-black dark:text-white',
-  h3: 'text-gray-500 dark:text-neutral-400',
   miniCalendarDay: `flex items-center justify-center rounded-full w-6`,
 } as const;
 
@@ -150,23 +134,6 @@ export const Label = {
   Generic: wrap('Label.Generic', 'label', className.label),
   ForCheckbox: wrap('Label.ForCheckbox', 'label', className.labelForCheckbox),
 };
-export const ErrorMessage = wrap(
-  'ErrorMessage',
-  'div',
-  'flex gap-2 p-2 text-white bg-red-500 rounded',
-  {
-    role: 'alert',
-  }
-);
-export const FormFooter = wrap(
-  'FormFooter',
-  'div',
-  'border-brand-300 border-t-2 flex print:hidden pt-2 gap-x-2',
-  {
-    role: 'toolbar',
-  }
-);
-export const FormHeader = wrap('FormHeader', 'h2', className.formHeader);
 export const Form = wrap(
   'Form',
   'form',
@@ -596,8 +563,6 @@ export const Container = {
     'section',
     `${baseContainer} max-w-[min(100%,1200px)] mx-auto`
   ),
-  Full: wrap('Container.Full', 'section', className.containerFull),
-  Base: wrap('Container.Base', 'section', className.containerBase),
   Quartered: wrap(
     'Container.Quartered',
     'main',
@@ -605,18 +570,8 @@ export const Container = {
       grid-cols-[256px_1fr] grid-rows-[min-content_1fr] p-4`
   ),
 };
-export const Progress = wrap<'progress', { readonly value: number }>(
-  'Progress',
-  'progress',
-  'w-full h-3 bg-gray-200 dark:bg-neutral-700 rounded',
-  {
-    max: 100,
-  }
-);
 
 // Need to set explicit [role] for list without bullets to be announced as a list
 export const Ul = wrap('Ul', 'ul', '', { role: 'list' });
 
-export const H2 = wrap('H2', 'h2', className.h2);
-export const H3 = wrap('H3', 'h3', className.h3);
 /* eslint-enable @typescript-eslint/naming-convention */

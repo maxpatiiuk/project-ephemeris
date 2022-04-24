@@ -16,7 +16,7 @@
  * @module
  */
 
-import type { CacheDefinitions } from './cachedefinitions';
+import type { CacheDefinitions } from './cacheDefinitions';
 import { omit } from './helpers';
 import type { R } from './types';
 

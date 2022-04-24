@@ -6,15 +6,8 @@ import Modal from 'react-modal';
 
 import { globalText } from '../localization/global';
 import type { RawTagProps } from './Basic';
-import {
-  Button,
-  className,
-  DialogContext,
-  dialogIconTriggers,
-  transitionDuration,
-} from './Basic';
-import { useId, useLiveState } from './Hooks';
-import { dialogIcons } from './Icons';
+import { Button, className, DialogContext, transitionDuration } from './Basic';
+import { useId } from './Hooks';
 
 export const loadingBar = (
   <div
@@ -49,7 +42,6 @@ export function LoadingScreen({
 const commonContainer = `rounded resize overflow-y-hidden max-w-[90%]
   shadow-lg shadow-gray-500`;
 export const dialogClassNames = {
-  fullScreen: '!transform-none !w-full !h-full',
   freeContainer: `${commonContainer} max-h-[90%]`,
   narrowContainer: `${commonContainer} max-h-[50%] min-w-[min(20rem,90%)]
     lg:max-w-[50%]`,
@@ -76,8 +68,6 @@ export function Dialog({
   isOpen = true,
   header,
   headerButtons,
-  // Default icon type is determined based on dialog button types
-  icon: defaultIconType,
   buttons,
   children,
   /*
@@ -87,7 +77,6 @@ export function Dialog({
    */
   modal = true,
   onClose: handleClose,
-  onResize: handleResize,
   className: {
     // Dialog's content is a flexbox
     content: contentClassName = dialogClassNames.flexContent,
@@ -103,9 +92,7 @@ export function Dialog({
 }: {
   readonly isOpen?: boolean;
   readonly header: React.ReactNode;
-  readonly title?: string;
   readonly headerButtons?: React.ReactNode;
-  readonly icon?: keyof typeof dialogIconTriggers;
   // Have to explicitly pass undefined if you don't want buttons
   readonly buttons: undefined | string | JSX.Element;
   readonly children: React.ReactNode;
@@ -118,7 +105,6 @@ export function Dialog({
    * not called
    */
   readonly onClose: (() => void) | undefined;
-  readonly onResize?: (element: HTMLElement) => void;
   readonly className?: {
     readonly content?: string;
     readonly container?: string;
@@ -179,19 +165,6 @@ export function Dialog({
     return (): void => container?.removeEventListener('click', handleClick);
   }, [forceToTop, modal, isOpen, zIndex, container]);
 
-  // Resize listener
-  React.useEffect(() => {
-    if (!isOpen || container === null || typeof handleResize === 'undefined')
-      return undefined;
-
-    const observer = new ResizeObserver(() => handleResize?.(container));
-    observer.observe(container);
-
-    return (): void => observer.disconnect();
-  }, [isOpen, container, handleResize]);
-
-  const isFullScreen = containerClassName.includes(dialogClassNames.fullScreen);
-
   const draggableContainer: Props['contentElement'] = React.useCallback(
     (props, children) => (
       <Draggable
@@ -211,27 +184,6 @@ export function Dialog({
       </Draggable>
     ),
     [id]
-  );
-
-  const [buttonContainer, setButtonContainer] =
-    React.useState<HTMLDivElement | null>(null);
-  const [iconType] = useLiveState(
-    React.useCallback(() => {
-      if (typeof defaultIconType === 'string') return defaultIconType;
-      else if (buttonContainer === null) return 'none';
-      /*
-       * If icon was not specified explicitly, it is determined based on what
-       * matching className dialog buttons have
-       */
-      return (
-        Object.entries(dialogIconTriggers).find(
-          ([_type, className]) =>
-            className !== '' &&
-            typeof buttonContainer.getElementsByClassName(className)[0] ===
-              'object'
-        )?.[0] ?? 'none'
-      );
-    }, [defaultIconType, buttons, buttonContainer])
   );
 
   return (
@@ -254,7 +206,7 @@ export function Dialog({
         via-white dark:via-neutral-900 to-white dark:to-neutral-900
         outline-none flex flex-col p-4 gap-y-2 ${containerClassName}
         dark:text-neutral-200 dark:border dark:border-neutral-700
-        text-neutral-900 ${isFullScreen ? 'full-screen' : ''}
+        text-neutral-900
         ${modal ? '' : 'pointer-events-auto border border-gray-500'}`}
       shouldCloseOnEsc={modal && typeof handleClose === 'function'}
       shouldCloseOnOverlayClick={modal && typeof handleClose === 'function'}
@@ -276,13 +228,10 @@ export function Dialog({
     >
       {/* "p-4 -m-4" increases the handle size for easier dragging */}
       <span
-        className={`flex flex-wrap gap-4' ${
-          isFullScreen ? '' : 'p-4 -m-4 cursor-move'
-        }`}
+        className={`flex flex-wrap gap-4 p-4 -m-4 cursor-move`}
         id={id('handle')}
       >
         <div className="flex items-center gap-2">
-          {dialogIcons[iconType]}
           <h2 className={headerClassName} id={id('header')}>
             {header}
           </h2>
@@ -302,10 +251,7 @@ export function Dialog({
         {children}
       </div>
       {typeof buttons !== 'undefined' && (
-        <div
-          className={`gap-x-2 flex ${buttonContainerClassName}`}
-          ref={setButtonContainer}
-        >
+        <div className={`gap-x-2 flex ${buttonContainerClassName}`}>
           <DialogContext.Provider value={handleClose}>
             {typeof buttons === 'string' ? (
               // If button was passed directly as text, render it as Blue.Button

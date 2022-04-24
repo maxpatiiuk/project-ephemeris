@@ -1,7 +1,7 @@
 import { Http } from '../../../../lib/ajax';
 import type { Payload } from '../../../../lib/apiUtils';
 import { endpoint } from '../../../../lib/apiUtils';
-import { tables } from '../../../../lib/datamodel';
+import { tables } from '../../../../lib/dataModel';
 import { execute } from '../../../../lib/mysql';
 import { queryRecord } from '../../../../lib/query';
 import type { IR } from '../../../../lib/types';

@@ -2,21 +2,6 @@
 import { handleAjaxError } from '../components/ErrorBoundary';
 import type { IR, PartialBy, RA } from './types';
 
-export const csrfSafeMethod = new Set(['GET', 'HEAD', 'OPTIONS', 'TRACE']);
-
-export function formData(data: IR<string | Blob>): FormData {
-  const formData = new FormData();
-  Object.entries(data).forEach(([key, value]) => formData.append(key, value));
-  return formData;
-}
-
-const reIsAbsolute = /^(?:[a-z]+:)?\/\//i;
-export const isExternalUrl = (url: string): boolean =>
-  // Relative url is not external. Passing a relative URL to new URL() throws
-  reIsAbsolute.exec(url) === null
-    ? false
-    : new URL(url).origin !== window.location.origin;
-
 /* An enum of HTTP status code back-end commonly returns */
 export const Http = {
   // You may add others codes as needed

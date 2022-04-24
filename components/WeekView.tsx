@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { Calendar } from '../lib/datamodel';
+import type { Calendar } from '../lib/dataModel';
 import type { IR, RA } from '../lib/types';
 import { MARKS_IN_DAY, padNumber, serializeDate } from '../lib/utils';
 import { LANGUAGE } from '../localization/utils';

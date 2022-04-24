@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 
 import { ajax } from '../lib/ajax';
-import type { EventOccurrence } from '../lib/datamodel';
+import type { EventOccurrence } from '../lib/dataModel';
 import { f } from '../lib/functools';
 import type { RA } from '../lib/types';
 import { serializeDate } from '../lib/utils';

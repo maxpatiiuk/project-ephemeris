@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { ajax } from '../lib/ajax';
-import type { EventOccurrence, EventTable } from '../lib/datamodel';
+import type { EventOccurrence, EventTable } from '../lib/dataModel';
 import { f } from '../lib/functools';
 import { sortFunction } from '../lib/helpers';
 import { formatUrl } from '../lib/querystring';

@@ -3,7 +3,7 @@ import Modal from 'react-modal';
 
 import { ajax } from '../lib/ajax';
 import { error } from '../lib/assert';
-import type { Calendar } from '../lib/datamodel';
+import type { Calendar } from '../lib/dataModel';
 import type { IR, RA } from '../lib/types';
 import { crash } from './ErrorBoundary';
 import { useAsyncState, useBooleanState } from './Hooks';

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 
-import type { Calendar } from '../lib/datamodel';
+import type { Calendar } from '../lib/dataModel';
 import { formatUrl } from '../lib/querystring';
 import type { IR, RA } from '../lib/types';
 import { defined } from '../lib/types';

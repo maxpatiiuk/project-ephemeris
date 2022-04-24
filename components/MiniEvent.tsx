@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 
 import { ajax, Http, ping } from '../lib/ajax';
-import type { Calendar, EventOccurrence, EventTable } from '../lib/datamodel';
+import type { Calendar, EventOccurrence, EventTable } from '../lib/dataModel';
 import { f } from '../lib/functools';
 import { replaceItem, replaceKey } from '../lib/helpers';
 import type { IR, PartialBy, RA } from '../lib/types';
@@ -254,7 +254,7 @@ export function MiniEvent({
                             range[1].setDate(
                               range[1].getDate() + 1 + WEEK / DAY
                             );
-                            getDatesBetween(...range)
+                            getDatesBetween(range[0], range[1])
                               .filter(
                                 (dateString) =>
                                   typeof eventsRef.current.eventOccurrences[

@@ -2,8 +2,6 @@
 import { breakpoint, error } from './assert';
 import type { IR, RA } from './types';
 
-const store = new Map<() => unknown, unknown>();
-
 /**
  * A collection of helper functions for functional programming style
  * Kind of like underscore or ramda, but typesafe
@@ -60,36 +58,6 @@ export const f = {
     (value: unknown) =>
     (secondValue: unknown): boolean =>
       secondValue === value,
-  notEqual:
-    (value: unknown) =>
-    (secondValue: unknown): boolean =>
-      secondValue !== value,
-  /**
-   * If need to support internationalization, consider using localeCompare
-   *
-   * Example of case-insensitive comparison:
-   * ```js
-   * a.localeCompare(b, LANGUAGE, { sensitivity: 'base' })
-   * ```
-   */
-  looseEqual:
-    (value: string) =>
-    (secondValue: string): boolean =>
-      value.toString() == secondValue.toLowerCase(),
-  /**
-   * Call the second argument with the first if not undefined.
-   * Else return undefined
-   * Can replace undefined case with an alternative branch using nullish
-   * coalescing operator:
-   * ```js
-   * f.maybe(undefinedOrNot, calledOnNotUndefined) ?? calledOnUndefined()
-   * ```
-   */
-  maybe: <VALUE, RETURN>(
-    value: VALUE | undefined,
-    callback: (value: VALUE) => RETURN
-  ): RETURN | undefined =>
-    typeof value === 'undefined' ? undefined : callback(value),
   /**
    * A better typed version of Array.prototype.includes
    *
@@ -106,32 +74,7 @@ export const f = {
    * Intercept function arguments without affecting it
    * Useful for debugging or logging
    */
-  tap:
-    <ARGUMENTS extends RA<never>, RETURN>(
-      tapFunction: (...args: ARGUMENTS) => void,
-      action: (...args: ARGUMENTS) => RETURN
-    ) =>
-    (...args: ARGUMENTS): RETURN => {
-      tapFunction(...args);
-      return action(...args);
-    },
-  /**
-   * Calls a function without any arguments.
-   * Useful when mapping over a list of functions
-   */
-  call: <RETURN>(callback: () => RETURN): RETURN => callback(),
-  /**
-   * Wrap a pure function that does not need any arguments in this
-   * call to remember and return its return value
-   */
-  store:
-    <RETURN>(callback: () => RETURN): (() => RETURN) =>
-    (): RETURN => {
-      if (!store.has(callback)) store.set(callback, callback());
-      return store.get(callback) as RETURN;
-    },
   unique: <ITEM>(array: RA<ITEM>): RA<ITEM> => Array.from(new Set(array)),
-  last: <ITEM>(array: RA<ITEM>): ITEM => array.slice(-1)[0],
   parseInt: (value: string): number | undefined =>
     f.var(Number.parseInt(value), (number) =>
       Number.isNaN(number) ? undefined : number

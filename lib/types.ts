@@ -30,10 +30,6 @@ export type PartialBy<
   OPTIONAL_KEYS extends keyof RECORD
 > = Omit<RECORD, OPTIONAL_KEYS> & Partial<Pick<RECORD, OPTIONAL_KEYS>>;
 
-export type Writable<T> = {
-  -readonly [K in keyof T]: T[K];
-};
-
 // "typeof value === 'function'" does not narrow the type in some cases
 export const isFunction = <T>(
   value: T

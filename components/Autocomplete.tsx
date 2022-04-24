@@ -353,52 +353,12 @@ export function Autocomplete<T>({
                 </li>
               ) : (
                 filteredItems.map((item, index, { length }) => {
-                  /**
-                   * Highlight relevant part of the string.
-                   * Note, if item.searchValue and item.value is different,
-                   * label might not be highlighted even if it matched
-                   */
-                  const stringLabel =
-                    typeof item.label === 'string' ? item.label : undefined;
-                  const label =
-                    typeof stringLabel === 'string'
-                      ? stringLabel
-                          // Convert to lower case as search may be case-insensitive
-                          .toLowerCase()
-                          .split(pendingValue.toLowerCase())
-                          .map((part, index, parts) => {
-                            const startIndex = parts
-                              .slice(0, index)
-                              .join(pendingValue).length;
-                            const offsetStartIndex =
-                              startIndex +
-                              (index === 0 ? 0 : pendingValue.length);
-                            const endIndex =
-                              startIndex +
-                              part.length +
-                              (index === 0 ? 0 : pendingValue.length);
-                            return (
-                              <React.Fragment key={index}>
-                                {/* Reconstruct the value in original casing */}
-                                {stringLabel.slice(offsetStartIndex, endIndex)}
-                                {index + 1 !== parts.length && (
-                                  <span className="text-brand-300">
-                                    {stringLabel.slice(
-                                      endIndex,
-                                      endIndex + pendingValue.length
-                                    )}
-                                  </span>
-                                )}
-                              </React.Fragment>
-                            );
-                          })
-                      : item.label;
                   const fullLabel =
                     typeof item.subLabel === 'undefined' ? (
-                      label
+                      item.label
                     ) : (
                       <div className="flex pr-2 gap-2">
-                        {label}
+                        {item.label}
                         <span className="flex-1 -ml-2" />
                         <span className="text-gray-500">{item.subLabel}</span>
                       </div>

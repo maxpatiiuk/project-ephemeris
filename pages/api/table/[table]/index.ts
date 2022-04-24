@@ -2,7 +2,7 @@ import { Http } from '../../../../lib/ajax';
 import type { Payload } from '../../../../lib/apiUtils';
 import { endpoint } from '../../../../lib/apiUtils';
 import { error } from '../../../../lib/assert';
-import { tables } from '../../../../lib/datamodel';
+import { tables } from '../../../../lib/dataModel';
 import { f } from '../../../../lib/functools';
 import { execute } from '../../../../lib/mysql';
 import { filtersToSql, queryRecords } from '../../../../lib/query';

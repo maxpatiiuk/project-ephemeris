@@ -3,7 +3,7 @@ import React from 'react';
 import { crash } from '../components/ErrorBoundary';
 import type { BucketType } from './cache';
 import * as cache from './cache';
-import type { CacheDefinitions } from './cachedefinitions';
+import type { CacheDefinitions } from './cacheDefinitions';
 import { isFunction } from './types';
 
 type DefaultValue<T> = T | Promise<T> | (() => Promise<T>);

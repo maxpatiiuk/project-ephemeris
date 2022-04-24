@@ -24,20 +24,17 @@ type ErrorBoundaryState =
     };
 
 function ErrorDialog({
-  title = globalText('errorBoundaryDialogTitle'),
   header = globalText('errorBoundaryDialogHeader'),
   children,
   // Error dialog is only closable in Development
   onClose: handleClose,
 }: {
   readonly children: React.ReactNode;
-  readonly title?: string;
   readonly header?: string;
   readonly onClose?: () => void;
 }): JSX.Element {
   return (
     <Dialog
-      title={title}
       header={header}
       buttons={
         <>
@@ -227,7 +224,7 @@ function ErrorIframe({ children: error }: { children: string }): JSX.Element {
 
   return (
     <iframe
-      title={globalText('errorBoundaryDialogTitle')}
+      title={globalText('errorBoundaryDialogHeader')}
       className="h-full"
       ref={iframeRef}
     />

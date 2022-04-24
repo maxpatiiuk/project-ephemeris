@@ -4,7 +4,7 @@ import { getTableColumns } from '../pages/api/table/[table]';
 import { Http } from './ajax';
 import type { ResponsePayload } from './apiUtils';
 import { error } from './assert';
-import { tables } from './datamodel';
+import { tables } from './dataModel';
 import { f } from './functools';
 import { execute } from './mysql';
 import type { IR, RA } from './types';

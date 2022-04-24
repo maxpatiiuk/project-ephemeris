@@ -6,7 +6,7 @@ import { Http } from '../../../../../../lib/ajax';
 import type {
   EventOccurrence,
   EventTable,
-} from '../../../../../../lib/datamodel';
+} from '../../../../../../lib/dataModel';
 import { f } from '../../../../../../lib/functools';
 import { connectToDatabase, execute } from '../../../../../../lib/mysql';
 import { queryRecord } from '../../../../../../lib/query';

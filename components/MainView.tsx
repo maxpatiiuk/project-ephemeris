@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import React from 'react';
 
-import type { EventOccurrence, EventTable } from '../lib/datamodel';
+import type { EventOccurrence, EventTable } from '../lib/dataModel';
 import { f } from '../lib/functools';
 import type { R, RA } from '../lib/types';
 import {

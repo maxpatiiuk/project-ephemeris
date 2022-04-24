@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { Calendar, New } from '../lib/datamodel';
+import type { Calendar, New } from '../lib/dataModel';
 import { replaceKey } from '../lib/helpers';
 import { globalText } from '../localization/global';
 import { Input, Label, Textarea } from './Basic';

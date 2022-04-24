@@ -35,6 +35,3 @@ export function formatUrl(url: string, parameters: IR<string>): string {
   }).toString();
   return urlObject.toString();
 }
-
-export const parseUrl = (url: string = window.location.href): IR<string> =>
-  Object.fromEntries(new URL(toAbsoluteUrl(url)).searchParams);

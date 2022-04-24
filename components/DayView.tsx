@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { Calendar } from '../lib/datamodel';
+import type { Calendar } from '../lib/dataModel';
 import type { IR, RA } from '../lib/types';
 import { className } from './Basic';
 import { Column } from './Column';

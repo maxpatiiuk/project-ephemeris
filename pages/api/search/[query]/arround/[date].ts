@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { Http } from '../../../../../lib/ajax';
-import type { EventOccurrence } from '../../../../../lib/datamodel';
+import type { EventOccurrence } from '../../../../../lib/dataModel';
 import { connectToDatabase, execute } from '../../../../../lib/mysql';
 import type { RA } from '../../../../../lib/types';
 import { deserializeDate } from '../../../../../lib/utils';
