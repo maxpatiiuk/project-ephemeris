@@ -208,7 +208,7 @@ export function Dialog({
         dark:text-neutral-200 dark:border dark:border-neutral-700
         text-neutral-900
         ${modal ? '' : 'pointer-events-auto border border-gray-500'}`}
-      shouldCloseOnEsc={modal && typeof handleClose === 'function'}
+      shouldCloseOnEsc={typeof handleClose === 'function'}
       shouldCloseOnOverlayClick={modal && typeof handleClose === 'function'}
       aria={{
         labelledby: id('header'),

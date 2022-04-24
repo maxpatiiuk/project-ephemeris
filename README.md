@@ -2,7 +2,8 @@
 
 A full-fledged calendar application with support for multiple calendars,
 repeated events and best of all, dark mode. It has four view modes: year, month,
-week and day. Additionally, there is good screen reader support.
+week and day. Additionally, there is good screen reader and keyboard navigation
+support.
 
 Build with React, Next.js and Tailwind. Uses MySQL/MariaDB for storage.
 

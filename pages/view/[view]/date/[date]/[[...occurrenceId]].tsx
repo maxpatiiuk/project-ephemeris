@@ -18,7 +18,7 @@ import { SearchBar } from '../../../../../components/SearchBar';
 import { ajax } from '../../../../../lib/ajax';
 import type { Calendar } from '../../../../../lib/dataModel';
 import { useCachedState } from '../../../../../lib/stateCache';
-import type { RA } from '../../../../../lib/types';
+import type { IR, RA } from '../../../../../lib/types';
 import { deserializeDate, serializeDate } from '../../../../../lib/utils';
 import { globalText } from '../../../../../localization/global';
 
@@ -83,6 +83,41 @@ export default function Index(): JSX.Element {
     [disabledCalendars, calendars]
   );
 
+  // Keyboard navigation
+  React.useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent): void {
+      const interactiveElements = ['input', 'button', 'textarea'];
+      if (
+        interactiveElements.some(
+          (tagName) => (event.target as Element)?.closest(tagName) !== null
+        )
+      )
+        return;
+      const actions: IR<() => void> = {
+        KeyT: async () =>
+          router.push(`/view/${view}/date/${serializeDate(new Date())}`),
+        KeyD: async () =>
+          router.push(`/view/day/date/${serializeDate(currentDate)}`),
+        KeyW: async () =>
+          router.push(`/view/week/date/${serializeDate(currentDate)}`),
+        KeyM: async () =>
+          router.push(`/view/month/date/${serializeDate(currentDate)}`),
+        KeyY: async () =>
+          router.push(`/view/year/date/${serializeDate(currentDate)}`),
+        KeyN: async () => router.push(`/view/${view}/date/${nextDate}`),
+        KeyP: async () => router.push(`/view/${view}/date/${previousDate}`),
+      };
+      if (event.code in actions) {
+        event.preventDefault();
+        actions[event.code]?.();
+      }
+    }
+
+    document.body.addEventListener('keydown', handleKeyDown);
+    return (): void =>
+      document.body.removeEventListener('keydown', handleKeyDown);
+  }, [router, view, currentDate, nextDate, previousDate]);
+
   return (
     <Layout title={undefined}>
       <Container.Quartered>
@@ -131,7 +166,7 @@ export default function Index(): JSX.Element {
           </div>
         </header>
         <aside className="flex flex-col gap-4">
-          <MiniCalendar currentDate={currentDate} view={view} mode="aside" />
+          <MiniCalendar currentDate={currentDate} mode="aside" />
           <CurrentTime />
           <CalendarList
             disabledCalendars={disabledCalendars ?? []}
