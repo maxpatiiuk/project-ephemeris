@@ -10,9 +10,3 @@ export function middleware(request: NextRequest): NextResponse {
       )
     : NextResponse.next();
 }
-
-/*
- * TODO: deploy to vercel
- * TODO: add project screenshots
- * TODO: add project URL
- */
