@@ -328,11 +328,7 @@ export function MiniEvent({
                           } else return undefined;
                         })
                   )
-                  .then(() =>
-                    eventsRef.current.eventTarget.dispatchEvent(
-                      new Event('change')
-                    )
-                  )
+                  .then(() => eventsRef.current.eventTarget.trigger())
                   .then(async () => router.push(baseUrl).catch(crash))
                   .catch(crash))
           }
@@ -516,7 +512,7 @@ export function MiniEvent({
                 eventsRef.current.eventOccurrences[serializeDate(startDateTime)]
               ).filter(([occurrenceId]) => occurrenceId !== id.toString())
             );
-            eventsRef.current.eventTarget.dispatchEvent(new Event('change'));
+            eventsRef.current.eventTarget.trigger();
             void router.push(baseUrl).catch(crash);
           }}
         />

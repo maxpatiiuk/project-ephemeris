@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 
 import type { Calendar, EventOccurrence, EventTable } from '../lib/dataModel';
+import type { eventTarget } from '../lib/events';
 import { f } from '../lib/functools';
 import type { R, RA } from '../lib/types';
 import {
@@ -21,7 +22,7 @@ import { YearView } from './YearView';
 export type EventsRef = React.MutableRefObject<{
   readonly events: R<EventTable>;
   readonly eventOccurrences: R<R<EventOccurrence>>;
-  readonly eventTarget: EventTarget;
+  readonly eventTarget: ReturnType<typeof eventTarget>;
 }>;
 
 export function MainView({

@@ -12,10 +12,10 @@ import type { RA } from './types';
 import { defined, filterArray } from './types';
 
 export const serializeDate = (date: Date): string =>
-  date.toLocaleDateString().replaceAll('/', '_');
+  date.toLocaleDateString().split('/').join('_');
 
 export const deserializeDate = (dateString: string): Date =>
-  new Date(dateString.replaceAll('_', '/'));
+  new Date(dateString.split('_').join('/'));
 
 export const padNumber = (number: number): string =>
   number.toString().padStart(2, '0');

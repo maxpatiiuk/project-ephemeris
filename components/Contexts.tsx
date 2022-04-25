@@ -2,6 +2,7 @@ import React from 'react';
 import Modal from 'react-modal';
 
 import { error } from '../lib/assert';
+import { eventTarget } from '../lib/events';
 import type { RA } from '../lib/types';
 import { crash } from './ErrorBoundary';
 import { useBooleanState } from './Hooks';
@@ -53,7 +54,7 @@ export function Contexts({
   const eventsRef = React.useRef<EventsRef['current']>({
     events: {},
     eventOccurrences: {},
-    eventTarget: new EventTarget(),
+    eventTarget: eventTarget(),
   });
 
   return (
@@ -84,7 +85,7 @@ export const EventsContext = React.createContext<EventsRef>({
   current: {
     events: {},
     eventOccurrences: {},
-    eventTarget: new EventTarget(),
+    eventTarget: undefined!,
   },
 });
 EventsContext.displayName = 'EventsContext';

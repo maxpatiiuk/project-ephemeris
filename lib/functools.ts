@@ -2,6 +2,9 @@
 import { breakpoint, error } from './assert';
 import type { IR, RA } from './types';
 
+/** A storage for f.store */
+const store = new Map<() => unknown, unknown>();
+
 /**
  * A collection of helper functions for functional programming style
  * Kind of like underscore or ramda, but typesafe
@@ -58,6 +61,26 @@ export const f = {
     (value: unknown) =>
     (secondValue: unknown): boolean =>
       secondValue === value,
+  /**
+   * Wrap a pure function that does not need any arguments in this
+   * call to remember and return its return value.
+   *
+   * @remarks
+   * Useful not just for performance reasons, but also for delaying evaluation
+   * of an object until the first time it is needed (i.e., if object is in
+   * the global scope, and depends on the datamodel, delaying evaluation
+   * allows for creation of the object only after schema is loaded)
+   *
+   * Additionally, this function has commonly used to avoid circular by delaying
+   * creation of an object until it is needed for the first time.
+   *
+   */
+  store:
+    <RETURN>(callback: () => RETURN): (() => RETURN) =>
+    (): RETURN => {
+      if (!store.has(callback)) store.set(callback, callback());
+      return store.get(callback) as RETURN;
+    },
   /**
    * A better typed version of Array.prototype.includes
    *

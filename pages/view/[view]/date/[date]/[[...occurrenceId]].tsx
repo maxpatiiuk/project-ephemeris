@@ -10,7 +10,6 @@ import {
 import { CalendarList } from '../../../../../components/CalendarList';
 import { CurrentTime } from '../../../../../components/CurrentTime';
 import { useAsyncState } from '../../../../../components/Hooks';
-import { dateParts } from '../../../../../components/Internationalization';
 import Layout from '../../../../../components/Layout';
 import { MainView } from '../../../../../components/MainView';
 import { MiniCalendar } from '../../../../../components/MiniCalendar';
@@ -155,10 +154,10 @@ export default function Index(): JSX.Element {
               }
             >
               {Object.entries({
-                day: dateParts.day,
-                week: dateParts.week,
-                month: dateParts.month,
-                year: dateParts.year,
+                day: globalText('day'),
+                week: globalText('week'),
+                month: globalText('month'),
+                year: globalText('year'),
               }).map(([value, label]) => (
                 <option key={value} value={value}>
                   {label}

@@ -1,28 +1,9 @@
-import { capitalize } from '../lib/helpers';
 import type { RA } from '../lib/types';
-import { globalText } from '../localization/global';
 import { LANGUAGE } from '../localization/utils';
 
 /* This is an incomplete definition. For complete, see MDN Docs */
 // eslint-disable-next-line @typescript-eslint/no-namespace
 declare namespace Intl {
-  class DisplayNames {
-    public constructor(
-      locales?: string | RA<string>,
-      options?: {
-        readonly type:
-          | 'calendar'
-          | 'currency'
-          | 'dateTimeField'
-          | 'language'
-          | 'region'
-          | 'script';
-      }
-    );
-
-    public of(code: string): string;
-  }
-
   class RelativeTimeFormat {
     public constructor(
       locales?: string | RA<string>,
@@ -76,16 +57,6 @@ function getMonthNames(monthFormat: 'long' | 'short'): RA<string> {
 
 // Localized month names
 export const months = getMonthNames('long');
-
-const datePartLocalizer = new Intl.DisplayNames(LANGUAGE, {
-  type: 'dateTimeField',
-});
-export const dateParts = {
-  day: capitalize(datePartLocalizer.of('day')),
-  week: globalText('week'),
-  month: capitalize(datePartLocalizer.of('month')),
-  year: capitalize(datePartLocalizer.of('year')),
-} as const;
 
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 export const MILLISECONDS = 1000;

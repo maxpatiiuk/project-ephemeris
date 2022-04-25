@@ -2,6 +2,7 @@ import React from 'react';
 
 import { ajax } from '../lib/ajax';
 import type { EventOccurrence, EventTable } from '../lib/dataModel';
+import type { eventTarget } from '../lib/events';
 import { f } from '../lib/functools';
 import { sortFunction } from '../lib/helpers';
 import { formatUrl } from '../lib/querystring';
@@ -106,13 +107,12 @@ const fetchEventOccurrences = async (
         )
   );
 
-function useUpdates(eventTarget: EventTarget): number {
+function useUpdates(target: ReturnType<typeof eventTarget>): number {
   const [version, setVersion] = React.useState<number>(0);
-  React.useEffect(() => {
-    const handleChange = (): void => setVersion((version) => version + 1);
-    eventTarget.addEventListener('change', handleChange);
-    return (): void => eventTarget.removeEventListener('change', handleChange);
-  }, [eventTarget]);
+  React.useEffect(
+    () => target.listen((): void => setVersion((version) => version + 1)),
+    [target]
+  );
   return version;
 }
 
