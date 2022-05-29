@@ -7,35 +7,9 @@ support.
 
 Build with React, Next.js and Tailwind. Uses MySQL/MariaDB for storage.
 
-## Screenshots
+[Online demo](https://project-ephemeris.vercel.app)
 
-Main page:
-
-![Main page](./docs/src/1.png)
-
-Editing an event
-
-![Editing an event](./docs/src/3.png)
-
-Searching for events:
-
-![Searching for events](./docs/src/2.png)
-
-Month view:
-
-![Month view](./docs/src/4.png)
-
-Year view:
-
-![Year view](./docs/src/5.png)
-
-Light mode:
-
-![Light mode](./docs/src/6.png)
-
-Editing calendar:
-
-![Editing calendar](./docs/src/7.png)
+[Project documentation, video overview and screenshots]()
 
 ## Configuration
 
