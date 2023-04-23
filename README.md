@@ -126,7 +126,7 @@ fetched days.
 ## Code Credit
 
 Majority of the start code was repurposed and reused from another project of
-mine: [max.patii.uk (my portfolio)](https://github.com/maxxxxxdlp/max.patii.uk/).
+mine: [max.patii.uk (my portfolio)](https://github.com/maxpatiiuk/max.patii.uk/).
 
 Additionally, many basic React components and utility functions have been
 repuposed from another project I am a working on:

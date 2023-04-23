@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/maxxxxxdlp/project-ephemeris"
+    "url": "https://github.com/maxpatiiuk/project-ephemeris"
   },
   "scripts": {
     "build": "next build",
