@@ -9,7 +9,7 @@ Build with React, Next.js and Tailwind. Uses MySQL/MariaDB for storage.
 
 [Online demo](https://project-ephemeris.vercel.app)
 
-[Project documentation, video overview and screenshots]()
+[Project documentation, video overview and screenshots](https://max.patii.uk/projects/project-ephemeris)
 
 ## Configuration
 
