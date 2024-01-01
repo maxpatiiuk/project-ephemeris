@@ -14,7 +14,7 @@ type DefaultValue<T> = T | Promise<T> | (() => Promise<T>);
  */
 export function useCachedState<
   BUCKET_NAME extends string & keyof CacheDefinitions,
-  CACHE_NAME extends string & keyof CacheDefinitions[BUCKET_NAME]
+  CACHE_NAME extends string & keyof CacheDefinitions[BUCKET_NAME],
 >({
   bucketName,
   cacheName,
@@ -36,7 +36,7 @@ export function useCachedState<
   readonly staleWhileRefresh: boolean;
 }): [
   value: CacheDefinitions[BUCKET_NAME][CACHE_NAME] | undefined,
-  setValue: (newValue: CacheDefinitions[BUCKET_NAME][CACHE_NAME]) => void
+  setValue: (newValue: CacheDefinitions[BUCKET_NAME][CACHE_NAME]) => void,
 ] {
   const [state, setState] = React.useState<
     CacheDefinitions[BUCKET_NAME][CACHE_NAME] | undefined
@@ -45,7 +45,7 @@ export function useCachedState<
       defaultSetOptions: {
         bucketType,
       },
-    })
+    }),
   );
 
   const setCachedState = React.useCallback(
@@ -54,12 +54,12 @@ export function useCachedState<
         cache.set(bucketName, cacheName, newValue, {
           bucketType,
           overwrite: true,
-        })
+        }),
       ),
-    [bucketName, cacheName, bucketType]
+    [bucketName, cacheName, bucketType],
   );
 
-  const isUndefined = typeof state === 'undefined';
+  const isUndefined = state === undefined;
   React.useEffect(() => {
     if (isUndefined || staleWhileRefresh)
       (isFunction(defaultValue)
@@ -67,7 +67,11 @@ export function useCachedState<
         : Promise.resolve(defaultValue)
       )
         .then((value) =>
-          typeof value === 'undefined' ? undefined : setCachedState(value)
+          value === undefined
+            ? undefined
+            : setCachedState(
+                value as CacheDefinitions[BUCKET_NAME][CACHE_NAME],
+              ),
         )
         .catch(crash);
   }, [isUndefined, defaultValue, setCachedState, staleWhileRefresh]);

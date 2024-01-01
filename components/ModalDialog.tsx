@@ -165,7 +165,9 @@ export function Dialog({
     return (): void => container?.removeEventListener('click', handleClick);
   }, [forceToTop, modal, isOpen, zIndex, container]);
 
-  const draggableContainer: Props['contentElement'] = React.useCallback(
+  const draggableContainer = React.useCallback<
+    Exclude<Props['contentElement'], undefined>
+  >(
     (props, children) => (
       <Draggable
         // Don't allow moving the dialog past the window bounds
@@ -183,7 +185,7 @@ export function Dialog({
         <div {...props}>{children}</div>
       </Draggable>
     ),
-    [id]
+    [id],
   );
 
   return (

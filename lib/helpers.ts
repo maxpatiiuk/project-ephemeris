@@ -17,7 +17,7 @@ export const camelToHuman = (value: string): string =>
 export const sortFunction =
   <T, V extends boolean | number | string | null>(
     mapper: (value: T) => V,
-    reverse = false
+    reverse = false,
   ): ((left: T, right: T) => -1 | 0 | 1) =>
   (left: T, right: T): -1 | 0 | 1 => {
     const [leftValue, rightValue] = reverse
@@ -26,16 +26,16 @@ export const sortFunction =
     if (leftValue === rightValue) return 0;
     return typeof leftValue === 'string' && typeof rightValue === 'string'
       ? (leftValue.localeCompare(rightValue) as -1 | 0 | 1)
-      : leftValue > rightValue
-      ? 1
-      : -1;
+      : (leftValue ?? '') > (rightValue ?? '')
+        ? 1
+        : -1;
   };
 
 /** Split array in half according to a discriminator function */
 export const split = <ITEM>(
   array: RA<ITEM>,
   // If returns true, item would go to the right array
-  discriminator: (item: ITEM, index: number, array: RA<ITEM>) => boolean
+  discriminator: (item: ITEM, index: number, array: RA<ITEM>) => boolean,
 ): Readonly<[left: RA<ITEM>, right: RA<ITEM>]> =>
   array
     .map((item, index) => [item, discriminator(item, index, array)] as const)
@@ -44,15 +44,15 @@ export const split = <ITEM>(
         [...left, ...(isRight ? [] : [item])],
         [...right, ...(isRight ? [item] : [])],
       ],
-      [[], []]
+      [[], []],
     );
 
 export const omit = <
   DICTIONARY extends IR<unknown>,
-  OMIT extends keyof DICTIONARY
+  OMIT extends keyof DICTIONARY,
 >(
   object: DICTIONARY,
-  toOmit: RA<OMIT>
+  toOmit: RA<OMIT>,
 ): {
   readonly [KEY in keyof DICTIONARY as KEY extends OMIT
     ? never
@@ -60,7 +60,7 @@ export const omit = <
 } =>
   // @ts-expect-error
   Object.fromEntries(
-    Object.entries(object).filter(([key]) => !f.includes(toOmit, key))
+    Object.entries(object).filter(([key]) => !f.includes(toOmit, key)),
   );
 
 /** Create a new array with a given item replaced */
@@ -82,7 +82,7 @@ export const toggleItem = <T>(array: RA<T>, toggle: T): RA<T> =>
 export const replaceKey = <T extends IR<unknown>>(
   object: T,
   targetKey: keyof T,
-  newValue: T[keyof T]
+  newValue: T[keyof T],
 ): T =>
   object[targetKey] === newValue
     ? object
@@ -94,5 +94,5 @@ export const replaceKey = <T extends IR<unknown>>(
            * to a string
            */
           key === targetKey.toString() ? newValue : value,
-        ])
+        ]),
       ) as T);
