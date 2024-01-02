@@ -13,14 +13,14 @@ export type ResponsePayload<T = unknown> = {
 
 const processResponse = async (
   response: NextApiResponse,
-  payload: ResponsePayload | Promise<ResponsePayload>
+  payload: ResponsePayload | Promise<ResponsePayload>,
 ): Promise<void> =>
   Promise.resolve(payload).then((payload) =>
-    response.status(payload.status).send(payload.body)
+    response.status(payload.status).send(payload.body),
   );
 
 const catchErrors = async (
-  promise: Promise<ResponsePayload>
+  promise: Promise<ResponsePayload>,
 ): Promise<ResponsePayload> =>
   promise.catch((error) => {
     console.error(error);
@@ -30,12 +30,12 @@ const catchErrors = async (
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 type Handler<BODY, QUERY extends string> = (
-  payload: Payload<BODY, QUERY>
+  payload: Payload<BODY, QUERY>,
 ) => Promise<ResponsePayload>;
 
 export type Payload<BODY, QUERY extends string = never> = {
   readonly body: BODY;
-  readonly connection: Connection;
+  readonly connection: Connection | undefined;
   readonly request: NextApiRequest;
   readonly response: NextApiResponse;
   readonly query: RR<QUERY, string>;
@@ -45,9 +45,9 @@ export const endpoint =
   <
     DEFINITION extends {
       readonly [METHOD in Method]?: Handler<never, string>;
-    }
+    },
   >(
-    definition: DEFINITION
+    definition: DEFINITION,
   ) =>
   async (request: NextApiRequest, response: NextApiResponse): Promise<void> =>
     connectToDatabase().then(async (connection) =>
@@ -61,8 +61,8 @@ export const endpoint =
                 request,
                 response,
                 query: request.query as never,
-              })
+              }),
             )
-          : { status: Http.WRONG_METHDO, body: '' }
-      )
+          : { status: Http.WRONG_METHOD, body: '' },
+      ),
     );

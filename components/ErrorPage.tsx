@@ -4,7 +4,11 @@ import React from 'react';
 import Layout from '../components/Layout';
 import { globalText } from '../localization/global';
 
-function ErrorPage({ errorCode }: { readonly errorCode: number }): JSX.Element {
+export function ErrorPage({
+  errorCode,
+}: {
+  readonly errorCode: number;
+}): JSX.Element {
   return (
     <Layout title={errorCode.toString()}>
       <div className="flex items-center justify-center w-screen h-screen text-center">

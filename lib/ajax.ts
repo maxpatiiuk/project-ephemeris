@@ -71,7 +71,7 @@ export const ajax = async <RESPONSE_TYPE = string>(
      * In either case, error messages are logged to the console
      */
     readonly strict?: boolean;
-  } = {}
+  } = {},
 ): Promise<ResponseObject<RESPONSE_TYPE>> =>
   fetch(url, {
     ...options,
@@ -98,7 +98,7 @@ export const ajax = async <RESPONSE_TYPE = string>(
         strict,
         response,
         text,
-      })
+      }),
     );
 
 export function handleResponse<RESPONSE_TYPE = string>({
@@ -131,7 +131,7 @@ export function handleResponse<RESPONSE_TYPE = string>({
           return {
             data: new window.DOMParser().parseFromString(
               text,
-              'text/xml'
+              'text/xml',
             ) as unknown as RESPONSE_TYPE,
             response,
             status: response.status,
@@ -179,7 +179,7 @@ export function handleResponse<RESPONSE_TYPE = string>({
 export const ping = async (
   url: string,
   options?: PartialBy<Parameters<typeof ajax>[1], 'headers'>,
-  additionalOptions?: Parameters<typeof ajax>[2]
+  additionalOptions?: Parameters<typeof ajax>[2],
 ): Promise<number> => {
   return ajax<never>(
     url,
@@ -187,6 +187,6 @@ export const ping = async (
       ...options,
       headers: options?.headers ?? {},
     },
-    additionalOptions
+    additionalOptions,
   ).then(({ status }) => status);
 };

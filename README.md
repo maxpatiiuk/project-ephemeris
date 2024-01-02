@@ -77,8 +77,8 @@ Database schema is located in `./schema.sql`.
 - Event occurs on at least 1 day of the week, but no more than 7
 - Each event may have one or more occurrences
 - Event occurrence start time is before event end time
-- Event occurrence start time and end time may differ from that of event
-  (to handle cases when an individual event is delayed or rescheduled)
+- Event occurrence start time and end time may differ from that of event (to
+  handle cases when an individual event is delayed or rescheduled)
 - Event occurrence’s date is between the start date and end date of the event
 - Event occurrence has a color, which may differ from that of the calendar
 
@@ -126,7 +126,8 @@ fetched days.
 ## Code Credit
 
 Majority of the start code was repurposed and reused from another project of
-mine: [max.patii.uk (my portfolio)](https://github.com/maxpatiiuk/max.patii.uk/).
+mine:
+[max.patii.uk (my portfolio)](https://github.com/maxpatiiuk/max.patii.uk/).
 
 Additionally, many basic React components and utility functions have been
 repuposed from another project I am a working on:

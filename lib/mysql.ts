@@ -32,17 +32,19 @@ function reconnect(error: string): never {
 
 makeConnection();
 
-export let connection: mysql.Connection;
+let connection: mysql.Connection | undefined;
 
-export async function connectToDatabase(): Promise<mysql.Connection> {
-  if (typeof connection === 'undefined') await connectionPromise;
+export async function connectToDatabase(): Promise<
+  mysql.Connection | undefined
+> {
+  if (connection === undefined) await connectionPromise;
   return connection;
 }
 
 export const execute = async <TYPE>(
   connection: mysql.Connection,
   sql: string,
-  args: RA<unknown> = []
+  args: RA<unknown> = [],
 ): Promise<TYPE> =>
   f.log(`QUERY: ${sql}. ARGUMENTS: `, ...args) ??
   connection.execute(sql, args).then(([data]) => data as unknown as TYPE);

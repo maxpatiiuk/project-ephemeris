@@ -8,10 +8,10 @@ import { deserializeDate } from '../../../../../lib/utils';
 
 export default async function endpoint(
   request: NextApiRequest,
-  response: NextApiResponse
+  response: NextApiResponse,
 ): Promise<void> {
   if (request.method !== 'POST')
-    return void response.status(Http.WRONG_METHDO).send('');
+    return void response.status(Http.WRONG_METHOD).send('');
 
   const connection = await connectToDatabase();
   const searchQuery = (request.query.query as string | undefined) ?? '';

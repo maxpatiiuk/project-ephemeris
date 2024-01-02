@@ -49,7 +49,7 @@ function wrap<
    * For example, can make some optional props be required, forbid passing
    * children, or mutate extra props using mergeProps callback
    */
-  EXTRA_PROPS extends IR<unknown> = RR<never, never>
+  EXTRA_PROPS extends IR<unknown> = RR<never, never>,
 >(
   // Would be shown in React DevTools
   name: string,
@@ -57,10 +57,10 @@ function wrap<
   className: string,
   initialProps?:
     | TagProps<TAG>
-    | ((props: TagProps<TAG> & Readonly<EXTRA_PROPS>) => TagProps<TAG>)
+    | ((props: TagProps<TAG> & Readonly<EXTRA_PROPS>) => TagProps<TAG>),
 ) {
   const wrapped = (
-    props: TagProps<TAG> & Readonly<EXTRA_PROPS>
+    props: TagProps<TAG> & Readonly<EXTRA_PROPS>,
   ): JSX.Element => {
     // Merge classNames
     const fullClassName =
@@ -162,14 +162,14 @@ export const Form = wrap(
         props.onSubmit(event);
       }
     },
-  })
+  }),
 );
 /*
  * Don't highlight missing required and pattern mismatch fields until focus
  * loss
  */
 const withHandleBlur = <TYPE extends InputType>(
-  handleBlur: ((event: React.FocusEvent<TYPE>) => void) | undefined
+  handleBlur: ((event: React.FocusEvent<TYPE>) => void) | undefined,
 ) => ({
   onBlur(event: React.FocusEvent<TYPE>): void {
     const input = event.target as TYPE;
@@ -211,7 +211,7 @@ export const Input = {
         props.onChange?.(event);
       },
       readOnly: isReadOnly,
-    })
+    }),
   ),
   Text: wrap<
     'input',
@@ -234,7 +234,7 @@ export const Input = {
         props.onChange?.(event);
       },
       readOnly: isReadOnly,
-    })
+    }),
   ),
   Generic: wrap<
     'input',
@@ -267,12 +267,12 @@ export const Input = {
           try {
             // @ts-expect-error
             input.value = (event.clipboardData ?? window.clipboardData).getData(
-              'text/plain'
+              'text/plain',
             );
             if (typeof onValueChange === 'function') onValueChange(input.value);
             else if (typeof props.onChange === 'function')
               props.onChange(
-                event as unknown as React.ChangeEvent<HTMLInputElement>
+                event as unknown as React.ChangeEvent<HTMLInputElement>,
               );
             else
               console.error('Input does not have an onChange event listener', {
@@ -288,7 +288,7 @@ export const Input = {
         props.onPaste?.(event);
       },
       readOnly: isReadOnly,
-    })
+    }),
   ),
   Number: wrap<
     'input',
@@ -308,12 +308,12 @@ export const Input = {
       ...withHandleBlur(props.onBlur),
       onChange(event): void {
         onValueChange?.(
-          Number.parseInt((event.target as HTMLInputElement).value)
+          Number.parseInt((event.target as HTMLInputElement).value),
         );
         props.onChange?.(event);
       },
       readOnly: isReadOnly,
-    })
+    }),
   ),
 };
 export const Textarea = wrap<
@@ -337,7 +337,7 @@ export const Textarea = wrap<
       props.onChange?.(event);
     },
     readOnly: isReadOnly,
-  })
+  }),
 );
 export const selectMultipleSize = 4;
 export const Select = wrap<
@@ -367,7 +367,7 @@ export const Select = wrap<
     ...withHandleBlur(props.onBlur),
     onChange(event): void {
       const options = Array.from(
-        (event.target as HTMLSelectElement).querySelectorAll('option')
+        (event.target as HTMLSelectElement).querySelectorAll('option'),
       );
       const [unselected, selected] = split(options, ({ selected }) => selected);
       /*
@@ -502,7 +502,7 @@ export const Button = {
   LikeLink: button('Button.LikeLink', className.link),
   Transparent: button(
     'Button.Transparent',
-    `${niceButton} ${className.transparentButton}`
+    `${niceButton} ${className.transparentButton}`,
   ),
   Gray: button('Button.Gray', `${niceButton} ${className.grayButton}`),
   Red: button('Button.Red', `${niceButton} ${className.redButton}`),
@@ -518,7 +518,7 @@ export const Button = {
       ...props,
       type: 'button',
       children: icons[props.icon],
-    })
+    }),
   ),
 } as const;
 
@@ -538,21 +538,21 @@ const submitButton = (name: string, buttonClassName: string) =>
       type: 'submit',
       ...props,
       value: children,
-    })
+    }),
   );
 export const Submit = {
   // Force passing children by nesting rather than through the [value] attribute
   Simple: submitButton('Submit.Simple', className.button),
   Transparent: submitButton(
     'Submit.Transparent',
-    `${niceButton} ${className.transparentButton}`
+    `${niceButton} ${className.transparentButton}`,
   ),
   Gray: submitButton('Submit.Gray', `${niceButton} ${className.grayButton}`),
   Red: submitButton('Submit.Red', `${niceButton} ${className.redButton}`),
   Blue: submitButton('Submit.Blue', `${niceButton} ${className.blueButton}`),
   Orange: submitButton(
     'Submit.Orange',
-    `${niceButton} ${className.orangeButton}`
+    `${niceButton} ${className.orangeButton}`,
   ),
   Green: submitButton('Submit.Green', `${niceButton} ${className.greenButton}`),
 } as const;
@@ -562,18 +562,18 @@ export const Container = {
     'Container.Generic',
     'section',
     `${baseContainer} ${rootBackground} ${rootText}
-      max-w-[min(100%,1200px)] mx-auto`
+      max-w-[min(100%,1200px)] mx-auto`,
   ),
   Full: wrap(
     'Container.Full',
     'section',
-    `bg-gray-100 dark:bg-neutral-800 rounded border border-gray-300 dark:border-neutral-700 `
+    `bg-gray-100 dark:bg-neutral-800 rounded border border-gray-300 dark:border-neutral-700 `,
   ),
   Quartered: wrap(
     'Container.Quartered',
     'main',
     `h-screen flex flex-col gap-2 grid ${rootBackground} ${rootText}
-      grid-cols-[256px_1fr] grid-rows-[min-content_1fr] p-4`
+      grid-cols-[256px_1fr] grid-rows-[min-content_1fr] p-4`,
   ),
 };
 

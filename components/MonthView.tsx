@@ -68,7 +68,7 @@ export function MonthView({
     days.previousMonth[0]?.[1] ?? days.currentMonth[0][1],
     days.nextMonth.slice(-1)[0]?.[1] ?? days.currentMonth.slice(-1)[0][1],
     eventsRef,
-    enabledCalendars
+    enabledCalendars,
   );
   return (
     <Container.Full className="flex flex-col overflow-hidden">

@@ -31,7 +31,7 @@ function usePlacing(occurrences: RA<OccurrenceWithEvent> | undefined): RA<{
       {
         length: atomCount,
       },
-      (): number[] => []
+      (): number[] => [],
     );
     const startDate = new Date(occurrences?.[0]?.startDateTime ?? new Date());
     startDate.setHours(0);
@@ -41,13 +41,14 @@ function usePlacing(occurrences: RA<OccurrenceWithEvent> | undefined): RA<{
     const startString = dateToString(startDate);
     occurrences?.forEach(({ id, startDateTime, endDateTime }) => {
       const startAtom = Math.floor(
-        ((startDateTime.getTime() - startTime) / DAY / MILLISECONDS) * atomCount
+        ((startDateTime.getTime() - startTime) / DAY / MILLISECONDS) *
+          atomCount,
       );
       const endAtom =
         startString === dateToString(endDateTime)
           ? Math.ceil(
               ((endDateTime.getTime() - startTime) / DAY / MILLISECONDS) *
-                atomCount
+                atomCount,
             )
           : atomCount;
       Array.from({ length: endAtom - startAtom }, (_, index) => {
@@ -64,10 +65,10 @@ function usePlacing(occurrences: RA<OccurrenceWithEvent> | undefined): RA<{
             .reverse()
             .findIndex((atom) => atom.includes(id));
         const fraction = Math.max(
-          ...atoms.slice(startIndex, endIndex).map((atom) => atom.length)
+          ...atoms.slice(startIndex, endIndex).map((atom) => atom.length),
         );
         const left = Math.max(
-          ...atoms.slice(startIndex, endIndex).map((atom) => atom.indexOf(id))
+          ...atoms.slice(startIndex, endIndex).map((atom) => atom.indexOf(id)),
         );
 
         return {
@@ -93,7 +94,7 @@ export function Column({
 }): JSX.Element {
   const router = useRouter();
   const [currentTime, setCurrentTime] = React.useState<number | undefined>(
-    undefined
+    undefined,
   );
   const placing = usePlacing(occurrences);
 
@@ -106,7 +107,7 @@ export function Column({
         dayStart.setMinutes(0);
         dayStart.setSeconds(0);
         setCurrentTime(
-          (currentDate.getTime() - dayStart.getTime()) / DAY / MILLISECONDS
+          (currentDate.getTime() - dayStart.getTime()) / DAY / MILLISECONDS,
         );
       } else setCurrentTime(undefined);
     }

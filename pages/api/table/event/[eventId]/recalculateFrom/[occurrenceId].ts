@@ -78,12 +78,12 @@ export default async function endpoint(
         weekDays.map(async (weekDay) => {
           const startDateTime = new Date(occurrence.startDateTime);
           startDateTime.setDate(
-            startDateTime.getDate() + (weekIndex * WEEK) / DAY + weekDay + 1
+            startDateTime.getDate() + (weekIndex * WEEK) / DAY + weekDay + 1,
           );
           const endDateTime = new Date(
             startDateTime.getTime() +
               (occurrence.endDateTime.getTime() -
-                occurrence.startDateTime.getTime())
+                occurrence.startDateTime.getTime()),
           );
           const record = {
             name: occurrence.name,

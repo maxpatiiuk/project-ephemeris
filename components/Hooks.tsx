@@ -25,7 +25,7 @@ export function useId(prefix: string): (suffix: string) => string {
   return React.useCallback(
     (suffix = ''): string =>
       `${resolvedPrefix}${id.current}${suffix ? `-${suffix}` : ''}`,
-    [resolvedPrefix]
+    [resolvedPrefix],
   );
 }
 
@@ -58,10 +58,10 @@ export function useAsyncState<T>(
   // Can return backOut to cancel a state update
   callback: () => undefined | T | Promise<T | undefined>,
   // Show the loading screen while the promise is being resolved
-  loadingScreen: boolean
+  loadingScreen: boolean,
 ): [
   state: T | undefined,
-  setState: React.Dispatch<React.SetStateAction<T | undefined>>
+  setState: React.Dispatch<React.SetStateAction<T | undefined>>,
 ] {
   const [state, setState] = React.useState<T | undefined>(undefined);
   const loading = React.useContext(LoadingContext);
@@ -74,8 +74,8 @@ export function useAsyncState<T>(
       Promise.resolve(callback()).then((newState) =>
         destructorCalled || newState === backOut
           ? undefined
-          : setState(newState)
-      )
+          : setState(newState),
+      ),
     );
 
     let destructorCalled = false;
@@ -110,7 +110,7 @@ export function useAsyncState<T>(
  * ```
  */
 export function useLiveState<T>(
-  callback: () => T
+  callback: () => T,
 ): [state: T, setState: React.Dispatch<React.SetStateAction<T>>] {
   const [state, setState] = React.useState<T>(() => callback());
 
@@ -181,7 +181,7 @@ export function useReadyEffect(callback: () => void): void {
  * ```
  */
 export function useBooleanState(
-  value = false
+  value = false,
 ): Readonly<
   [state: boolean, enable: () => void, disable: () => void, toggle: () => void]
 > {
@@ -192,19 +192,19 @@ export function useBooleanState(
       function enable() {
         setState(true);
       },
-      [setState]
+      [setState],
     ),
     React.useCallback(
       function disable() {
         setState(false);
       },
-      [setState]
+      [setState],
     ),
     React.useCallback(
       function toggle() {
         setState((value) => !value);
       },
-      [setState]
+      [setState],
     ),
   ];
 }

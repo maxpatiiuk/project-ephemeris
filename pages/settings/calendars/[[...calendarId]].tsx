@@ -62,9 +62,9 @@ export default function Calendars(): JSX.Element {
         ajax<IR<number>>('/api/stats/global', {
           headers: { Accept: 'application/json' },
         }).then(({ data }) => data),
-      []
+      [],
     ),
-    false
+    false,
   );
 
   return (
@@ -119,9 +119,9 @@ export default function Calendars(): JSX.Element {
                                 headers: { Accept: 'application/json' },
                                 body: calendar,
                               },
-                              { expectedResponseCodes: [Http.CREATED] }
+                              { expectedResponseCodes: [Http.CREATED] },
                             )
-                        ).then(async () => router.push('/'))
+                        ).then(async () => router.push('/')),
                       )
                     }
                   >

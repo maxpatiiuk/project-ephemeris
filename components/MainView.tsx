@@ -54,7 +54,7 @@ export function MainView({
         const currentDate = new Date();
         startDate.setHours(currentDate.getHours());
         startDate.setMinutes(
-          f.ceil(currentDate.getMinutes(), DEFAULT_MINUTE_ROUNDING)
+          f.ceil(currentDate.getMinutes(), DEFAULT_MINUTE_ROUNDING),
         );
       }
       return {

@@ -4,18 +4,19 @@ import { endpoint } from '../../../../lib/apiUtils';
 import { error } from '../../../../lib/assert';
 import { tables } from '../../../../lib/dataModel';
 import { f } from '../../../../lib/functools';
+import { inMemory } from '../../../../lib/inMemoryDatabase';
 import { execute } from '../../../../lib/mysql';
 import { filtersToSql, queryRecords } from '../../../../lib/query';
 import type { IR, RA } from '../../../../lib/types';
 
 export const parseTableName = (tableName: string): keyof typeof tables =>
   Object.keys(tables).find(
-    (key) => key.toLowerCase() === tableName.toLowerCase()
+    (key) => key.toLowerCase() === tableName.toLowerCase(),
   ) ??
   error(
     `"${tableName}" is not a valid table name. Table names include ${Object.keys(
-      tables
-    ).join(', ')}`
+      tables,
+    ).join(', ')}`,
   );
 
 export const getTableColumns = (tableName: string): RA<string> =>

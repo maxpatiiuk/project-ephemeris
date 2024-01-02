@@ -349,10 +349,10 @@ export function MiniEvent({
                           Math.max(
                             endDateTime.getTime() -
                               (startDateTime.getTime() - startDate.getTime()),
-                            startDate.getTime() + MINUTE * MILLISECONDS
-                          )
-                        )
-                      )
+                            startDate.getTime() + MINUTE * MILLISECONDS,
+                          ),
+                        ),
+                      ),
                     )
                   }
                 />
@@ -371,11 +371,11 @@ export function MiniEvent({
                               Math.min(
                                 startDateTime.getTime() -
                                   (endDateTime.getTime() - endDate.getTime()),
-                                endDate.getTime() - MINUTE * MILLISECONDS
-                              )
+                                endDate.getTime() - MINUTE * MILLISECONDS,
+                              ),
                             )
-                          : startDateTime
-                      )
+                          : startDateTime,
+                      ),
                     )
                   }
                 />
@@ -404,9 +404,9 @@ export function MiniEvent({
                               index,
                               isEnabled
                                 ? event.daysOfWeek[index].toLowerCase()
-                                : event.daysOfWeek[index].toUpperCase()
-                            ).join('')
-                          )
+                                : event.daysOfWeek[index].toUpperCase(),
+                            ).join(''),
+                          ),
                         )
                       }
                     >
@@ -456,20 +456,20 @@ export function MiniEvent({
                       occurrence,
                       'color',
                       calendars?.find(({ id }) => id.toString() === calendarId)
-                        ?.color ?? color
-                    )
+                        ?.color ?? color,
+                    ),
                   );
                   setEvent(
                     replaceKey(
                       replaceKey(
                         event,
                         'calendarId',
-                        Number.parseInt(calendarId)
+                        Number.parseInt(calendarId),
                       ),
                       'defaultColor',
                       calendars?.find(({ id }) => id.toString() === calendarId)
-                        ?.color ?? event.defaultColor
-                    )
+                        ?.color ?? event.defaultColor,
+                    ),
                   );
                 }}
               >
@@ -487,7 +487,7 @@ export function MiniEvent({
                 value={description}
                 onValueChange={(description): void =>
                   setOccurrence(
-                    replaceKey(occurrence, 'description', description)
+                    replaceKey(occurrence, 'description', description),
                   )
                 }
               />
@@ -509,8 +509,10 @@ export function MiniEvent({
               serializeDate(initialOccurrence.startDateTime)
             ] = Object.fromEntries(
               Object.entries(
-                eventsRef.current.eventOccurrences[serializeDate(startDateTime)]
-              ).filter(([occurrenceId]) => occurrenceId !== id.toString())
+                eventsRef.current.eventOccurrences[
+                  serializeDate(startDateTime)
+                ],
+              ).filter(([occurrenceId]) => occurrenceId !== id.toString()),
             );
             eventsRef.current.eventTarget.trigger();
             void router.push(baseUrl).catch(crash);
@@ -544,7 +546,7 @@ export function DeleteDialog({
                 {
                   method: 'DELETE',
                 },
-                { expectedResponseCodes: [Http.NO_CONTENT] }
+                { expectedResponseCodes: [Http.NO_CONTENT] },
               ).catch(crash);
             }}
           >

@@ -21,8 +21,8 @@ export const padNumber = (number: number): string =>
   number.toString().padStart(2, '0');
 
 export const dateToString = (date: Date): string =>
-  `${date.getFullYear()}-${padNumber(date.getMonth())}-${padNumber(
-    date.getDate()
+  `${date.getFullYear()}-${padNumber(date.getMonth() + 1)}-${padNumber(
+    date.getDate(),
   )}`;
 
 export const dateToDatetimeLocal = (date: Date): string =>
@@ -61,7 +61,7 @@ export const parseReTime = (
  */
 export default function debounce<ARGS extends RA<unknown>>(
   callback: (...args: ARGS) => void,
-  wait: number
+  wait: number,
 ): (...args: ARGS) => void {
   let timeout: number | ReturnType<typeof setTimeout> | undefined = undefined;
   let lastCall = 0;
@@ -107,7 +107,7 @@ export function getMonthDays(currentDate: Date): {
   const previousMonthYear = month === 1 ? year - 1 : year;
   const daysInPreviousMonth = countDaysInMonth(
     previousMonthYear,
-    previousMonth
+    previousMonth,
   );
   const weekDayForFirstDay = new Date(year, month, 1).getDay();
   const weekDayForLastDay = new Date(year, month, daysInMonth).getDay();
@@ -128,12 +128,12 @@ export function getMonthDays(currentDate: Date): {
     thisDayLastMonth: new Date(
       previousMonthYear,
       previousMonth,
-      Math.min(day, daysInPreviousMonth)
+      Math.min(day, daysInPreviousMonth),
     ),
     thisDayNextMonth: new Date(
       nextMonthYear,
       nextMonth,
-      Math.min(day, daysInPreviousMonth)
+      Math.min(day, daysInPreviousMonth),
     ),
     previousMonth: Array.from(
       { length: previousMonthDaysToShow },
@@ -149,13 +149,13 @@ export function getMonthDays(currentDate: Date): {
             daysInPreviousMonth -
               weekDayForFirstDay +
               index +
-              (startWithSunday ? 1 : 2)
+              (startWithSunday ? 1 : 2),
           ),
-        ] as const
+        ] as const,
     ),
     currentMonth: Array.from(
       { length: daysInMonth },
-      (_, index) => [index + 1, new Date(year, month, index + 1)] as const
+      (_, index) => [index + 1, new Date(year, month, index + 1)] as const,
     ),
     nextMonth: Array.from(
       {
@@ -169,7 +169,7 @@ export function getMonthDays(currentDate: Date): {
           (startWithSunday ? 1 : 0),
       },
       (_, index) =>
-        [index + 1, new Date(nextMonthYear, nextMonth, index + 1)] as const
+        [index + 1, new Date(nextMonthYear, nextMonth, index + 1)] as const,
     ),
   };
 }

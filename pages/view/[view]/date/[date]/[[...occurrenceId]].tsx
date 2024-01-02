@@ -30,9 +30,9 @@ export default function Index(): JSX.Element {
   const currentDate = React.useMemo(
     () =>
       deserializeDate(
-        (router.query.date as string) ?? serializeDate(new Date())
+        (router.query.date as string) ?? serializeDate(new Date()),
       ),
-    [router.query.date]
+    [router.query.date],
   );
 
   const previousDate = React.useMemo(() => {
@@ -81,7 +81,7 @@ export default function Index(): JSX.Element {
             .filter(({ id }) => !disabledCalendars.includes(id))
             .map(({ id }) => id)
         : undefined,
-    [disabledCalendars, calendars]
+    [disabledCalendars, calendars],
   );
 
   // Keyboard navigation
@@ -90,7 +90,7 @@ export default function Index(): JSX.Element {
       const interactiveElements = ['input', 'button', 'textarea'];
       if (
         interactiveElements.some(
-          (tagName) => (event.target as Element)?.closest(tagName) !== null
+          (tagName) => (event.target as Element)?.closest(tagName) !== null,
         )
       )
         return;
@@ -149,7 +149,7 @@ export default function Index(): JSX.Element {
               value={view}
               onValueChange={async (newView) =>
                 router.push(
-                  `/view/${newView}/date/${router.query.date as string}`
+                  `/view/${newView}/date/${router.query.date as string}`,
                 )
               }
             >
