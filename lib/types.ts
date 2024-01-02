@@ -27,12 +27,12 @@ export const filterArray = <T>(array: RA<T | undefined>): RA<T> =>
 // Make some keys on a record optional
 export type PartialBy<
   RECORD extends IR<unknown>,
-  OPTIONAL_KEYS extends keyof RECORD
+  OPTIONAL_KEYS extends keyof RECORD,
 > = Omit<RECORD, OPTIONAL_KEYS> & Partial<Pick<RECORD, OPTIONAL_KEYS>>;
 
 // "typeof value === 'function'" does not narrow the type in some cases
 export const isFunction = <T>(
-  value: T
+  value: T,
 ): value is T & ((...args: RA<unknown>) => unknown) =>
   typeof value === 'function';
 

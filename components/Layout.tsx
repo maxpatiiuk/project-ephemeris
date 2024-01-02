@@ -8,8 +8,8 @@ const extractTitle = (title: string): string =>
   title === ''
     ? globalText('title')
     : title.endsWith(' ')
-    ? `${title}- ${globalText('title')}`
-    : title;
+      ? `${title}- ${globalText('title')}`
+      : title;
 
 function Layout({
   title = '',

@@ -136,7 +136,7 @@ export function Column({
         )}${
           typeof router.query.occurrenceId === 'undefined' ? '/event/add' : ''
         }`}
-        className="absolute w-full h-full block flex flex-col"
+        className="absolute w-full h-full flex flex-col"
         aria-label={globalText('createEvent')}
         onClick={(event): void => {
           if (typeof router.query.occurrenceId !== 'undefined') return;

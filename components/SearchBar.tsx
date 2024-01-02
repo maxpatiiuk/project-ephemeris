@@ -31,7 +31,7 @@ export function SearchBar({
               {
                 method: 'POST',
                 headers: { Accept: 'application/json' },
-              }
+              },
             ).then(({ data }) =>
               data.map(({ recurring, ...occurrence }) => ({
                 label: `${occurrence.name}${
@@ -41,7 +41,7 @@ export function SearchBar({
                   <>
                     <time dateTime={occurrence.startDateTime.toString()}>
                       {f.var(new Date(occurrence.startDateTime), (startDate) =>
-                        getRelativeDate(startDate)
+                        getRelativeDate(startDate),
                       )}
                     </time>
                     <div
@@ -51,21 +51,21 @@ export function SearchBar({
                   </>
                 ),
                 data: occurrence,
-              }))
+              })),
             )
           }
           onNewValue={(): void =>
             void router.push(
               `/view/${router.query.view as string}/date/${serializeDate(
-                currentDate
-              )}/event/add`
+                currentDate,
+              )}/event/add`,
             )
           }
           onChange={({ data }): void =>
             void router.push(
               `/view/${router.query.view as string}/date/${serializeDate(
-                new Date(data.startDateTime)
-              )}/event/${data.id}`
+                new Date(data.startDateTime),
+              )}/event/${data.id}`,
             )
           }
           onCleared={(): void => setValue('')}

@@ -43,7 +43,7 @@ export function Contexts({
           if (holders.current.length === 0) handleLoaded();
         });
     },
-    [handleLoading, handleLoaded]
+    [handleLoading, handleLoaded],
   );
 
   const [error, setError] = React.useState<JSX.Element | undefined>(undefined);

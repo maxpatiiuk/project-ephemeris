@@ -56,7 +56,7 @@ export function WeekView({
         typeof window === 'undefined' ? LANGUAGE : window?.navigator.language,
         {
           weekday: 'short',
-        }
+        },
       ),
     }));
   }, [currentDate]);
@@ -66,7 +66,7 @@ export function WeekView({
     days[0].date,
     days.slice(-1)[0].date,
     eventsRef,
-    enabledCalendars
+    enabledCalendars,
   );
 
   return (

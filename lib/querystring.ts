@@ -14,7 +14,7 @@ export type KeysToLowerCase<DICTIONARY extends IR<unknown>> = {
 
 /** Recursively convert keys on an object to lowercase */
 export const keysToLowerCase = <OBJECT extends IR<unknown>>(
-  resource: OBJECT
+  resource: OBJECT,
 ): KeysToLowerCase<OBJECT> =>
   Object.fromEntries(
     Object.entries(resource).map(([key, value]) => [
@@ -22,9 +22,9 @@ export const keysToLowerCase = <OBJECT extends IR<unknown>>(
       Array.isArray(value)
         ? value.map(keysToLowerCase)
         : typeof value === 'object' && value !== null
-        ? keysToLowerCase(value as IR<unknown>)
-        : value,
-    ])
+          ? keysToLowerCase(value as IR<unknown>)
+          : value,
+    ]),
   ) as unknown as KeysToLowerCase<OBJECT>;
 
 export function formatUrl(url: string, parameters: IR<string>): string {

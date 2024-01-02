@@ -18,7 +18,7 @@ export const f = {
   array: (): RA<never> => [],
   unary:
     <ARGUMENT, RETURN>(
-      callback: (argument: ARGUMENT) => RETURN
+      callback: (argument: ARGUMENT) => RETURN,
     ): ((argument: ARGUMENT) => RETURN) =>
     (argument) =>
       callback(argument),
@@ -38,7 +38,7 @@ export const f = {
   /** An alternative way to declare a variable */
   var: <VALUE, RETURN>(
     value: VALUE,
-    callback: (value: VALUE) => RETURN
+    callback: (value: VALUE) => RETURN,
   ): RETURN => callback(value),
   /** Like Promise.all, but accepts a dictionary instead of an array */
   all: async <T extends IR<unknown>>(dictionary: {
@@ -51,8 +51,8 @@ export const f = {
         Object.entries(dictionary).map(async ([promiseName, promise]) => [
           promiseName,
           await promise,
-        ])
-      )
+        ]),
+      ),
     ),
   sum: (array: RA<number>): number =>
     array.reduce((total, value) => total + value, 0),
@@ -100,7 +100,7 @@ export const f = {
   unique: <ITEM>(array: RA<ITEM>): RA<ITEM> => Array.from(new Set(array)),
   parseInt: (value: string): number | undefined =>
     f.var(Number.parseInt(value), (number) =>
-      Number.isNaN(number) ? undefined : number
+      Number.isNaN(number) ? undefined : number,
     ),
   /**
    * Round a number to the nearest step value, where step could be a float

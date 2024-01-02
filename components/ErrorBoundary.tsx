@@ -76,7 +76,7 @@ export function crash(error: Error): void {
   summonErrorPage(
     <ErrorDialog onClose={() => summonErrorPage(undefined)}>
       {errorObject}
-    </ErrorDialog>
+    </ErrorDialog>,
   );
 }
 
@@ -100,7 +100,7 @@ export class ErrorBoundary extends React.Component<
 
   public componentDidCatch(
     error: { readonly toString: () => string },
-    errorInfo: { readonly componentStack: string }
+    errorInfo: { readonly componentStack: string },
   ): void {
     console.error(error.toString());
     this.setState({
@@ -128,7 +128,7 @@ export class ErrorBoundary extends React.Component<
 
 function formatError(
   error: unknown,
-  url?: string
+  url?: string,
 ): Readonly<[errorObject: JSX.Element, errorMessage: string]> {
   const errorObject: React.ReactNode[] = [
     typeof url === 'string' && (
@@ -146,7 +146,7 @@ function formatError(
         <>
           <p>Stack:</p>
           <pre>{error.stack}</pre>
-        </>
+        </>,
       );
       errorMessage.push(`Error: ${error.message}`);
       console.error(error);
@@ -159,7 +159,7 @@ function formatError(
         <>
           <p>{statusText}</p>
           {formatErrorResponse(responseText)}
-        </>
+        </>,
       );
       errorMessage.push(statusText);
     } else errorObject.push(<p>{error.toString()}</p>);
@@ -174,14 +174,14 @@ function formatError(
 export function handleAjaxError(
   error: unknown,
   url: string,
-  strict: boolean
+  strict: boolean,
 ): never {
   const [errorObject, errorMessage] = formatError(error, url);
   if (strict)
     summonErrorPage(
       <ErrorDialog onClose={(): void => summonErrorPage(undefined)}>
         {errorObject}
-      </ErrorDialog>
+      </ErrorDialog>,
     );
   const newError = new Error(errorMessage);
   Object.defineProperty(newError, 'handledBy', {

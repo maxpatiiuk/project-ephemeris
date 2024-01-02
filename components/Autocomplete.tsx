@@ -34,8 +34,8 @@ const getScrollParent = (node: Element | undefined): Element =>
   node === undefined
     ? document.body
     : node.scrollHeight > node.clientHeight
-    ? node
-    : getScrollParent(node.parentElement ?? undefined);
+      ? node
+      : getScrollParent(node.parentElement ?? undefined);
 
 /**
  * An accessible autocomplete.
@@ -100,19 +100,19 @@ export function Autocomplete<T>({
       pendingValue.length === 0
         ? newResults
         : shouldFilterItems
-        ? newResults.filter(
-            ({ label, searchValue }) =>
-              (typeof label === 'string' ? label : searchValue ?? '')
-                .toLowerCase()
-                .includes(pendingValue.toLowerCase()) ||
-              (typeof searchValue === 'string' &&
-                compareStrings(
-                  searchValue.slice(0, pendingValue.length),
-                  pendingValue
-                ) === 0)
-          )
-        : newResults,
-    [shouldFilterItems]
+          ? newResults.filter(
+              ({ label, searchValue }) =>
+                (typeof label === 'string' ? label : searchValue ?? '')
+                  .toLowerCase()
+                  .includes(pendingValue.toLowerCase()) ||
+                (typeof searchValue === 'string' &&
+                  compareStrings(
+                    searchValue.slice(0, pendingValue.length),
+                    pendingValue,
+                  ) === 0),
+            )
+          : newResults,
+    [shouldFilterItems],
   );
   const updateItems = React.useCallback(
     (items: RA<Item<T>>, pendingValue: string): void =>
@@ -123,7 +123,7 @@ export function Autocomplete<T>({
         setFilteredItems(filterItems(newResults, pendingValue));
         return newResults;
       }),
-    [filterItems]
+    [filterItems],
   );
 
   // Update source array on changes if statically supplied
@@ -136,7 +136,7 @@ export function Autocomplete<T>({
   const handleRefreshItems = React.useCallback(
     debounce(function onKeyDown(
       fetchItems: typeof source,
-      value: string
+      value: string,
     ): void {
       if (typeof fetchItems !== 'function' || previousValue.current === value)
         return;
@@ -150,9 +150,8 @@ export function Autocomplete<T>({
         .then((items) => updateItems(items, value))
         .catch(console.error)
         .finally(handleLoaded);
-    },
-    delay),
-    []
+    }, delay),
+    [],
   );
 
   const [isOpen, handleOpen, handleClose, handleToggle] = useBooleanState();
@@ -165,7 +164,7 @@ export function Autocomplete<T>({
   const [pendingValue, setPendingValue] = useTriggerState<string>(currentValue);
 
   function handleKeyDown(
-    event: React.KeyboardEvent<HTMLInputElement | HTMLUListElement>
+    event: React.KeyboardEvent<HTMLInputElement | HTMLUListElement>,
   ): void {
     let newIndex = currentIndex;
     if (event.key === 'Escape' || event.key === 'Enter') {
@@ -376,7 +375,7 @@ export function Autocomplete<T>({
                         setPendingValue(
                           typeof item.label === 'string'
                             ? item.label
-                            : item.searchValue ?? ''
+                            : item.searchValue ?? '',
                         );
                         handleClose();
                       }}
@@ -420,7 +419,7 @@ export function Portal({
 
   const element = React.useMemo(
     () => (isClientSide ? document.createElement('div') : undefined),
-    [isClientSide]
+    [isClientSide],
   );
 
   React.useEffect(() => {

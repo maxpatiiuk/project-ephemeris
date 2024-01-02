@@ -76,7 +76,7 @@ function commitToStorage(): void {
     .filter(
       ([, bucketData]) =>
         bucketData.type === 'localStorage' &&
-        Object.keys(bucketData.records).length > 0
+        Object.keys(bucketData.records).length > 0,
     )
     .forEach(([bucketName]) => commitBucketToStorage(bucketName));
 }
@@ -85,14 +85,14 @@ function commitToStorage(): void {
 function commitBucketToStorage(bucketName: string): void {
   localStorage.setItem(
     `${cachePrefix}${bucketName}`,
-    JSON.stringify(buckets[bucketName])
+    JSON.stringify(buckets[bucketName]),
   );
 }
 
 /** Tries to fetch a bucket from localStorage */
 function fetchBucket(
   // The name of the bucket to fetch
-  bucketName: string
+  bucketName: string,
 ): BucketData | false {
   /*
    * {boolean} False if bucket does not exist
@@ -124,7 +124,7 @@ export const get: {
   // Overload with a default value
   <
     BUCKET_NAME extends string & keyof CacheDefinitions,
-    CACHE_NAME extends string & keyof CacheDefinitions[BUCKET_NAME]
+    CACHE_NAME extends string & keyof CacheDefinitions[BUCKET_NAME],
   >(
     bucketName: BUCKET_NAME,
     cacheName: CACHE_NAME,
@@ -132,23 +132,23 @@ export const get: {
       readonly version?: string;
       readonly defaultSetOptions?: SetOptions;
       readonly defaultValue: CacheDefinitions[BUCKET_NAME][CACHE_NAME];
-    }
+    },
   ): CacheDefinitions[BUCKET_NAME][CACHE_NAME];
   // Overload without a default value (returns T|undefined)
   <
     BUCKET_NAME extends string & keyof CacheDefinitions,
-    CACHE_NAME extends string & keyof CacheDefinitions[BUCKET_NAME]
+    CACHE_NAME extends string & keyof CacheDefinitions[BUCKET_NAME],
   >(
     bucketName: BUCKET_NAME,
     cacheName: CACHE_NAME,
     props?: {
       readonly version?: string;
       readonly defaultSetOptions?: SetOptions;
-    }
+    },
   ): CacheDefinitions[BUCKET_NAME][CACHE_NAME] | undefined;
 } = <
   BUCKET_NAME extends string & keyof CacheDefinitions,
-  CACHE_NAME extends string & keyof CacheDefinitions[BUCKET_NAME]
+  CACHE_NAME extends string & keyof CacheDefinitions[BUCKET_NAME],
 >(
   bucketName: BUCKET_NAME,
   cacheName: CACHE_NAME,
@@ -156,12 +156,12 @@ export const get: {
     readonly version?: string;
     readonly defaultSetOptions?: SetOptions;
     readonly defaultValue?: CacheDefinitions[BUCKET_NAME][CACHE_NAME];
-  }
+  },
 ) =>
   genericGet<CacheDefinitions[BUCKET_NAME][CACHE_NAME]>(
     bucketName,
     cacheName,
-    props
+    props,
   );
 
 /** Get value of cacheName in the bucketName */
@@ -175,7 +175,7 @@ export function genericGet<T>(
     version?: string;
     defaultValue: T;
     defaultSetOptions?: SetOptions;
-  }
+  },
 ): T;
 // Overload without defaultValue (returns T|undefined)
 export function genericGet<T = never>(
@@ -188,7 +188,7 @@ export function genericGet<T = never>(
         version?: string;
         defaultSetOptions?: SetOptions;
       }
-    | undefined
+    | undefined,
 ): T | undefined;
 export function genericGet<T>(
   // The name of the bucket
@@ -203,7 +203,7 @@ export function genericGet<T>(
     readonly version?: string;
     readonly defaultSetOptions?: SetOptions;
     readonly defaultValue?: T;
-  } = {}
+  } = {},
 ): T | undefined {
   /*
    * {boolean} False on error
@@ -254,18 +254,18 @@ type SetOptions = {
 
 export const set = <
   BUCKET_NAME extends string & keyof CacheDefinitions,
-  CACHE_NAME extends string & keyof CacheDefinitions[BUCKET_NAME]
+  CACHE_NAME extends string & keyof CacheDefinitions[BUCKET_NAME],
 >(
   bucketName: BUCKET_NAME,
   cacheName: CACHE_NAME,
   cacheValue: CacheDefinitions[BUCKET_NAME][CACHE_NAME],
-  setOptions?: SetOptions
+  setOptions?: SetOptions,
 ) =>
   genericSet<CacheDefinitions[BUCKET_NAME][CACHE_NAME]>(
     bucketName,
     cacheName,
     cacheValue,
-    setOptions
+    setOptions,
   );
 
 /** Set's cacheValue as cache value under cacheName in `bucketName` */
@@ -283,7 +283,7 @@ export function genericSet<T>(
     bucketType = 'localStorage',
     overwrite = false,
     version = undefined,
-  }: SetOptions = {}
+  }: SetOptions = {},
 ): T {
   if (typeof bucketName === 'undefined')
     throw new Error('Bucket name cannot be undefined');

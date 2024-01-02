@@ -22,7 +22,7 @@ export function DayView({
     currentDate,
     currentDate,
     eventsRef,
-    enabledCalendars
+    enabledCalendars,
   );
   return (
     <Container.Full className="flex-1  flex">

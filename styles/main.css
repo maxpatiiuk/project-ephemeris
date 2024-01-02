@@ -5,7 +5,6 @@
 @tailwind base;
 
 @layer base {
-
   * {
     /*
      * If changing "duration-100", don't forget to change "transitionDuration"
@@ -43,7 +42,8 @@
     @apply cursor-pointer text-brand-200 dark:text-brand-400;
   }
 
-  label, summary {
+  label,
+  summary {
     @apply cursor-pointer;
   }
 
@@ -61,7 +61,8 @@
     @apply w-full resize;
   }
 
-  :disabled:not(.icon), [readonly] {
+  :disabled:not(.icon),
+  [readonly] {
     @apply cursor-not-allowed bg-gray-350 dark:bg-neutral-900 text-gray-700
       dark:text-neutral-500;
   }
@@ -87,7 +88,6 @@
     @apply m-0 appearance-none;
   }
 
-
   [type='number']:not([readonly]):not(.no-arrows)::-webkit-inner-spin-button,
   [type='number']:not([readonly]):not(.no-arrows)::-webkit-outer-spin-button {
     /* Always show spinner buttons */
@@ -102,7 +102,7 @@
   }
 
   [type='number'].webkit:not([readonly]):not(.no-arrows) {
-    @apply text-right relative pr-2.5
+    @apply text-right relative pr-2.5;
   }
 
   .button {
@@ -122,7 +122,8 @@
     @apply !bg-transparent text-brand-200 dark:text-brand-400 cursor-default;
   }
 
-  .link, .icon {
+  .link,
+  .icon {
     @apply text-black hover:text-brand-300 dark:text-gray-200 cursor-pointer;
   }
 
@@ -144,7 +145,9 @@
 
   @media print {
     /* Hide arrows, calendar icon and other symbols */
-    input, select, textarea {
+    input,
+    select,
+    textarea {
       @apply bg-none m-0 appearance-none;
     }
   }
@@ -161,7 +164,6 @@
     @apply bg-brand-200 dark:bg-brand-400 rounded;
   }
 
-
   /* Display tooltips as an overlay on touch-screen devices */
   @media (pointer: coarse), (hover: none) {
     [title] {
@@ -170,7 +172,7 @@
 
     [title]:focus::after {
       @apply w-fit absolute p-1 text-black bg-white border border-black
-        content-[attr(title)] top-[90%]
+        content-[attr(title)] top-[90%];
     }
   }
 
@@ -182,30 +184,29 @@
    *   grid-cols-[repeat(4,_1fr)_auto_auto_min-content_minmax(30px,_1fr)]
    */
   table.grid-table,
-  .grid-table[role~="table"] {
+  .grid-table[role~='table'] {
     @apply grid;
   }
 
   .grid-table thead,
   .grid-table tbody,
   .grid-table tr,
-  .grid-table [role~="rowgroup"],
-  .grid-table [role~="row"] {
+  .grid-table [role~='rowgroup'],
+  .grid-table [role~='row'] {
     @apply contents;
   }
 
   .grid-table th,
   .grid-table td,
-  .grid-table [role~="columnheader"],
-  .grid-table [role~="rowheader"],
-  .grid-table [role~="cell"] {
+  .grid-table [role~='columnheader'],
+  .grid-table [role~='rowheader'],
+  .grid-table [role~='cell'] {
     @apply flex items-center gap-x-1;
   }
 
   .sr-only {
     top: 0;
   }
-
 }
 
 /**

@@ -27,7 +27,7 @@ const MILLISECONDS_IN_DAY = MILLISECONDS * DAY;
 export const getDaysBetween = (startDate: Date, endDate: Date): number =>
   Math.round(
     (treatAsUtc(endDate).getTime() - treatAsUtc(startDate).getTime()) /
-      MILLISECONDS_IN_DAY
+      MILLISECONDS_IN_DAY,
   );
 
 export const getDatesBetween = (startDate: Date, endDate: Date): RA<string> =>
@@ -39,17 +39,17 @@ export const getDatesBetween = (startDate: Date, endDate: Date): RA<string> =>
       const date = new Date(startDate);
       date.setDate(startDate.getDate() + index);
       return serializeDate(date);
-    }
+    },
   );
 
 const fetchEventOccurrences = async (
   startDate: Date,
   endDate: Date,
-  eventsRef: EventsRef
+  eventsRef: EventsRef,
 ): Promise<void> =>
   f.var(getDatesBetween(startDate, endDate), (dates) =>
     dates.every(
-      (dateNumber) => dateNumber in eventsRef.current.eventOccurrences
+      (dateNumber) => dateNumber in eventsRef.current.eventOccurrences,
     )
       ? undefined
       : ajax<RA<EventOccurrence>>(
@@ -57,25 +57,25 @@ const fetchEventOccurrences = async (
             startDateTime_greaterEqual: new Date(
               startDate.getFullYear(),
               startDate.getMonth(),
-              startDate.getDate()
+              startDate.getDate(),
             ).toJSON(),
             startDateTime_less: new Date(
               endDate.getFullYear(),
               endDate.getMonth(),
-              endDate.getDate() + 1
+              endDate.getDate() + 1,
             ).toJSON(),
             orderBy: 'startDateTime',
           }),
           {
             headers: { Accept: 'application/json' },
-          }
+          },
         ).then(async ({ data: occurrences }) =>
           Promise.all(
             f
               .unique(occurrences.map(({ eventId }) => eventId))
               .filter(
                 (eventId) =>
-                  typeof eventsRef.current.events[eventId] === 'undefined'
+                  typeof eventsRef.current.events[eventId] === 'undefined',
               )
               .map(async (eventId) =>
                 ajax<EventTable>(`/api/table/event/${eventId}`, {
@@ -86,8 +86,8 @@ const fetchEventOccurrences = async (
                     startDate: new Date(data.startDate),
                     endDate: new Date(data.endDate),
                   };
-                })
-              )
+                }),
+              ),
           ).then((): void => {
             dates.forEach((dateNumber) => {
               eventsRef.current.eventOccurrences[dateNumber] ??= {};
@@ -103,15 +103,15 @@ const fetchEventOccurrences = async (
                 endDateTime,
               };
             });
-          })
-        )
+          }),
+        ),
   );
 
 function useUpdates(target: ReturnType<typeof eventTarget>): number {
   const [version, setVersion] = React.useState<number>(0);
   React.useEffect(
     () => target.listen((): void => setVersion((version) => version + 1)),
-    [target]
+    [target],
   );
   return version;
 }
@@ -123,7 +123,7 @@ export function useEvents(
   startDate: Date,
   endDate: Date,
   eventsRef: EventsRef,
-  enabledCalendars: RA<number> | undefined
+  enabledCalendars: RA<number> | undefined,
 ): RA<RA<OccurrenceWithEvent>> | undefined {
   const version = useUpdates(eventsRef.current.eventTarget);
 
@@ -138,23 +138,23 @@ export function useEvents(
                 event: eventsRef.current.events[occurrence.eventId],
               }))
               .sort(
-                sortFunction(({ startDateTime }) => startDateTime.getTime())
-              )
-          )
+                sortFunction(({ startDateTime }) => startDateTime.getTime()),
+              ),
+          ),
         ),
       // Version is used to force recalculate events for a given day
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [eventsRef, startDate, endDate, version]
+      [eventsRef, startDate, endDate, version],
     ),
-    false
+    false,
   );
   return React.useMemo(
     () =>
       eventOccurrences?.map((occurrences) =>
         occurrences.filter(
-          ({ event }) => enabledCalendars?.includes(event.calendarId) !== false
-        )
+          ({ event }) => enabledCalendars?.includes(event.calendarId) !== false,
+        ),
       ),
-    [eventOccurrences, enabledCalendars]
+    [eventOccurrences, enabledCalendars],
   );
 }

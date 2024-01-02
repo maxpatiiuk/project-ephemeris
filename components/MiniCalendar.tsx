@@ -64,8 +64,8 @@ export function MiniCalendar({
               label === days.day && mode === 'aside'
                 ? 'bg-brand-200'
                 : days.todayDay === label
-                ? 'bg-brand-300'
-                : ''
+                  ? 'bg-brand-300'
+                  : ''
             }`}
             key={`currentMonth_${label}`}
             href={`/view/week/date/${serializeDate(date)}`}

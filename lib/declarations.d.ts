@@ -33,7 +33,7 @@ declare global {
   interface ObjectConstructor {
     // Object
     entries<DICTIONARY extends IR<unknown>>(
-      object: DICTIONARY
+      object: DICTIONARY,
     ): [string & keyof DICTIONARY, DICTIONARY[keyof DICTIONARY]][];
 
     // Array
@@ -41,7 +41,7 @@ declare global {
 
     // Prevent Object.fromEntries() from widening the key type to string
     fromEntries<KEYS extends PropertyKey, VALUES>(
-      entries: Iterable<readonly [KEYS, VALUES]>
+      entries: Iterable<readonly [KEYS, VALUES]>,
     ): RR<KEYS, VALUES>;
 
     // Prevent Object.keys() from widening the key type to string[]

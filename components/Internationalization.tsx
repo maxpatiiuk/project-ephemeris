@@ -10,12 +10,12 @@ declare namespace Intl {
       options?: {
         readonly numeric: 'auto' | 'always';
         readonly style: 'long' | 'short' | 'narrow';
-      }
+      },
     );
 
     public format(
       count: number,
-      type: 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
+      type: 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year',
     ): string;
   }
 
@@ -28,7 +28,7 @@ declare namespace Intl {
         readonly timeStyle?: 'full' | 'long' | 'medium' | 'short';
         readonly month?: 'long' | 'short';
         readonly timeZone?: 'UTC';
-      }
+      },
     );
 
     public format(value: Readonly<Date>): string;
@@ -41,7 +41,7 @@ declare namespace Intl {
         readonly sensitivity?: 'base' | 'accent' | 'case' | 'variant';
         readonly caseFirst?: 'upper' | 'lower' | false;
         readonly ignorePunctuation?: boolean;
-      }
+      },
     );
 
     public compare(left: string, right: string): -1 | 0 | 1;
@@ -51,7 +51,7 @@ declare namespace Intl {
 function getMonthNames(monthFormat: 'long' | 'short'): RA<string> {
   const months = new Intl.DateTimeFormat(LANGUAGE, { month: monthFormat });
   return Array.from({ length: 12 }, (_, month) =>
-    months.format(new Date(0, month, 2, 0, 0, 0))
+    months.format(new Date(0, month, 2, 0, 0, 0)),
   );
 }
 
@@ -82,34 +82,34 @@ function formatRelativeDate(direction: -1 | 1, timePassed: number): string {
   if (timePassed <= MINUTE)
     return relativeDate.format(
       direction * Math.round(timePassed / SECOND),
-      'second'
+      'second',
     );
   else if (timePassed <= HOUR)
     return relativeDate.format(
       direction * Math.round(timePassed / MINUTE),
-      'minute'
+      'minute',
     );
   else if (timePassed <= DAY)
     return relativeDate.format(
       direction * Math.round(timePassed / HOUR),
-      'hour'
+      'hour',
     );
   else if (timePassed <= WEEK)
     return relativeDate.format(direction * Math.round(timePassed / DAY), 'day');
   else if (timePassed <= MONTH)
     return relativeDate.format(
       direction * Math.round(timePassed / WEEK),
-      'week'
+      'week',
     );
   else if (timePassed <= YEAR)
     return relativeDate.format(
       direction * Math.round(timePassed / MONTH),
-      'month'
+      'month',
     );
   else
     return relativeDate.format(
       direction * Math.round(timePassed / YEAR),
-      'year'
+      'year',
     );
 }
 
@@ -124,8 +124,8 @@ export const weekDays = Array.from(
   { length: WEEK / DAY },
   (_, index) =>
     new Date(
-      `2017-01-${index < 9 ? `0${index + 1}` : index + 1}T00:00:00+00:00`
-    )
+      `2017-01-${index < 9 ? `0${index + 1}` : index + 1}T00:00:00+00:00`,
+    ),
 ).map(weekDayFormatter.format);
 
 export const compareStrings = new Intl.Collator(
@@ -134,5 +134,5 @@ export const compareStrings = new Intl.Collator(
     sensitivity: 'base',
     caseFirst: 'upper',
     ignorePunctuation: true,
-  }
+  },
 ).compare;

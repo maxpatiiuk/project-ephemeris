@@ -1,14 +1,8 @@
 {
   /** ROOT FIELDS **/
   /* File Inclusion */
-  "include": [
-    "**/*.ts",
-    "**/*.tsx"
-  ],
-  "exclude": [
-    "node_modules",
-    ".next"
-  ],
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", ".next"],
   "compilerOptions": {
     /** COMPILER OPTIONS **/
     /* Basic Options */

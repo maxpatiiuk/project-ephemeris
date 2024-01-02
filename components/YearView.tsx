@@ -15,9 +15,9 @@ export function YearView({
     () =>
       Array.from(
         { length: MONTHS_IN_YEAR },
-        (_, index) => new Date(year, index, 0)
+        (_, index) => new Date(year, index, 0),
       ),
-    [year]
+    [year],
   );
   return (
     <Container.Full className="grid grid-cols-4 grid-rows-3 gap-6 p-4">

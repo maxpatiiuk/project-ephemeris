@@ -10,7 +10,7 @@ import type { IR, RA, RR } from '../lib/types';
 // Only en-us is available at this time
 export const languages = ['en-us'] as const;
 
-export type Language = typeof languages[number];
+export type Language = (typeof languages)[number];
 export const DEFAULT_LANGUAGE = 'en-us';
 // Appropriate language is selected by Next.js. Read it from html[lang]
 export const LANGUAGE: Language =
@@ -62,7 +62,7 @@ function assertExhaustive(key: string): never {
           typeof value[proto] === 'function'
             ? value[proto].bind(value)
             : value[proto];
-      }
+      },
     );
     return defaultValue as never;
   } else throw new Error(errorMessage);
@@ -70,11 +70,11 @@ function assertExhaustive(key: string): never {
 
 export function createDictionary<DICT extends Dictionary>(dictionary: DICT) {
   const resolver = <KEY extends string & keyof typeof dictionary>(
-    key: KEY
-  ): GetValueType<typeof dictionary[typeof key]> =>
+    key: KEY,
+  ): GetValueType<(typeof dictionary)[typeof key]> =>
     key in dictionary
       ? (dictionary[key][LANGUAGE] as GetValueType<
-          typeof dictionary[typeof key]
+          (typeof dictionary)[typeof key]
         >) ?? assertExhaustive(key)
       : assertExhaustive(key);
   resolver.dictionary = dictionary;

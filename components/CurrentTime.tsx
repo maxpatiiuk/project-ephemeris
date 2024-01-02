@@ -8,16 +8,19 @@ export function CurrentTime(): JSX.Element {
   const timeZoneName = React.useMemo(
     () =>
       globalText('time')(
-        Intl.DateTimeFormat().resolvedOptions().timeZone.split('/').slice(-1)[0]
+        Intl.DateTimeFormat()
+          .resolvedOptions()
+          .timeZone.split('/')
+          .slice(-1)[0],
       ),
-    []
+    [],
   );
 
   const [time, setTime] = React.useState<string>('');
   React.useEffect(() => {
     const interval = setInterval(
       () => setTime(dateToTimeString(new Date())),
-      MILLISECONDS
+      MILLISECONDS,
     );
     setTime(dateToTimeString(new Date()));
     return (): void => clearInterval(interval);
