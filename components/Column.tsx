@@ -132,50 +132,47 @@ export function Column({
       )}
       <Link
         href={`/view/${router.query.view as string}/date/${serializeDate(
-          date
+          date,
         )}${
           typeof router.query.occurrenceId === 'undefined' ? '/event/add' : ''
         }`}
+        className="absolute w-full h-full block flex flex-col"
+        aria-label={globalText('createEvent')}
+        onClick={(event): void => {
+          if (typeof router.query.occurrenceId !== 'undefined') return;
+          event.preventDefault();
+          const target = event.target as Element;
+          const link =
+            target.tagName === 'A'
+              ? target
+              : defined(target.closest('a') ?? undefined);
+          const { top, height } = link.getBoundingClientRect();
+          const percentage = (event.clientY - top) / height;
+          const startTime =
+            Math.round(
+              ((DAY * MILLISECONDS) / DEFAULT_EVENT_DURATION) * percentage,
+            ) * DEFAULT_EVENT_DURATION;
+          const eventDate = new Date(date);
+          eventDate.setHours(0);
+          eventDate.setMinutes(0);
+          eventDate.setSeconds(0);
+          eventDate.setTime(eventDate.getTime() + startTime);
+          router.push(
+            formatUrl(
+              `/view/${router.query.view as string}/date/${serializeDate(
+                date,
+              )}/event/add`,
+              { start: dateToTimeString(eventDate).replace(':', '_') },
+            ),
+          );
+        }}
       >
-        <a
-          className="absolute w-full h-full block flex flex-col"
-          aria-label={globalText('createEvent')}
-          onClick={(event): void => {
-            if (typeof router.query.occurrenceId !== 'undefined') return;
-            event.preventDefault();
-            const target = event.target as Element;
-            const link =
-              target.tagName === 'A'
-                ? target
-                : defined(target.closest('a') ?? undefined);
-            const { top, height } = link.getBoundingClientRect();
-            const percentage = (event.clientY - top) / height;
-            const startTime =
-              Math.round(
-                ((DAY * MILLISECONDS) / DEFAULT_EVENT_DURATION) * percentage
-              ) * DEFAULT_EVENT_DURATION;
-            const eventDate = new Date(date);
-            eventDate.setHours(0);
-            eventDate.setMinutes(0);
-            eventDate.setSeconds(0);
-            eventDate.setTime(eventDate.getTime() + startTime);
-            router.push(
-              formatUrl(
-                `/view/${router.query.view as string}/date/${serializeDate(
-                  date
-                )}/event/add`,
-                { start: dateToTimeString(eventDate).replace(':', '_') }
-              )
-            );
-          }}
-        >
-          {Array.from({ length: MARKS_IN_DAY }, (_, index) => (
-            <span
-              key={index}
-              className="border-b border-gray-200 dark:border-neutral-700 flex-1"
-            />
-          ))}
-        </a>
+        {Array.from({ length: MARKS_IN_DAY }, (_, index) => (
+          <span
+            key={index}
+            className="border-b border-gray-200 dark:border-neutral-700 flex-1"
+          />
+        ))}
       </Link>
       {occurrences?.map(
         (
@@ -187,56 +184,52 @@ export function Column({
             color,
             event: { calendarId },
           },
-          index
+          index,
         ) => (
           <Link
             href={`/view/${router.query.view as string}/date/${serializeDate(
-              startDateTime
+              startDateTime,
             )}${
               typeof router.query.occurrenceId === 'undefined'
                 ? `/event/${id}`
                 : ''
             }`}
             key={id}
+            style={{
+              backgroundColor: color,
+              borderColor:
+                calendars?.find(({ id }) => id === calendarId)?.color ?? color,
+              top: `${placing[index].top}%`,
+              left: `${placing[index].left}%`,
+              width: `${placing[index].width}%`,
+              height: `${placing[index].height}%`,
+            }}
+            className={`rounded !border-l-2 hover:brightness-150 z-10 absolute
+              flex overflow-hidden
+              ${endDateTime.getTime() < Date.now() ? 'brightness-80' : ''}
+              ${
+                placing[index].atomCount > 3
+                  ? `flex-col p-1 ${
+                      placing[index].atomCount === 4 ? 'pt-0 text-sm' : ''
+                    }`
+                  : 'gap-0.5 text-xs items-center whitespace-nowrap'
+              }
+            `}
           >
-            <a
-              style={{
-                backgroundColor: color,
-                borderColor:
-                  calendars?.find(({ id }) => id === calendarId)?.color ??
-                  color,
-                top: `${placing[index].top}%`,
-                left: `${placing[index].left}%`,
-                width: `${placing[index].width}%`,
-                height: `${placing[index].height}%`,
-              }}
-              className={`rounded !border-l-2 hover:brightness-150 z-10 absolute
-                flex overflow-hidden
-                ${endDateTime.getTime() < Date.now() ? 'brightness-80' : ''}
-                ${
-                  placing[index].atomCount > 3
-                    ? `flex-col p-1 ${
-                        placing[index].atomCount === 4 ? 'pt-0 text-sm' : ''
-                      }`
-                    : 'gap-0.5 text-xs items-center whitespace-nowrap'
-                }
-              `}
-            >
-              <span>{`${name}${placing[index].atomCount > 3 ? '' : ','}`}</span>
-              <span className="text-xs">
-                <time
-                  aria-label={globalText('from')}
-                  dateTime={startDateTime.toJSON()}
-                >{`${dateToTimeString(startDateTime)}`}</time>
-                {' - '}
-                <time
-                  aria-label={globalText('till')}
-                  dateTime={endDateTime.toJSON()}
-                >{`${dateToTimeString(endDateTime)}`}</time>
-              </span>
-            </a>
+            <span>{`${name}${placing[index].atomCount > 3 ? '' : ','}`}</span>
+            <span className="text-xs">
+              <time
+                aria-label={globalText('from')}
+                dateTime={startDateTime.toJSON()}
+              >{`${dateToTimeString(startDateTime)}`}</time>
+              {' - '}
+              <time
+                aria-label={globalText('till')}
+                dateTime={endDateTime.toJSON()}
+              >{`${dateToTimeString(endDateTime)}`}</time>
+            </span>
           </Link>
-        )
+        ),
       )}
     </div>
   );

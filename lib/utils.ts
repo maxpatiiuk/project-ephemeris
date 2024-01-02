@@ -39,21 +39,13 @@ export const DEFAULT_MINUTE_ROUNDING = 15;
 
 export const MARKS_IN_DAY = 24;
 
-const reDateTimeLocal = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/;
-export const parseDateTimeLocal = (dateString: string): Date =>
-  new Date(
-    ...(defined(
-      reDateTimeLocal.exec(dateString)?.slice(1).map(f.unary(Number.parseInt))
-    ) as [number, number, number, number, number])
-  );
-
 const reTime = /^(\d{2})_(\d{2})$/;
 export const parseReTime = (
-  timeString: string
+  timeString: string,
 ): Readonly<[number, number]> | undefined =>
   f.var(
     filterArray(reTime.exec(timeString)?.slice(1).map(f.parseInt) ?? []),
-    (time) => (time.length === 2 ? (time as [number, number]) : undefined)
+    (time) => (time.length === 2 ? (time as [number, number]) : undefined),
   );
 
 /**

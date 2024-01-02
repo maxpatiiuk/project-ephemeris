@@ -128,6 +128,7 @@ export const className = {
   greenButton: `hover:bg-green-800 bg-green-700 text-white`,
   h2: 'font-semibold text-black dark:text-white',
   miniCalendarDay: `flex items-center justify-center rounded-full w-6`,
+  ariaHandled: 'aria-handled',
 } as const;
 
 export const Label = {
@@ -377,27 +378,30 @@ export const Select = wrap<
       if (props.required !== true && props.multiple === true) {
         selected.map((option) => option.classList.add('dark:bg-neutral-100'));
         unselected.map((option) =>
-          option.classList.remove('dark:bg-neutral-100')
+          option.classList.remove('dark:bg-neutral-100'),
         );
       }
       onValueChange?.((event.target as HTMLSelectElement).value);
       onValuesChange?.(selected.map(({ value }) => value));
       props.onChange?.(event);
     },
-  })
+  }),
 );
 
 export const Link = {
   Default({
     children,
-    href,
+    ref: _,
+    forwardRef: ref,
     ...props
   }: TagProps<'a'> & { readonly href: string }): JSX.Element {
     return (
-      <LinkComponent href={href}>
-        <a {...props} className={`${className.link} ${props.className ?? ''}`}>
-          {children}
-        </a>
+      <LinkComponent
+        {...props}
+        ref={typeof ref === 'string' ? undefined : ref}
+        className={`${className.link} ${props.className ?? ''}`}
+      >
+        {children}
       </LinkComponent>
     );
   },
@@ -420,53 +424,56 @@ export const Link = {
   },
   LikeButton({
     children,
-    href,
+    ref: _,
+    forwardRef: ref,
     ...props
   }: TagProps<'a'> & { readonly href: string }): JSX.Element {
     return (
-      <LinkComponent href={href}>
-        <a
-          {...props}
-          className={`${className.button} ${props.className ?? ''}`}
-        >
-          {children}
-        </a>
+      <LinkComponent
+        {...props}
+        ref={typeof ref === 'string' ? undefined : ref}
+        className={`${className.button} ${props.className ?? ''}`}
+      >
+        {children}
       </LinkComponent>
     );
   },
   LikeFancyButton({
     children,
-    href,
+    ref: _,
+    forwardRef: ref,
     ...props
   }: TagProps<'a'> & { readonly href: string }): JSX.Element {
     return (
-      <LinkComponent href={href}>
-        <a {...props} className={`${niceButton} ${props.className ?? ''}`}>
-          {children}
-        </a>
+      <LinkComponent
+        {...props}
+        ref={typeof ref === 'string' ? undefined : ref}
+        className={`${niceButton} ${props.className ?? ''}`}
+      >
+        {children}
       </LinkComponent>
     );
   },
   Icon({
     icon,
-    href,
+    ref: _,
+    forwardRef: ref,
     ...props
   }: TagProps<'a'> & IconProps & { readonly href: string }): JSX.Element {
     return (
-      <LinkComponent href={href}>
-        <a
-          {...props}
-          className={`${className.link} rounded ${props.className ?? ''}`}
-        >
-          {icons[icon]}
-        </a>
+      <LinkComponent
+        {...props}
+        ref={typeof ref === 'string' ? undefined : ref}
+        className={`${className.link} rounded ${props.className ?? ''}`}
+      >
+        {icons[icon]}
       </LinkComponent>
     );
   },
 } as const;
 
 export const DialogContext = React.createContext<(() => void) | undefined>(() =>
-  error('DialogContext can only be used by <Dialog> buttons')
+  error('DialogContext can only be used by <Dialog> buttons'),
 );
 DialogContext.displayName = 'DialogContext';
 

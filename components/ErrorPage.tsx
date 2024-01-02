@@ -17,14 +17,12 @@ export function ErrorPage({
           <h2>{globalText('notFoundPageHeader')}</h2>
           <p>
             {globalText('notFoundPageMessage')}
-            <Link href="/">
-              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-              <a
-                className={`block pt-10 transition
+            <Link
+              href="/"
+              className={`block pt-10 transition
               text-red-400 hover:text-black`}
-              >
-                {globalText('returnToHomePage')}
-              </a>
+            >
+              {globalText('returnToHomePage')}
             </Link>
           </p>
         </div>
@@ -32,5 +30,3 @@ export function ErrorPage({
     </Layout>
   );
 }
-
-export default ErrorPage;

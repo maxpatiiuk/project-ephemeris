@@ -119,16 +119,19 @@ export function useLiveState<T>(
   return [state, setState];
 }
 
+export const useBrowserLayoutEffect =
+  typeof window === 'undefined' ? () => {} : React.useLayoutEffect;
+
 /**
  * Like React.useState, but updates the state whenever default value changes
  */
 export function useTriggerState<T>(
-  defaultValue: T
+  defaultValue: T,
 ): [state: T, setState: React.Dispatch<React.SetStateAction<T>>] {
   const [state, setState] = React.useState<T>(defaultValue);
 
   /* Using layout effect rather than useEffect to update the state earlier on */
-  React.useLayoutEffect(() => {
+  useBrowserLayoutEffect(() => {
     setState(defaultValue);
   }, [defaultValue]);
 

@@ -357,6 +357,7 @@ export function MiniEvent({
                   return (
                     <Component
                       aria-pressed={isEnabled}
+                      className={className.ariaHandled}
                       key={index}
                       onClick={(): void =>
                         setEvent(

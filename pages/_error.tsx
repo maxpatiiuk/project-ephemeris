@@ -1,7 +1,7 @@
 import type { NextPageContext } from 'next';
 import React from 'react';
 
-import ErrorPage from '../components/ErrorPage';
+import { ErrorPage } from '../components/ErrorPage';
 
 function Error({ statusCode }: { statusCode: number }): JSX.Element {
   return <ErrorPage errorCode={statusCode} />;
