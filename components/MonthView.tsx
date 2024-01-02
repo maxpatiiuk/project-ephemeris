@@ -31,22 +31,18 @@ function DayEvents({
           <BaseLink
             href={`/view/day/date/${serializeDate(startDateTime)}/event/${id}`}
             key={id}
+            style={{
+              backgroundColor: color,
+              borderColor:
+                calendars?.find(({ id }) => id === calendarId)?.color ?? color,
+            }}
+            className={`flex flex-col rounded p-1 !border-l-2
+              hover:brightness-150 z-10
+              ${endDateTime.getTime() < Date.now() ? 'brightness-80' : ''}`}
           >
-            <a
-              style={{
-                backgroundColor: color,
-                borderColor:
-                  calendars?.find(({ id }) => id === calendarId)?.color ??
-                  color,
-              }}
-              className={`flex flex-col rounded p-1 !border-l-2
-                hover:brightness-150 z-10
-                ${endDateTime.getTime() < Date.now() ? 'brightness-80' : ''}`}
-            >
-              {name}
-            </a>
+            {name}
           </BaseLink>
-        )
+        ),
       )}
     </div>
   );

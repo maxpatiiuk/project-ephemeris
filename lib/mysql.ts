@@ -8,6 +8,7 @@ let connectionPromise: Promise<void> | undefined = undefined;
 const reconnectTimeout = 10_000;
 
 function makeConnection() {
+  if (process.env.MYSQL_HOST === undefined) return undefined;
   connectionPromise = mysql
     .createConnection({
       host: process.env.MYSQL_HOST,

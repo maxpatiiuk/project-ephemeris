@@ -10,58 +10,77 @@ import type {
 import { f } from '../../../../../../lib/functools';
 import { connectToDatabase, execute } from '../../../../../../lib/mysql';
 import { queryRecord } from '../../../../../../lib/query';
+import { inMemory } from '../../../../../../lib/inMemoryDatabase';
 
 export default async function endpoint(
   request: NextApiRequest,
-  response: NextApiResponse
+  response: NextApiResponse,
 ): Promise<void> {
   if (request.method !== 'POST')
-    return void response.status(Http.WRONG_METHDO).send('');
+    return void response.status(Http.WRONG_METHOD).send('');
 
   const connection = await connectToDatabase();
   const eventId = f.parseInt(
-    (request.query.eventId as string | undefined) ?? ''
+    (request.query.eventId as string | undefined) ?? '',
   );
   const occurrenceId = f.parseInt(
-    (request.query.occurrenceId as string | undefined) ?? ''
+    (request.query.occurrenceId as string | undefined) ?? '',
   );
-  if (typeof eventId === 'undefined' || typeof occurrenceId === 'undefined')
+  if (eventId === undefined || occurrenceId === undefined)
     return void response.status(Http.BAD_REQUEST).send('');
   const { event, occurrence } = await f.all({
-    event: queryRecord<EventTable>(
-      connection,
-      'SELECT * FROM event WHERE id = ?',
-      [eventId]
-    ).then(({ status, body }) =>
-      status === Http.NOT_FOUND ? undefined : body
-    ),
-    occurrence: queryRecord<EventOccurrence>(
-      connection,
-      'SELECT * FROM eventOccurrence WHERE id = ?',
-      [occurrenceId]
-    ).then(({ status, body }) =>
-      status === Http.NOT_FOUND ? undefined : body
-    ),
+    event:
+      connection === undefined
+        ? (inMemory.fetchRecord('event', eventId)?.body as EventTable) ||
+          undefined
+        : queryRecord<EventTable>(
+            connection,
+            'SELECT * FROM event WHERE id = ?',
+            [eventId],
+          ).then(({ status, body }) =>
+            status === Http.NOT_FOUND ? undefined : body,
+          ),
+    occurrence:
+      connection === undefined
+        ? (inMemory.fetchRecord('eventOccurrence', occurrenceId)
+            ?.body as EventOccurrence) || undefined
+        : queryRecord<EventOccurrence>(
+            connection,
+            'SELECT * FROM eventOccurrence WHERE id = ?',
+            [occurrenceId],
+          ).then(({ status, body }) =>
+            status === Http.NOT_FOUND ? undefined : body,
+          ),
   });
-  if (typeof event === 'undefined' || typeof occurrence === 'undefined')
-    return void response.status(Http.NOT_FOUND).send('');
+  if (event === undefined || occurrence === undefined)
+    // FIXME: remove
+    return void response.status(Http.NOT_FOUND).send({
+      event,
+      occurrence,
+      eventId,
+      occurrenceId,
+      database: inMemory.database(),
+    });
 
   // Delete future events
-  await execute(
-    connection,
-    'DELETE FROM eventOccurrence WHERE eventId = ? AND startDateTime > ?',
-    [event.id, occurrence.startDateTime]
-  );
+  if (connection === undefined)
+    inMemory.deleteStaleOccurrences(event.id, occurrence.startDateTime);
+  else
+    await execute(
+      connection,
+      'DELETE FROM eventOccurrence WHERE eventId = ? AND startDateTime > ?',
+      [event.id, occurrence.startDateTime],
+    );
 
   // Recreate future events
   const repeatForWeeks = Math.round(
-    (getDaysBetween(occurrence.startDateTime, event.endDate) / WEEK) * DAY
+    (getDaysBetween(occurrence.startDateTime, event.endDate) / WEEK) * DAY,
   );
 
   const weekDay = new Date(occurrence.startDateTime).getDay() + 1;
   // Rotate the string so that first day matches the day after current event's day
   const rotatedWeekDays = `${event.daysOfWeek.slice(
-    weekDay
+    weekDay,
   )}${event.daysOfWeek.slice(0, weekDay)}`;
   const weekDays = rotatedWeekDays
     .split('')
@@ -93,17 +112,22 @@ export default async function endpoint(
             color: occurrence.color,
             eventId: event.id,
           } as const;
-          return execute<{ readonly insertId: number }>(
-            connection,
-            `INSERT INTO eventOccurrence (${Object.keys(record).join(', ')})
+
+          console.log({ creating: record });
+
+          return connection === undefined
+            ? inMemory.createRecord('eventOccurrence', record)?.body
+            : execute<{ readonly insertId: number }>(
+                connection,
+                `INSERT INTO eventOccurrence (${Object.keys(record).join(', ')})
             VALUES (?, ?, ?, ?, ?, ?)`,
-            Object.values(record)
-          ).then(({ insertId }) => ({
-            id: insertId,
-            ...record,
-          }));
-        })
-    ).flat()
+                Object.values(record),
+              ).then(({ insertId }) => ({
+                id: insertId,
+                ...record,
+              }));
+        }),
+    ).flat(),
   );
 
   return void response.status(Http.CREATED).json(createdOccurrences);

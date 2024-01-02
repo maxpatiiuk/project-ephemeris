@@ -5,6 +5,7 @@ import type { EventOccurrence } from '../../../../../lib/dataModel';
 import { connectToDatabase, execute } from '../../../../../lib/mysql';
 import type { RA } from '../../../../../lib/types';
 import { deserializeDate } from '../../../../../lib/utils';
+import { inMemory } from '../../../../../lib/inMemoryDatabase';
 
 export default async function endpoint(
   request: NextApiRequest,
@@ -20,11 +21,12 @@ export default async function endpoint(
   if (searchQuery.length === 0 || Number.isNaN(currentDate))
     return void response.status(Http.BAD_REQUEST).send('');
 
-  const records = await execute<
-    RA<EventOccurrence & { readonly recurring: 1 | 0 }>
-  >(
-    connection,
-    `    SELECT eventOccurrence.*,
+  const records =
+    connection === undefined
+      ? inMemory.searchAroundDate(searchQuery, currentDate)
+      : await execute<RA<EventOccurrence & { readonly recurring: 1 | 0 }>>(
+          connection,
+          `    SELECT eventOccurrence.*,
                 IF(
                   BINARY event.daysOfWeek != BINARY LOWER(event.daysOfWeek)
                   AND DATEDIFF(event.endDate,event.startDate) > 0,
@@ -35,8 +37,8 @@ export default async function endpoint(
      INNER JOIN event ON event.id = eventOccurrence.eventId
           WHERE eventOccurrence.name LIKE ?
        ORDER BY ABS(DATEDIFF(startDateTime,?) + 1)`,
-    [`%${searchQuery}%`, currentDate]
-  );
+          [`%${searchQuery}%`, currentDate],
+        );
 
   return void response.status(Http.OK).json(records);
 }

@@ -27,38 +27,44 @@ export default endpoint({
     connection,
     query: { table, ...filters },
   }: Payload<never, string>) =>
-    f.var(
-      filtersToSql(filters, parseTableName(table)),
-      async ([whereSql, values]) =>
-        queryRecords<IR<unknown>>(
-          connection,
-          `SELECT * FROM \`${parseTableName(table)}\` ${whereSql}`,
-          values
-        )
-    ),
+    connection === undefined
+      ? inMemory.queryRecords(parseTableName(table), filters)
+      : f.var(
+          filtersToSql(filters, parseTableName(table)),
+          async ([whereSql, values]) =>
+            queryRecords<IR<unknown>>(
+              connection,
+              `SELECT * FROM \`${parseTableName(table)}\` ${whereSql}`,
+              values,
+            ),
+        ),
   POST: async ({
     body,
     connection,
     query: { table },
   }: Payload<IR<unknown>, 'table'>) =>
-    execute<{ readonly insertId: number }>(
-      connection,
-      `INSERT INTO \`${parseTableName(table)}\` (${getTableColumns(table).join(
-        ', '
-      )}) VALUES (${Array.from(getTableColumns(table)).fill('?').join(', ')})`,
-      getTableColumns(table).map(
-        (column) => body[column.toLowerCase()] ?? body[column]
-      )
-    ).then(({ insertId }) => ({
-      status: Http.CREATED,
-      body: {
-        id: insertId,
-        ...Object.fromEntries(
-          getTableColumns(table).map((column) => [
-            column,
-            body[column.toLowerCase()] ?? body[column],
-          ])
-        ),
-      },
-    })),
+    connection === undefined
+      ? inMemory.createRecord(parseTableName(table), body)
+      : execute<{ readonly insertId: number }>(
+          connection,
+          `INSERT INTO \`${parseTableName(table)}\` (${getTableColumns(
+            table,
+          ).join(', ')}) VALUES (${Array.from(getTableColumns(table))
+            .fill('?')
+            .join(', ')})`,
+          getTableColumns(table).map(
+            (column) => body[column.toLowerCase()] ?? body[column],
+          ),
+        ).then(({ insertId }) => ({
+          status: Http.CREATED,
+          body: {
+            id: insertId,
+            ...Object.fromEntries(
+              getTableColumns(table).map((column) => [
+                column,
+                body[column.toLowerCase()] ?? body[column],
+              ]),
+            ),
+          },
+        })),
 });

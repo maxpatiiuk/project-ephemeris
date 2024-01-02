@@ -104,7 +104,11 @@ export function MainView({
         />
       )}
       {typeof currentOccurrence === 'object' && (
-        <MiniEvent occurrence={currentOccurrence} calendars={calendars} />
+        <MiniEvent
+          key={currentOccurrence.id}
+          occurrence={currentOccurrence}
+          calendars={calendars}
+        />
       )}
     </>
   );

@@ -13,20 +13,25 @@ Build with React, Next.js and Tailwind. Uses MySQL/MariaDB for storage.
 
 ## Configuration
 
-Ephemeris requires a MySQL/MariaDB connection to store calendars and events.
+By default, Ephemeris uses an in-memory database. This is useful for development
+and demo. For production use, it can be connected to a MySQL/MariaDB database.
+
+> WARNING: in-memory database is lost on server reload
+
+### (optional) MySQL/MariaDB configuration
 
 To configure a connection, create an `.env.local` file in the root directory
 with the following content (replace placeholder values with your credentials):
 
-```js
+```ini
 MYSQL_USERNAME=<username>
 MYSQL_PASSWORD=<password>
 MYSQL_HOST=<hostname>
 MYSQL_DATABASE=<database>
 ```
 
-Then, create a database with name that matches your `MYSQL_DATABASE` setting
-and import its schema from `./schema.sql`.
+Then, create a database with name that matches your `MYSQL_DATABASE` setting and
+import its schema from `./schema.sql`.
 
 ## Development
 

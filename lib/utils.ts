@@ -9,7 +9,7 @@ import {
 } from '../components/Internationalization';
 import { f } from './functools';
 import type { RA } from './types';
-import { defined, filterArray } from './types';
+import { filterArray } from './types';
 
 export const serializeDate = (date: Date): string =>
   date.toLocaleDateString().split('/').join('_');

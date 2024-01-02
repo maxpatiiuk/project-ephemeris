@@ -9,18 +9,15 @@ import {
 } from '../../../../../components/Basic';
 import { CalendarList } from '../../../../../components/CalendarList';
 import { CurrentTime } from '../../../../../components/CurrentTime';
-import { useAsyncState } from '../../../../../components/Hooks';
 import Layout from '../../../../../components/Layout';
 import { MainView } from '../../../../../components/MainView';
 import { MiniCalendar } from '../../../../../components/MiniCalendar';
 import { SearchBar } from '../../../../../components/SearchBar';
-import { ajax } from '../../../../../lib/ajax';
-import type { Calendar } from '../../../../../lib/dataModel';
-import { formatUrl } from '../../../../../lib/querystring';
 import { useCachedState } from '../../../../../lib/stateCache';
-import type { IR, RA } from '../../../../../lib/types';
+import type { IR } from '../../../../../lib/types';
 import { deserializeDate, serializeDate } from '../../../../../lib/utils';
 import { globalText } from '../../../../../localization/global';
+import { useCalendars } from '../../../../settings/calendars/[[...calendarId]]';
 
 export type View = 'day' | 'week' | 'month' | 'year';
 
@@ -53,19 +50,7 @@ export default function Index(): JSX.Element {
     return serializeDate(newDate);
   }, [currentDate, view]);
 
-  const [calendars] = useAsyncState(
-    React.useCallback(
-      async () =>
-        ajax<RA<Calendar>>(
-          formatUrl('/api/table/calendar', { orderBy: 'name' }),
-          {
-            headers: { Accept: 'application/json' },
-          }
-        ).then(({ data }) => data),
-      []
-    ),
-    false
-  );
+  const calendars = useCalendars();
 
   const [disabledCalendars, setDisabledCalendars] = useCachedState({
     bucketName: 'main',

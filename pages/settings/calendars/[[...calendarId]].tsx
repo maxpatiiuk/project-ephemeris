@@ -15,22 +15,31 @@ import { useAsyncState, useLiveState } from '../../../components/Hooks';
 import { icons } from '../../../components/Icons';
 import Layout from '../../../components/Layout';
 import { ajax, Http, ping } from '../../../lib/ajax';
-import type { Calendar, New } from '../../../lib/dataModel';
+import type { Calendar } from '../../../lib/dataModel';
 import { f } from '../../../lib/functools';
 import type { IR, RA } from '../../../lib/types';
 import { globalText } from '../../../localization/global';
+import { formatUrl } from '../../../lib/querystring';
 
-export default function Calendars(): JSX.Element {
-  const [calendars] = useAsyncState<RA<New<Calendar>>>(
+export function useCalendars() {
+  return useAsyncState<RA<Calendar>>(
     React.useCallback(
       async () =>
-        ajax<RA<Calendar>>('/api/table/calendar', {
-          headers: { Accept: 'application/json' },
-        }).then(({ data }) => data),
-      []
+        ajax<RA<Calendar>>(
+          formatUrl('/api/table/calendar', { orderBy: 'name' }),
+          {
+            headers: { Accept: 'application/json' },
+          },
+        ).then(({ data }) => data),
+      [],
     ),
-    true
-  );
+    true,
+  )[0];
+}
+
+export default function Calendars(): JSX.Element {
+  const calendars = useCalendars();
+
   const router = useRouter();
   const rawCalendarId =
     (router.query.calendarId as RA<string> | undefined)?.[0] ?? '';
@@ -44,15 +53,15 @@ export default function Calendars(): JSX.Element {
             ? Object.values(calendars)[0]
             : undefined
           : selectedCalendar === 'new'
-          ? {
-              id: undefined,
-              name: globalText('myCalendar'),
-              description: '',
-              color: '#123abc',
-            }
-          : calendars?.[selectedCalendar ?? -1],
-      [calendars, selectedCalendar]
-    )
+            ? {
+                id: undefined,
+                name: globalText('myCalendar'),
+                description: '',
+                color: '#123abc',
+              }
+            : calendars?.[selectedCalendar ?? -1],
+      [calendars, selectedCalendar],
+    ),
   );
   const loading = React.useContext(LoadingContext);
 
