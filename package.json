@@ -17,7 +17,7 @@
   "dependencies": {
     "@tailwindcss/forms": "^0.5.7",
     "mysql2": "^3.6.5",
-    "next": "^14.0.4",
+    "next": "^14.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-modal": "^3.16.1",
